@@ -7,7 +7,7 @@ const headers = {
 };
 //alert(process.env.REST_URL);
 const badalsAPI = axios.create({
-    baseURL: 'http://api.badals.com/api', //process.env.REST_URL,
+    baseURL: 'https://api.badals.com/api', //process.env.REST_URL,
     headers: headers
 });
 
