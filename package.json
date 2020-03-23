@@ -11,6 +11,7 @@
     "apollo-boost": "^0.4.7",
     "axios": "^0.19.2",
     "baseui": "^9.64.1",
+    "express": "^4.17.1",
     "formik": "^2.1.4",
     "graphql": "^14.6.0",
     "mobile-detect": "^1.4.4",
