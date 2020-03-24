@@ -309,7 +309,7 @@ export default function Orders() {
                             <Moment format='Do MMM YYYY'>{row.createdDate}</Moment>
                           </StyledCell>
                           <StyledCell>{row.deliveryAddress.firstName}</StyledCell>
-                          <StyledCell>${row.total}</StyledCell>
+                          <StyledCell>OMR {row.total}</StyledCell>
                           <StyledCell>{row.paymentMethod}</StyledCell>
                           <StyledCell>{row.orderState}</StyledCell>
                           <StyledCell style={{ justifyContent: 'center' }}>

@@ -11,7 +11,12 @@ import Routes from './routes';
 import ApolloClient from 'apollo-boost';
 import * as serviceWorker from './serviceWorker';
 import './theme/global.css';
-
+import { positions, Provider } from "react-alert";
+import AlertTemplate from "react-alert-template-basic";
+const options = {
+  timeout: 5000,
+  position: positions.BOTTOM_CENTER
+};
 const client = new ApolloClient({
   uri: process.env.REACT_APP_API_URL,
 });
@@ -22,11 +27,14 @@ function App() {
   return (
     <ApolloProvider client={client as any}>
       <StyletronProvider value={engine}>
+        <Provider template={AlertTemplate} {...options}>
         <BaseProvider theme={theme}>
           <BrowserRouter>
+
             <Routes />
           </BrowserRouter>
         </BaseProvider>
+        </Provider>
       </StyletronProvider>
     </ApolloProvider>
   );

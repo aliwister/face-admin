@@ -25,6 +25,7 @@ import StickerCard from "../../components/Widgets/StickerCard/StickerCard";
 import {CartIconBig, CoinIcon} from "../../components/AllSvgIcon";
 import Image from '../../components/Image/Image';
 import Button from "../../components/Button/Button";
+import Payment from "./Payment";
 
 const GET_ORDER = gql`
   query orderA($id: ID) {
@@ -223,7 +224,7 @@ export default function OrderDetails(props) {
               </StickerCard>
             </Col>
             <Col lg={3} sm={6} xs={12} className='mb-30'>
-              <Button onClick={contactBySms} >Contact By SMS</Button>
+              <Payment orderId={slug} orderRef={data.orderA.reference}/>
             </Col>
           </Row>
 
