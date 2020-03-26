@@ -1,351 +1,230 @@
 import React, { useState } from 'react';
 import { styled, withStyle, createThemedUseStyletron } from 'baseui';
+import { makeStyles } from '@material-ui/core/styles';
 import Moment from 'react-moment';
 import {
   Grid,
   Row as Rows,
   Col as Column,
 } from '../../components/FlexBox/FlexBox';
-import Select from '../../components/Select/Select';
-import Input from '../../components/Input/Input';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import {useMutation, useQuery} from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
-import Checkbox from '../../components/CheckBox/CheckBox';
-
-import {
-  TableWrapper,
-  StyledTable,
-  StyledHeadCell,
-  StyledCell,
-} from '../Orders/Orders.style';
-import NoResult from '../../components/NoResult/NoResult';
-import { Link } from 'react-router-dom';
-
-const GET_ORDERS = gql`
-  query getOrders($state: [OrderState], $limit: Int, $searchText: String) {
-    ordersA(state: $state, limit: $limit, searchText: $searchText) {
+import { useAlert } from "react-alert";
+import { TableRow, TableHead, TableContainer, Table, Paper,
+  TableCell,Typography,
+  TableBody } from '@material-ui/core';
+import Image from "../../components/Image/Image";
+import SaveIcon from '@material-ui/icons/Save';
+import DeleteIcon from '@material-ui/icons/Delete';
+const CREATE_PURCHASE = gql`
+  mutation createPurchase($dto: PurchaseInput) {
+    createPurchase(dto: $dto) {
       id
-      
-      reference
-      createdDate
-      invoiceDate
-      total
-      invoiceDate
-      paymentMethod
-      subtotal
-      orderState
-      deliveryTotal
-      discountsTotal
-      deliveryDate
-      deliveryAddress {
-          firstName
-          lastName
-          line1
-          line1
-          city
-      }
-      orderItems {
-        productName
-        price
-        quantity
-        image
-        lineTotal
-      }
+    }
+  }
+`;
+const UPDATE_PURCHASE = gql`
+  mutation updatePurchase($dto: PurchaseInput, $items: [PurchaseItemInput]) {
+    updatePurchase(dto: $dto, items: $items) {
+      id
     }
   }
 `;
 
-type CustomThemeT = { red400: string; textNormal: string; colors: any };
-const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
-
-const Status = styled('div', ({ $theme }) => ({
-  ...$theme.typography.fontBold14,
-  color: $theme.colors.textDark,
-  display: 'flex',
-  alignItems: 'center',
-  lineHeight: '1',
-  textTransform: 'capitalize',
-
-  ':before': {
-    content: '""',
-    width: '10px',
-    height: '10px',
-    display: 'inline-block',
-    borderRadius: '10px',
-    backgroundColor: $theme.borders.borderE6,
-    marginRight: '10px',
+const PURCHASE_QUEUE = gql`
+query purchaseQueue {
+  purchaseQueue {
+    id
+    productName
+    quantity
+    price
+    image
+  }
+}
+`;
+const PURCHASE = gql`
+query purchase($id: Long) {
+  purchase(id: $id) {
+    id
+    items {
+      id
+      sequence
+      price
+      quantity
+      description
+      orderItemId
+    }
+  }
+}
+`;
+const useStyles = makeStyles(theme => ({
+  table: {
+    minWidth: 650,
+  },
+  button: {
+    margin: theme.spacing(1),
   },
 }));
 
-const Col = withStyle(Column, () => ({
-  '@media only screen and (max-width: 767px)': {
-    marginBottom: '20px',
-
-    ':last-child': {
-      marginBottom: 0,
-    },
-  },
-}));
-
-const Row = withStyle(Rows, () => ({
-  '@media only screen and (min-width: 768px)': {
-    alignItems: 'center',
-  },
-}));
-
-const statusSelectOptions = [
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'failed', label: 'Failed' },
-];
-const limitSelectOptions = [
-  { value: 7, label: 'Last 7 orders' },
-  { value: 15, label: 'Last 15 orders' },
-  { value: 30, label: 'Last 30 orders' },
-];
 
 export default function Purchases() {
-  const [checkedId, setCheckedId] = useState([]);
-  const [checked, setChecked] = useState(false);
+  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE);
+  const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE);
+  const [po, setPO] = useState(0);
+  const [items, setItems] = useState([]);
+  const [create, setCreate] = useState(true);
+  const [update, setUpdate] = useState(false);
+  const [pqButton, setPQButton] = useState([]);
 
-  const [useCss, theme] = themedUseStyletron();
-  const sent = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.primary,
-    },
-  });
-  const failed = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.red400,
-    },
-  });
-  const processing = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.textNormal,
-    },
-  });
-  const paid = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.blue400,
-    },
-  });
+  const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only"});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = useQuery(PURCHASE, {fetchPolicy: "network-only"});
+  const alert = useAlert();
+  const classes = useStyles();
 
-  const [status, setStatus] = useState([]);
-  const [limit, setLimit] = useState([]);
-  const [search, setSearch] = useState([]);
+  const createPurchase = async () => {
+    const dto = {merchantId: 1, currency: "OMR"};
+    const {
+      data: { createPurchase },
+    }: any = await createPurchaseMutation({
+      variables: { dto: dto },
+    });
+    if(createPurchase)  {
+      alert.success(createPurchase.id);
+      setPO(createPurchase.id);
+      setCreate(false);
+    }
+  }
 
-  const { data, error, refetch } = useQuery(GET_ORDERS, {
-    variables: {
-      status: ['PAYMENT_ACCEPTED'],
-      limit: 10,
-      searchText: "",
-    },
-    fetchPolicy: "network-only"
+  const savePurchase = async () => {
+    const dto = {id: po, merchantId: 1, currency: "OMR"};
+    const {
+      data: { updatePurchase },
+    }: any = await updatePurchaseMutation({
+      variables: { dto, items },
+    });
+    if(updatePurchase)  {
+      alert.success("Purchase saved successfully");
+      //setPO(createPurchase.id);
+      setCreate(true);
+      //setItems(updatePurchase.items);
+    }
+  }
 
-  });
+  const addToPurchase = ({id,price,quantity, productName}) => {
+    setItems([
+        ...items,
+      {
+        sequence:items.length+1,
+        price: price,
+        quantity: quantity,
+        description: productName,
+        orderItemId: id
+      }]);
+  }
+
   if (error) {
     return <div>Error! {error.message}</div>;
   }
-
-  function handleStatus({ value }) {
-    setStatus(value);
-    if (value.length) {
-      refetch({
-        status: [value[0].value],
-        limit: limit.length ? limit[0].value : null,
-        searchText: "",
-      });
-    } else {
-      refetch({ status: [], limit:10, searchText:"" });
-    }
+  if(loading) {
+    return <div>Loading</div>
   }
 
-  function handleLimit({ value }) {
-    setLimit(value);
-    if (value.length) {
-      refetch({
-        status: status.length ? [status[0].value] : [],
-        limit: value[0].value,
-        searchText: ""
-      });
-    } else {
-      refetch({ status: [], limit:10, searchText:"" });
-    }
-  }
-  function handleSearch(event) {
-    const { value } = event.currentTarget;
-    setSearch(value);
-    refetch({ status: [], limit:10, searchText:value });
-  }
-  function onAllCheck(event) {
-    if (event.target.checked) {
-      const idx = data && data.orders.map(order => order.id);
-      setCheckedId(idx);
-    } else {
-      setCheckedId([]);
-    }
-    setChecked(event.target.checked);
-  }
-
-  function handleCheckbox(event) {
-    const { name } = event.currentTarget;
-    if (!checkedId.includes(name)) {
-      setCheckedId(prevState => [...prevState, name]);
-    } else {
-      setCheckedId(prevState => prevState.filter(id => id !== name));
-    }
-  }
   return (
-    <Grid fluid={true}>
-      <Row>
-        <Col md={12}>
-          <Header
-            style={{
-              marginBottom: 30,
-              boxShadow: '0 0 8px rgba(0, 0 ,0, 0.1)',
-            }}
-          >
-            <Col md={3} xs={12}>
-              <Heading>Orders</Heading>
-            </Col>
 
-            <Col md={9} xs={12}>
-              <Row>
-                <Col md={3} xs={12}>
-                  <Select
-                    options={statusSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    placeholder='Status'
-                    value={status}
-                    searchable={false}
-                    onChange={handleStatus}
-                  />
-                </Col>
+      <Grid item xs={12} md={12}>
+        <Heading>Purchases</Heading>
+        <TextField id="outlined-basic" label="Outlined" variant="outlined" value={po}/>
 
-                <Col md={3} xs={12}>
-                  <Select
-                    options={limitSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    value={limit}
-                    placeholder='Order Limits'
-                    searchable={false}
-                    onChange={handleLimit}
-                  />
-                </Col>
+        <Button variant="contained" color="primary" onClick={createPurchase} disabled={!create}>
+          Create New Purchase
+        </Button><Button variant="contained" color="primary" onClick={savePurchase}>
+          Save Purchase
+        </Button>
+        <Typography variant="h6">Purchase Items</Typography>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell></TableCell>
+                <TableCell align="right">Description</TableCell>
+                <TableCell align="right">Quantity</TableCell>
+                <TableCell align="right">Price</TableCell>
+                <TableCell align="right">Link</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items.map(q => (
+                  <TableRow key={q.orderId}>
+                    <TableCell align="right">{q.id}</TableCell>
+                    <TableCell component="th" scope="row">
+                      {q.description}
+                    </TableCell>
+                    <TableCell align="right">{q.quantity}</TableCell>
+                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">
+                      <Button
+                          variant="contained"
+                          color="secondary"
+                          className={classes.button}
+                          startIcon={<DeleteIcon />}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
 
-                <Col md={6} xs={12}>
-                  <Input
-                    value={search}
-                    placeholder='Ex: Search By Address'
-                    onChange={handleSearch}
-                    clearable
-                  />
-                </Col>
-              </Row>
-            </Col>
-          </Header>
+                  </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-          <Wrapper style={{ boxShadow: '0 0 5px rgba(0, 0 , 0, 0.05)' }}>
-            <TableWrapper>
-              <StyledTable $gridTemplateColumns='minmax(70px, 70px) minmax(70px, 70px) minmax(150px, auto) minmax(150px, auto) minmax(200px, max-content) minmax(150px, auto) minmax(150px, auto) minmax(150px, auto) minmax(150px, auto)'>
-                <StyledHeadCell>
-                  <Checkbox
-                    type='checkbox'
-                    value='checkAll'
-                    checked={checked}
-                    onChange={onAllCheck}
-                    overrides={{
-                      Checkmark: {
-                        style: {
-                          borderWidth: '2px',
-                          borderRadius: '4px',
-                        },
-                      },
-                    }}
-                  />
-                </StyledHeadCell>
-                <StyledHeadCell>ID</StyledHeadCell>
-                <StyledHeadCell>Customer ID</StyledHeadCell>
-                <StyledHeadCell>Time</StyledHeadCell>
-                <StyledHeadCell>Delivery Address</StyledHeadCell>
-                <StyledHeadCell>Amount</StyledHeadCell>
-                <StyledHeadCell>Payment Method</StyledHeadCell>
-                <StyledHeadCell>Contact</StyledHeadCell>
-                <StyledHeadCell>Status</StyledHeadCell>
+        <Typography variant="h6">PurchaseQueue</Typography>
+      <Button variant="contained" color="secondary" onClick={()=>{refetch({})}}>
+          Refresh
+      </Button>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell></TableCell>
+                <TableCell align="right">Description</TableCell>
+                <TableCell align="right">Quantity</TableCell>
+                <TableCell align="right">Price</TableCell>
+                <TableCell align="right">Link</TableCell>
+              </TableRow>
+            </TableHead>
+            {data && <TableBody>
+              {data.purchaseQueue.map(q => (
+                  <TableRow key={q.id}>
+                    <TableCell align="right">{q.id}</TableCell>
+                    <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
+                    <TableCell component="th" scope="row">
+                      {q.productName}
+                    </TableCell>
+                    <TableCell align="right">{q.quantity}</TableCell>
+                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">
+                      <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          className={classes.button}
+                          startIcon={<SaveIcon />}
+                          onClick={()=>addToPurchase(q)}
+                      />
+                    </TableCell>
 
-                {data ? (
-                  data.ordersA.length ? (
-                    data.ordersA
-                      //.map(item => Object.values(item))
-                      .map((row, index) => (
-                        <React.Fragment key={index}>
-                          <StyledCell>
-                            <Checkbox
-                              name={row.id}
-                              checked={checkedId.includes(row.id)}
-                              onChange={handleCheckbox}
-                              overrides={{
-                                Checkmark: {
-                                  style: {
-                                    borderWidth: '2px',
-                                    borderRadius: '4px',
-                                  },
-                                },
-                              }}
-                            />
-                          </StyledCell>
-                          <StyledCell><div><Link to={`order-details/${row.id}`}>{row.id}</Link></div></StyledCell>
-                          <StyledCell>{row.reference}</StyledCell>
-                          <StyledCell>
-                            <Moment format='Do MMM YYYY'>{row.createdDate}</Moment>
-                          </StyledCell>
-                          <StyledCell>{row.deliveryAddress.firstName}</StyledCell>
-                          <StyledCell>${row.total}</StyledCell>
-                          <StyledCell>{row.paymentMethod}</StyledCell>
-                          <StyledCell>{row.orderState}</StyledCell>
-                          <StyledCell style={{ justifyContent: 'center' }}>
-                            <Status
-                              className={
-                                row[7] === 'delivered'
-                                  ? sent
-                                  : row[7] === 'pending'
-                                  ? paid
-                                  : row[7] === 'processing'
-                                  ? processing
-                                  : row[7] === 'failed'
-                                  ? failed
-                                  : ''
-                              }
-                            >
-                              {row[7]}
-                            </Status>
-                          </StyledCell>
-                        </React.Fragment>
-                      ))
-                  ) : (
-                    <NoResult
-                      hideButton={false}
-                      style={{
-                        gridColumnStart: '1',
-                        gridColumnEnd: 'one',
-                      }}
-                    />
-                  )
-                ) : null}
-              </StyledTable>
-            </TableWrapper>
-          </Wrapper>
-        </Col>
-      </Row>
+                  </TableRow>
+              ))}
+            </TableBody>}
+          </Table>
+        </TableContainer>
     </Grid>
   );
 }

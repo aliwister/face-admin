@@ -19,7 +19,7 @@ const isValidToken = () => {
 };
 
 const AuthProvider = (props: any) => {
-  const [isAuthenticated, makeAuthenticated] = React.useState(false);
+  const [isAuthenticated, makeAuthenticated] = React.useState(true);
   const [token, setToken] = React.useState("");
 
   function authenticate({ username, password }, cb) {

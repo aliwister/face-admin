@@ -10,7 +10,7 @@ import {
 import {
   DASHBOARD,
   PRODUCTS,
-  CATEGORY,
+  PURCHASES,
   ORDERS,
   CUSTOMERS,
   COUPONS,
@@ -42,8 +42,8 @@ const sidebarMenus = [
     icon: <ProductIcon />,
   },
   {
-    name: 'Category',
-    path: CATEGORY,
+    name: 'Purchasing',
+    path: PURCHASES,
     exact: false,
     icon: <SidebarCategoryIcon />,
   },

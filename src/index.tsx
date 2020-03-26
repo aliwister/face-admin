@@ -20,6 +20,9 @@ const options = {
 const client = new ApolloClient({
   uri: process.env.REACT_APP_API_URL,
 });
+import { createMuiTheme} from '@material-ui/core/styles';
+import { ThemeProvider } from 'styled-components';
+const mtheme = createMuiTheme();
 
 function App() {
   const engine = new Styletron();
@@ -27,6 +30,7 @@ function App() {
   return (
     <ApolloProvider client={client as any}>
       <StyletronProvider value={engine}>
+        <ThemeProvider theme={mtheme}>
         <Provider template={AlertTemplate} {...options}>
         <BaseProvider theme={theme}>
           <BrowserRouter>
@@ -35,6 +39,7 @@ function App() {
           </BrowserRouter>
         </BaseProvider>
         </Provider>
+        </ThemeProvider>
       </StyletronProvider>
     </ApolloProvider>
   );

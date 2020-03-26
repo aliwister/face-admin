@@ -14,6 +14,7 @@ import {
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
+import Purchases from "./containers/Purchases/Purchases";
 const Products = lazy(() => import("./containers/Products/Products"));
 const AdminLayout = lazy(() => import("./containers/Layout/Layout"));
 const Dashboard = lazy(() => import("./containers/Dashboard/Dashboard"));
@@ -104,7 +105,7 @@ const Routes = () => {
           <PrivateRoute path={PURCHASES}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
-                <Orders />
+                <Purchases />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
