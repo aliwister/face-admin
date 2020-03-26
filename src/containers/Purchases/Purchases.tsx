@@ -96,6 +96,7 @@ export default function Purchases() {
       alert.success(createPurchase.id);
       setPO(createPurchase.id);
       setCreate(false);
+      setItems([]);
     }
   }
 
