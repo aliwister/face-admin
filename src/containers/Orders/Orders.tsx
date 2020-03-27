@@ -13,21 +13,21 @@ import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import Checkbox from '../../components/CheckBox/CheckBox';
-
+import { useAlert } from "react-alert";
 import {
-  TableWrapper,
-  StyledTable,
-  StyledHeadCell,
-  StyledCell,
+  OrderInfoPaper
 } from './Orders.style';
 import NoResult from '../../components/NoResult/NoResult';
 import { Link } from 'react-router-dom';
+import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import DeleteIcon from "@material-ui/icons/Delete";
+import {makeStyles} from "@material-ui/core/styles";
 
 const GET_ORDERS = gql`
   query getOrders($state: [OrderState], $limit: Int, $searchText: String) {
     ordersA(state: $state, limit: $limit, searchText: $searchText) {
       id
-      
       reference
       createdDate
       invoiceDate
@@ -56,6 +56,14 @@ const GET_ORDERS = gql`
     }
   }
 `;
+const useStyles = makeStyles(theme => ({
+  table: {
+    minWidth: 650,
+  },
+  button: {
+    margin: theme.spacing(1),
+  },
+}));
 
 type CustomThemeT = { red400: string; textNormal: string; colors: any };
 const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
@@ -110,6 +118,11 @@ const limitSelectOptions = [
 export default function Orders() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [status, setStatus] = useState([]);
+  const [limit, setLimit] = useState([]);
+  const [search, setSearch] = useState([]);
+  const alert = useAlert();
+  const classes = useStyles();
 
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
@@ -137,9 +150,6 @@ export default function Orders() {
     },
   });
 
-  const [status, setStatus] = useState([]);
-  const [limit, setLimit] = useState([]);
-  const [search, setSearch] = useState([]);
 
   const { data, error, refetch } = useQuery(GET_ORDERS, {
     variables: {
@@ -193,7 +203,6 @@ export default function Orders() {
     }
     setChecked(event.target.checked);
   }
-
   function handleCheckbox(event) {
     const { name } = event.currentTarget;
     if (!checkedId.includes(name)) {
@@ -254,42 +263,26 @@ export default function Orders() {
             </Col>
           </Header>
 
-          <Wrapper style={{ boxShadow: '0 0 5px rgba(0, 0 , 0, 0.05)' }}>
-            <TableWrapper>
-              <StyledTable $gridTemplateColumns='minmax(70px, 70px) minmax(70px, 70px) minmax(150px, auto) minmax(150px, auto) minmax(200px, max-content) minmax(150px, auto) minmax(150px, auto) minmax(150px, auto) minmax(150px, auto)'>
-                <StyledHeadCell>
-                  <Checkbox
-                    type='checkbox'
-                    value='checkAll'
-                    checked={checked}
-                    onChange={onAllCheck}
-                    overrides={{
-                      Checkmark: {
-                        style: {
-                          borderWidth: '2px',
-                          borderRadius: '4px',
-                        },
-                      },
-                    }}
-                  />
-                </StyledHeadCell>
-                <StyledHeadCell>ID</StyledHeadCell>
-                <StyledHeadCell>Customer ID</StyledHeadCell>
-                <StyledHeadCell>Time</StyledHeadCell>
-                <StyledHeadCell>Delivery Address</StyledHeadCell>
-                <StyledHeadCell>Amount</StyledHeadCell>
-                <StyledHeadCell>Payment Method</StyledHeadCell>
-                <StyledHeadCell>Contact</StyledHeadCell>
-                <StyledHeadCell>Status</StyledHeadCell>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>ID</TableCell>
+                  <TableCell align="left">Ref</TableCell>
+                  <TableCell align="left">Name</TableCell>
+                  <TableCell align="right">Amount</TableCell>
+                  <TableCell align="center">Payment</TableCell>
+                  <TableCell align="center">Date</TableCell>
+                  <TableCell align="center">Status</TableCell>
+                </TableRow>
+              </TableHead>
+              {data && data.ordersA.length && (
+              <TableBody>
 
-                {data ? (
-                  data.ordersA.length ? (
-                    data.ordersA
-                      //.map(item => Object.values(item))
-                      .map((row, index) => (
-                        <React.Fragment key={index}>
-                          <StyledCell>
-                            <Checkbox
+                {data.ordersA.map(row => (
+                    <TableRow key={row.orderId}>
+                      <TableCell align="right"><Checkbox
                               name={row.id}
                               checked={checkedId.includes(row.id)}
                               onChange={handleCheckbox}
@@ -301,49 +294,40 @@ export default function Orders() {
                                   },
                                 },
                               }}
-                            />
-                          </StyledCell>
-                          <StyledCell><div><Link to={`order-details/${row.id}`}>{row.id}</Link></div></StyledCell>
-                          <StyledCell>{row.reference}</StyledCell>
-                          <StyledCell>
-                            <Moment format='Do MMM YYYY'>{row.createdDate}</Moment>
-                          </StyledCell>
-                          <StyledCell>{row.deliveryAddress.firstName}</StyledCell>
-                          <StyledCell>OMR {row.total}</StyledCell>
-                          <StyledCell>{row.paymentMethod}</StyledCell>
-                          <StyledCell>{row.orderState}</StyledCell>
-                          <StyledCell style={{ justifyContent: 'center' }}>
-                            <Status
-                              className={
-                                row[7] === 'delivered'
+                            /></TableCell>
+                      <TableCell component="th" scope="row">
+                       <Link to={`order-details/${row.id}`}>{row.id}</Link>
+                      </TableCell>
+                      <TableCell align="left">{row.reference}</TableCell>
+
+                      <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
+                      <TableCell align="right">OMR {row.total}</TableCell>
+
+                      <TableCell align="center">{row.paymentMethod}</TableCell>
+                      <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
+                      <TableCell align="right">
+                        <Status
+                            className={
+                              row.orderState === 'Delivered'
                                   ? sent
-                                  : row[7] === 'pending'
+                                  : row.orderState === 'PAYMENT_ACCEPTED'
                                   ? paid
-                                  : row[7] === 'processing'
-                                  ? processing
-                                  : row[7] === 'failed'
-                                  ? failed
-                                  : ''
-                              }
-                            >
-                              {row[7]}
-                            </Status>
-                          </StyledCell>
-                        </React.Fragment>
-                      ))
-                  ) : (
-                    <NoResult
-                      hideButton={false}
-                      style={{
-                        gridColumnStart: '1',
-                        gridColumnEnd: 'one',
-                      }}
-                    />
-                  )
-                ) : null}
-              </StyledTable>
-            </TableWrapper>
-          </Wrapper>
+                                  : row.orderState === 'AWAITING_PAYMENT'
+                                      ? processing
+                                      : row.orderState === 'CANCELLED'
+                                          ? failed
+                                          : ''
+                            }
+                        >
+                          {row.orderState}
+                        </Status>
+                      </TableCell>
+                    </TableRow>
+                ))}
+              </TableBody>
+                  )}
+            </Table>
+          </TableContainer>
         </Col>
       </Row>
     </Grid>

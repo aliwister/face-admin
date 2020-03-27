@@ -13,7 +13,8 @@ export const SETTINGS = '/settings';
 export const STUFF_MEMBERS = '/staff-members';
 export const SITE_SETTINGS = '/site-settings';
 export const PURCHASES = '/purchases';
-export const PURCHASEDETAILS = '/purchase-details';
+export const PURCHASEDETAILS = '/purchase-details/:slug';
+export const CART = '/cart';
 // **************** ROUTE CONSTANT END **************************
 
 export const CURRENCY = '$';

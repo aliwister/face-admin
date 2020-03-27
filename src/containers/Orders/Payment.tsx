@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { useAlert } from "react-alert";
 import { useForm } from 'react-hook-form';
-import {
-  Grid,
-  Row,
-  Col,
-} from '../../components/FlexBox/FlexBox';
-
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
-import Button from "../../components/Button/Button";
-import Input from '../../components/Input/Input';
-import Select from "../../components/Select/Select";
+import {Snackbar} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Select from "@material-ui/core/Select";
+import { useAlert } from "react-alert";
+import Paper from "@material-ui/core/Paper";
+import {OrderInfoPaper} from "./Orders.style";
+import MenuItem from "@material-ui/core/MenuItem";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import FormControl from "@material-ui/core/FormControl";
 
 //const
 
@@ -49,11 +49,26 @@ mutation addPayment($id: ID, $amount: BigDecimal, $method: String) {
 }
 `;
 
+const useStyles = makeStyles(theme => ({
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 180,
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
+    },
+    textbox: {
+        width: 120,
+        margin: theme.spacing(1)
+    }
+}));
+
 export default function Payment({orderId, orderRef}) {
   const [b1,setB1] = useState(true);
   const [b2,setB2] = useState(true);
-  const [b3,setB3] = useState(true);
+
   const [amount, setAmount] = useState([]);
+  const [snack, setSnack] = useState(false);
   const [method, setMethod] = useState(false);
   const [auth, setAuth] = useState(false);
   const { register, handleSubmit, errors } = useForm();
@@ -61,6 +76,7 @@ export default function Payment({orderId, orderRef}) {
   const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL);
   const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS);
   const alert = useAlert();
+  const classes = useStyles();
 
   const onSubmit = async data => {
     console.log(data);
@@ -88,48 +104,32 @@ export default function Payment({orderId, orderRef}) {
     }
   }
 
-  const onSendSms = async data => {
-    console.log(data);
-    setB3(false);
-    const {
-        data: { sendPaymentSms },
-    }: any = await sendPaymentSmsMutation({
-        variables: {id: orderId}
-    });
-    if(sendPaymentSms)  {
-        alert.success(sendPaymentSms.value);
-    }
-  }
-  /*const { data, loading, error, refetch } = useQuery(GET_PAYMENTS, {
-    variables: {
-      id: slug
-    },
-    fetchPolicy: "network-only"
-  });
 
-  //const []
-
-  if (error) {
-    return <div>Error! {error.message}</div>;
-  }
-  if (loading)
-    return <div>Loading </div>
-*/
   return (
     <>
+        <OrderInfoPaper>
         <form onSubmit={handleSubmit(onSubmit)}>
-            <select name="method" ref={register({ required: true })}>
-                <option value="POS">POS</option>
-                <option value="CHECKOUTCOM">CHECKOUTCOM</option>
-                <option value="BMB">Bank Transfer</option>
-                <option value="CASH">CASH</option>
-            </select>
-            <Input type="text" placeholder="Amount" name="Amount" onChange={e=>setAmount(e.target.value)} useRef={register({required: true, max: 1000, min: 1, maxLength: 5})} />
-            <Input type="text" placeholder="Auth Code" name="Auth Code" onChange={e=>setAuth(e.target.value)} useRef={register({required: true, maxLength: 6, pattern: /^\S+@\S+$/i})} />
-            <Button type="submit" disabled={!b1}>Add Payment</Button>
+
+            <TextField variant="filled" placeholder="Amount" name="Amount" className={classes.textbox} inputRef={register({required: true, max: 1000, min: 1, maxLength: 5})} />
+            <TextField variant="filled" type="text" placeholder="Auth Code" name="Auth Code" className={classes.textbox} inputRef={register({required: true, maxLength: 6, pattern: /^\S+@\S+$/i})} />
+            <FormControl variant="filled" className={classes.formControl}>
+                <Select native name="method" inputRef={register({ required: true })}>
+                    <option value="POS">POS</option>
+                    <option value="CHECKOUTCOM">CHECKOUTCOM</option>
+                    <option value="BMB">Bank Transfer</option>
+                    <option value="CASH">CASH</option>
+                </Select>
+            </FormControl>
+            <Button variant="contained" color="primary" type="submit" size="large" disabled={!b1}>Add</Button>
         </form>
-        <Button onClick={onSendSms} disabled={!b3}>Contact By SMS</Button>
         <Button onClick={onSendOrderCreateEmail} disabled={!b2}>Send Order Confirmation</Button>
+        </OrderInfoPaper>
+{/*        <Snackbar open={snack} autoHideDuration={6000} onClose={()=>{setSnack(false)}}>
+            <Alert onClose={handleClose} severity="success">
+                This is a success message!
+            </Alert>
+        </Snackbar>*/}
+
     </>
   );
 }

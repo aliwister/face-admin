@@ -38,10 +38,13 @@ const GET_ORDERS = gql`
       merchantObj {
         name
       }
+      deliveryAddressId
       purchaseItems {
-        description
+        productName
         price
         quantity
+        image
+        lineTotal
       }
     }
   }
@@ -105,7 +108,7 @@ const limitSelectOptions = [
   { value: 30, label: 'Last 30 orders' },
 ];
 
-export default function Purchases() {
+export default function Carts() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState([]);
@@ -140,7 +143,7 @@ export default function Purchases() {
     },
   });
 
-  alert.success('in purchases');
+
   const { data, error, refetch } = useQuery(GET_ORDERS, {
     variables: {
       status: [],
@@ -270,7 +273,7 @@ export default function Purchases() {
                 {data && data.purchases.length && (
                     <TableBody>
 
-                      {data.purchases.map(row => (
+                      {data.ordersA.map(row => (
                           <TableRow key={row.orderId}>
                             <TableCell align="right"><Checkbox
                                 name={row.id}
@@ -286,14 +289,14 @@ export default function Purchases() {
                                 }}
                             /></TableCell>
                             <TableCell component="th" scope="row">
-                              <Link to={`purchase-details/${row.id}`}>{row.id}</Link>
+                              <Link to={`order-details/${row.id}`}>{row.id}</Link>
                             </TableCell>
-                            <TableCell align="left">{row.merchantObj.name}</TableCell>
+                            <TableCell align="left">{row.reference}</TableCell>
 
-                            <TableCell align="left">{row.deliveryTotal}</TableCell>
-                            <TableCell align="right">{row.taxesTotal}</TableCell>
+                            <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
+                            <TableCell align="right">OMR {row.total}</TableCell>
 
-                            <TableCell align="center">OMR {row.total}</TableCell>
+                            <TableCell align="center">{row.paymentMethod}</TableCell>
                             <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                             <TableCell align="right">
                               <Status
