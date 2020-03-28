@@ -13,7 +13,7 @@ import { Wrapper, FormWrapper, LogoImage, LogoWrapper } from './Login.style';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
 import Logoimage from '../../image/logo.svg';
-
+import { useAlert } from "react-alert";
 const initialValues = {
   username: '',
   password: '',
@@ -35,12 +35,29 @@ export default () => {
   let location = useLocation();
   const { authenticate, isAuthenticated } = useContext(AuthContext);
   if (isAuthenticated) return <Redirect to={{ pathname: '/' }} />;
-
+    const alert = useAlert();
   let { from } = (location.state as any) || { from: { pathname: '/' } };
-  let login = ({ username, password }) => {
-    authenticate({ username, password }, () => {
-      history.replace(from);
-    });
+  let login = async ({username, password}) => {
+      let x = await authenticate({username, password}, () => {
+          history.replace(from);
+      }).catch(function (error) {
+          if (error.response) {
+              // Request made and server responded
+              console.log(error.response.data);
+              alert.error(error.response.data.title + ' ' + error.response.data.detail);
+              //console.log(error.response.status);
+              //console.log(error.response.headers);
+
+              return error.response.data.detail;
+          } else if (error.request) {
+              // The request was made but no response was received
+              //console.log(error.request);
+          } else {
+              // Something happened in setting up the request that triggered an Error
+              //console.log('Error', error.message);
+          }
+      });;
+
   };
   return (
     <Wrapper>

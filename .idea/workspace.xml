@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="02c373d3-6f6e-44b1-962d-784f3be0a5c4" name="Default Changelist" comment="" />
+    <list default="true" id="02c373d3-6f6e-44b1-962d-784f3be0a5c4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/Login/Login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/Login/Login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/Orders/Payment.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/Orders/Payment.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/Purchases/Purchases.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/Purchases/Purchases.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/auth.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/auth.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
   <component name="ProjectId" id="1ZTyUIKon8DV1XnpOx4auTrM3SY" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="flattenPackages" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -16,6 +36,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/containers" />
@@ -25,9 +46,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\work\face-admin\src\containers" />
-      <recent name="C:\work\face-admin\src" />
+      <recent name="C:\work\face-admin\src\containers\Purchases" />
+      <recent name="C:\work\face-admin\public" />
       <recent name="C:\work\face-admin\src\containers\Orders" />
-      <recent name="C:\work\face-admin\src\image" />
+      <recent name="C:\work\face-admin\src" />
     </key>
   </component>
   <component name="ServiceViewManager">
@@ -54,7 +76,11 @@
       <updated>1584877392508</updated>
       <workItem from="1584877394436" duration="4896000" />
       <workItem from="1584888215340" duration="3783000" />
-      <workItem from="1584966525229" duration="14203000" />
+      <workItem from="1584966525229" duration="27687000" />
+      <workItem from="1585081084035" duration="1816000" />
+      <workItem from="1585116087774" duration="642000" />
+      <workItem from="1585161176049" duration="5267000" />
+      <workItem from="1585248527777" duration="45921000" />
     </task>
     <servers />
   </component>
@@ -62,22 +88,104 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="2418" y="310" width="737" height="596" key="find.popup" timestamp="1584974069253">
+    <state x="2172" y="171" key="#Notifications" timestamp="1585002062780">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="2418" y="310" width="737" height="596" key="find.popup/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1584974069253" />
-    <state x="3079" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1584973436318">
+    <state x="2172" y="171" key="#Notifications/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585002062780" />
+    <state x="2540" y="358" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1584997886441">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
-    <state x="3079" y="259" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1584973436318" />
+    <state x="2540" y="358" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1584997886441" />
+    <state x="3031" y="324" key="FileChooserDialogImpl" timestamp="1585249680171">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="3031" y="324" key="FileChooserDialogImpl/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585249680171" />
+    <state x="2163" y="0" key="FileDocumentManager.FileCacheConflict" timestamp="1585002041313">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2163" y="0" key="FileDocumentManager.FileCacheConflict/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585002041313" />
+    <state width="1391" height="95" key="GridCell.Tab.0.bottom" timestamp="1585081065100">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1391" height="95" key="GridCell.Tab.0.bottom/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585081065100" />
+    <state width="1391" height="95" key="GridCell.Tab.0.center" timestamp="1585081065100">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1391" height="95" key="GridCell.Tab.0.center/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585081065100" />
+    <state width="1391" height="95" key="GridCell.Tab.0.left" timestamp="1585081065100">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1391" height="95" key="GridCell.Tab.0.left/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585081065100" />
+    <state width="1391" height="95" key="GridCell.Tab.0.right" timestamp="1585081065100">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1391" height="95" key="GridCell.Tab.0.right/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585081065100" />
+    <state x="336" y="153" key="com.intellij.ide.util.TipDialog" timestamp="1585116087278">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="336" y="153" key="com.intellij.ide.util.TipDialog/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585116087278" />
+    <state x="2220" y="128" width="1524" height="830" maximized="true" key="dock-window-1" timestamp="1585321012238">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2434" y="83" width="1524" height="926" key="dock-window-1/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585314608012" />
+    <state x="2220" y="128" width="1524" height="830" maximized="true" key="dock-window-1/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585321012238" />
+    <state x="18" y="0" width="1524" height="830" key="dock-window-1/0.0.1536.824@0.0.1536.824" timestamp="1585316268019" />
+    <state x="2" y="0" width="1545" height="882" key="dock-window-2" timestamp="1585321065020">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="2" y="0" width="1545" height="882" key="dock-window-2/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585321065020" />
+    <state x="2012" y="92" width="1736" height="856" key="dock-window-3" timestamp="1585321709655">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2012" y="92" width="1736" height="856" key="dock-window-3/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585321709655" />
+    <state x="2012" y="92" width="1736" height="856" key="dock-window-4" timestamp="1585321709655">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2012" y="92" width="1736" height="856" key="dock-window-4/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585321709655" />
+    <state x="3078" y="236" width="737" height="804" key="find.popup" timestamp="1585381685708">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="927" y="185" width="609" height="526" key="find.popup/0.0.1536.824/1920.0.1920.1040@0.0.1536.824" timestamp="1585312415309" />
+    <state x="3078" y="236" width="737" height="804" key="find.popup/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585381685708" />
+    <state x="2907" y="267" key="run.anything.popup" timestamp="1585381067490">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2907" y="267" key="run.anything.popup/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585381067490" />
+    <state x="3079" y="259" width="672" height="678" key="search.everywhere.popup" timestamp="1585338805149">
+      <screen x="1920" y="0" width="1920" height="1040" />
+    </state>
+    <state x="3079" y="259" width="672" height="678" key="search.everywhere.popup/0.0.1536.824/1920.0.1920.1040@1920.0.1920.1040" timestamp="1585338805149" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/containers/Orders/OrderDetails.tsx</url>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/containers/Orders/Orders.tsx</url>
+          <line>146</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/containers/Purchases/PurchaseDetails.tsx</url>
+          <line>35</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/containers/Purchases/PurchaseDetails.tsx</url>
+          <line>28</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/containers/Purchases/PurchaseDetails.tsx</url>
+          <line>29</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="7" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

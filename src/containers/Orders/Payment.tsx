@@ -41,8 +41,8 @@ mutation addPayment($id: ID, $amount: BigDecimal, $method: String) {
 `;
 
 const ADD_PAYMENT_MUTATION = gql`
-mutation addPayment($id: ID, $amount: BigDecimal, $method: String) {
-  addPayment(id: $id, amount: $amount, method: $method) {
+mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
+  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
     paymentMethod
     amount
   }
@@ -84,7 +84,7 @@ export default function Payment({orderId, orderRef}) {
     const {
       data: { addPayment },
     }: any = await addPaymentMutation({
-      variables: {id: orderId, amount, method:data.method}
+      variables: {id: orderId, ...data}
     });
     if(addPayment)  {
       alert.success("Payment added");
@@ -110,8 +110,8 @@ export default function Payment({orderId, orderRef}) {
         <OrderInfoPaper>
         <form onSubmit={handleSubmit(onSubmit)}>
 
-            <TextField variant="filled" placeholder="Amount" name="Amount" className={classes.textbox} inputRef={register({required: true, max: 1000, min: 1, maxLength: 5})} />
-            <TextField variant="filled" type="text" placeholder="Auth Code" name="Auth Code" className={classes.textbox} inputRef={register({required: true, maxLength: 6, pattern: /^\S+@\S+$/i})} />
+            <TextField variant="filled" placeholder="Amount" name="amount" className={classes.textbox} inputRef={register({required: true, max: 1000, min: 1, maxLength: 5})} />
+            <TextField variant="filled" type="text" placeholder="Auth Code" name="authCode" className={classes.textbox} inputRef={register({required: true, maxLength: 6})} />
             <FormControl variant="filled" className={classes.formControl}>
                 <Select native name="method" inputRef={register({ required: true })}>
                     <option value="POS">POS</option>

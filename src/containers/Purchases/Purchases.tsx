@@ -36,6 +36,7 @@ const GET_ORDERS = gql`
       discountTotal
       total
       merchantObj {
+        id
         name
       }
       purchaseItems {
