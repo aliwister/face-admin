@@ -1,54 +1,60 @@
-import React, { useState } from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 import { styled, withStyle, createThemedUseStyletron } from 'baseui';
+import { makeStyles } from '@material-ui/core/styles';
 import Moment from 'react-moment';
 import {
   Grid,
-  Row as Rows,
-  Col as Column,
 } from '../../components/FlexBox/FlexBox';
-import Select from '../../components/Select/Select';
-import Input from '../../components/Input/Input';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import {useMutation, useQuery} from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
-import Checkbox from '../../components/CheckBox/CheckBox';
 import { useAlert } from "react-alert";
 import {
-  OrderInfoPaper
-} from '../Orders/Orders.style';
-import NoResult from '../../components/NoResult/NoResult';
-import { Link } from 'react-router-dom';
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import DeleteIcon from "@material-ui/icons/Delete";
-import {makeStyles} from "@material-ui/core/styles";
-
-const GET_ORDERS = gql`
-  query purchases($state: [OrderState], $limit: Int, $searchText: String) {
-    purchases(state: $state, limit: $limit, searchText: $searchText) {
+  TableRow,
+  TableHead,
+  TableContainer,
+  Table,
+  Paper,
+  TableCell,
+  Typography,
+  TableBody } from '@material-ui/core';
+import Image from "../../components/Image/Image";
+import SaveIcon from '@material-ui/icons/Save';
+import DeleteIcon from '@material-ui/icons/Delete';
+import _ from 'lodash';
+import {useForm} from "react-hook-form";
+import {Alert} from "@material-ui/lab";
+const CREATE_PURCHASE = gql`
+  mutation createPurchase($dto: PurchaseInput) {
+    createPurchase(dto: $dto) {
       id
-      currency
-      invoiceDate
-      subtotal
-      deliveryTotal
-      taxesTotal
-      discountTotal
-      total
-      merchantObj {
-        name
-      }
-      deliveryAddressId
-      purchaseItems {
-        productName
-        price
-        quantity
-        image
-        lineTotal
-      }
     }
   }
 `;
+const CREATE_CART = gql`
+  mutation createCart($cart: CheckoutCartInput) {
+    createCart(cart: $cart) {
+      id
+      phone
+      email
+      secureKey
+    }
+  }
+`;
+
+const MERCHANTS = gql`
+query merchants {
+  merchants {
+    id
+    name
+  }
+}
+`;
+
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -58,271 +64,174 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type CustomThemeT = { red400: string; textNormal: string; colors: any };
-const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
+export default function Cart() {
+  const [createCartMutation] = useMutation(CREATE_CART);
+  const [po, setPO] = useState(0);
+  const [items, setItems] = useState([]);
+  const [secureKey, setSecureKey] = useState('');
+  const [create, setCreate] = useState(true);
+  const [update, setUpdate] = useState(false);
+  // const [image, setImage] = useState('');
+  // const [url, setUrl] = useState('');
+  // const [price, setPrice] = useState('');
+  // const [cost, setCost] = useState('');
+  // const [title, setTitle] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [total, setTotal] = useState();
+  const [subtotal, setSubtotal] = useState();
+  const { register, handleSubmit, errors } = useForm();
 
-const Status = styled('div', ({ $theme }) => ({
-  ...$theme.typography.fontBold14,
-  color: $theme.colors.textDark,
-  display: 'flex',
-  alignItems: 'center',
-  lineHeight: '1',
-  textTransform: 'capitalize',
 
-  ':before': {
-    content: '""',
-    width: '10px',
-    height: '10px',
-    display: 'inline-block',
-    borderRadius: '10px',
-    backgroundColor: $theme.borders.borderE6,
-    marginRight: '10px',
-  },
-}));
 
-const Col = withStyle(Column, () => ({
-  '@media only screen and (max-width: 767px)': {
-    marginBottom: '20px',
+  //const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only"});
+  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
+  //const [state, dispatch] = useReducer(reducer, purchase);
+  //console.log(state);
+  // console.log(merchants);
+  // useEffect(()=>{
+  //   setSubtotal(calcSubtotal());
+  //   setTotal(calcSubtotal() + Number(state.deliveryTotal) + Number(state.taxesTotal) - Number(state.discountTotal));
+  // },[state]);
 
-    ':last-child': {
-      marginBottom: 0,
-    },
-  },
-}));
-
-const Row = withStyle(Rows, () => ({
-  '@media only screen and (min-width: 768px)': {
-    alignItems: 'center',
-  },
-}));
-
-const statusSelectOptions = [
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'failed', label: 'Failed' },
-];
-const limitSelectOptions = [
-  { value: 7, label: 'Last 7 orders' },
-  { value: 15, label: 'Last 15 orders' },
-  { value: 30, label: 'Last 30 orders' },
-];
-
-export default function Carts() {
-  const [checkedId, setCheckedId] = useState([]);
-  const [checked, setChecked] = useState(false);
-  const [status, setStatus] = useState([]);
-  const [limit, setLimit] = useState([]);
-  const [search, setSearch] = useState([]);
   const alert = useAlert();
   const classes = useStyles();
 
-  const [useCss, theme] = themedUseStyletron();
-  const sent = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.primary,
-    },
-  });
-  const failed = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.red400,
-    },
-  });
-  const processing = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.textNormal,
-    },
-  });
-  const paid = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.blue400,
-    },
-  });
-
-
-  const { data, error, refetch } = useQuery(GET_ORDERS, {
-    variables: {
-      status: [],
-      limit: 10,
-      searchText: "",
-    },
-    fetchPolicy: "network-only"
-
-  });
-  if (error) {
-    return <div>Error! {error.message}</div>;
+  const calcSubtotal = () => items.reduce((sum,p) => sum + p.quantity * p.price, 0);
+  const onSubmit = data => {
+    console.log(data);
+    let newItems =
+        [...items,
+          {...data}
+        ];
+    setItems(newItems);
   }
 
-  function handleStatus({ value }) {
-    setStatus(value);
-    if (value.length) {
-      refetch({
-        status: [value[0].value],
-        limit: limit.length ? limit[0].value : null,
-        searchText: "",
-      });
-    } else {
-      refetch({ status: [], limit:10, searchText:"" });
+  const onSaveCart = async () => {
+    let cart = {
+      name: name,
+      email: email,
+      phone: phone,
+      items: [
+          ...items
+      ]
+    };
+    const {
+      data: { saveCart },
+    }: any = await createCartMutation({
+      variables: { cart},
+    });
+    if(saveCart) {
+      alert.success("Cart saved successfully");
+      setCreate(true);
+      setSecureKey(saveCart.secureKey);
     }
   }
 
-  function handleLimit({ value }) {
-    setLimit(value);
-    if (value.length) {
-      refetch({
-        status: status.length ? [status[0].value] : [],
-        limit: value[0].value,
-        searchText: ""
-      });
-    } else {
-      refetch({ status: [], limit:10, searchText:"" });
-    }
-  }
-  function handleSearch(event) {
-    const { value } = event.currentTarget;
-    setSearch(value);
-    refetch({ status: [], limit:10, searchText:value });
-  }
-  function onAllCheck(event) {
-    if (event.target.checked) {
-      const idx = data && data.orders.map(order => order.id);
-      setCheckedId(idx);
-    } else {
-      setCheckedId([]);
-    }
-    setChecked(event.target.checked);
-  }
-  function handleCheckbox(event) {
-    const { name } = event.currentTarget;
-    if (!checkedId.includes(name)) {
-      setCheckedId(prevState => [...prevState, name]);
-    } else {
-      setCheckedId(prevState => prevState.filter(id => id !== name));
-    }
-  }
+  if(merhcnatsLoading)
+    return <div>Loading</div>
+
+
   return (
-      <Grid fluid={true}>
-        <Row>
-          <Col md={12}>
-            <Header
-                style={{
-                  marginBottom: 30,
-                  boxShadow: '0 0 8px rgba(0, 0 ,0, 0.1)',
-                }}
-            >
-              <Col md={3} xs={12}>
-                <Heading>Orders</Heading>
-              </Col>
 
-              <Col md={9} xs={12}>
-                <Row>
-                  <Col md={3} xs={12}>
-                    <Select
-                        options={statusSelectOptions}
-                        labelKey='label'
-                        valueKey='value'
-                        placeholder='Status'
-                        value={status}
-                        searchable={false}
-                        onChange={handleStatus}
-                    />
-                  </Col>
+      <Grid item xs={12} md={12}>
+        <Heading>Cart</Heading>
 
-                  <Col md={3} xs={12}>
-                    <Select
-                        options={limitSelectOptions}
-                        labelKey='label'
-                        valueKey='value'
-                        value={limit}
-                        placeholder='Order Limits'
-                        searchable={false}
-                        onChange={handleLimit}
-                    />
-                  </Col>
+        {/*<TextField id="outlined-basic" label="Ref" variant="outlined" value={cart.id} onChange={(e) => handleUpdate('UPDATE_REF', e.target.value)}/>*/}
 
-                  <Col md={6} xs={12}>
-                    <Input
-                        value={search}
-                        placeholder='Ex: Search By Address'
-                        onChange={handleSearch}
-                        clearable
-                    />
-                  </Col>
-                </Row>
-              </Col>
-            </Header>
+        <Autocomplete
+            id="combo-box-demo"
+            //value={merchant}
+            options={merchants.merchants}
+            getOptionLabel={(option: any) => option.name}
+            // defaultValue={[merchants.merchants[merchantId]]}
+            style={{ width: 300 }}
+            //onChange={(event, value) => handleUpdate('UPDATE_MERCHANT',value)}
+            renderInput={params => <TextField {...params} label="Combo box" variant="outlined" />}
+        />
+        <TextField id="outlined-basic" label="Name" variant="outlined" value={name} onChange={(e) => setName(e.target.value)}/>
+        <TextField id="outlined-basic" label="Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <TextField id="outlined-basic" label="Phone" variant="outlined" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        {secureKey &&
+        <Alert severity="success">https://checkout.badals.com/start?token={secureKey}</Alert>
 
-            <TableContainer component={Paper}>
-              <Table className={classes.table} size="small" aria-label="a dense table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell>ID</TableCell>
-                    <TableCell align="left">Ref</TableCell>
-                    <TableCell align="left">Name</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="center">Payment</TableCell>
-                    <TableCell align="center">Date</TableCell>
-                    <TableCell align="center">Status</TableCell>
+        }
+        <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
+          Save Purchase
+        </Button>
+        <Typography variant="h6">Cart Items</Typography>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>Image</TableCell>
+                <TableCell>URL</TableCell>
+                <TableCell>Title</TableCell>
+                <TableCell>Cost</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {items && items.map(q => (
+                  <TableRow key={q.title}>
+                    <TableCell align="right">{q.image}</TableCell>
+                    <TableCell align="right">{q.url}</TableCell>
+                    <TableCell align="right">{q.title}</TableCell>
+                    <TableCell align="right">{q.cost}</TableCell>
+                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">
+                      <Button
+                          variant="contained"
+                          color="secondary"
+                          className={classes.button}
+                          startIcon={<DeleteIcon />}
+                          //onClick={()=>handleRemove(q)}
+                      >
+                      </Button>
+                    </TableCell>
+
                   </TableRow>
-                </TableHead>
-                {data && data.purchases.length && (
-                    <TableBody>
+              ))}
+            </TableBody>
+          </Table>
+          <TextField id="outlined-basic" label="Subtotal" variant="outlined" value={subtotal} disabled/>
+         <TextField id="outlined-basic" label="Total" variant="outlined" value={total} disabled/>
+        </TableContainer>
+        <br/>
+        <Paper>
+          <Typography variant="subtitle1">Add New Cart Item</Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <input type="url" placeholder="Image URL" name="image" ref={register({required: true})} />
+            <input type="url" placeholder="URL" name="url" ref={register({required: true})} />
+            <input type="text" placeholder="Title" name="name" ref={register} />
+            <input type="number" placeholder="Cost" name="cost" ref={register} />
+            <input type="number" placeholder="Price" name="price" ref={register} />
 
-                      {data.ordersA.map(row => (
-                          <TableRow key={row.orderId}>
-                            <TableCell align="right"><Checkbox
-                                name={row.id}
-                                checked={checkedId.includes(row.id)}
-                                onChange={handleCheckbox}
-                                overrides={{
-                                  Checkmark: {
-                                    style: {
-                                      borderWidth: '2px',
-                                      borderRadius: '4px',
-                                    },
-                                  },
-                                }}
-                            /></TableCell>
-                            <TableCell component="th" scope="row">
-                              <Link to={`order-details/${row.id}`}>{row.id}</Link>
-                            </TableCell>
-                            <TableCell align="left">{row.reference}</TableCell>
+            <input type="submit" />
+          </form>
+          {/*<form>
+            <div>
+              <TextField variant="filled" placeholder="Image URL" name="Image URL" value={image} onChange={(e) => setImage(e.target.value)}/>
+            </div>
+            <div>
+              <TextField variant="filled" placeholder="URL" name="URL" value={url} onChange={(e) => setUrl(e.target.value)}/>
+            </div>
+            <div>
+              <TextField variant="filled" placeholder="Cost" name="Cost" value={cost} onChange={(e) => setCost(e.target.value)}/>
+            </div>
+            <div>
+              <TextField variant="filled" placeholder="Title" name="Title" value={title} onChange={(e) => setTitle(e.target.value)}/>
+            </div>
+            <div>
+              <TextField variant="filled" placeholder="Price" name="Price" value={price} onChange={(e) => setPrice(e.target.value)}/>
+            </div>
 
-                            <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
-                            <TableCell align="right">OMR {row.total}</TableCell>
+          </form>*/}
 
-                            <TableCell align="center">{row.paymentMethod}</TableCell>
-                            <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
-                            <TableCell align="right">
-                              <Status
-                                  className={
-                                    row.orderState === 'Delivered'
-                                        ? sent
-                                        : row.orderState === 'PAYMENT_ACCEPTED'
-                                        ? paid
-                                        : row.orderState === 'AWAITING_PAYMENT'
-                                            ? processing
-                                            : row.orderState === 'CANCELLED'
-                                                ? failed
-                                                : ''
-                                  }
-                              >
-                                {row.orderState}
-                              </Status>
-                            </TableCell>
-                          </TableRow>
-                      ))}
-                    </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Col>
-        </Row>
-      </Grid>
+        </Paper>
+    </Grid>
   );
 }
