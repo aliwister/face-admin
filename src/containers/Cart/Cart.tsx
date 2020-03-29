@@ -83,18 +83,7 @@ export default function Cart() {
   const [subtotal, setSubtotal] = useState();
   const { register, handleSubmit, errors } = useForm();
 
-
-
-  //const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only"});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
-  //const [state, dispatch] = useReducer(reducer, purchase);
-  //console.log(state);
-  // console.log(merchants);
-  // useEffect(()=>{
-  //   setSubtotal(calcSubtotal());
-  //   setTotal(calcSubtotal() + Number(state.deliveryTotal) + Number(state.taxesTotal) - Number(state.discountTotal));
-  // },[state]);
-
   const alert = useAlert();
   const classes = useStyles();
 
@@ -118,14 +107,14 @@ export default function Cart() {
       ]
     };
     const {
-      data: { saveCart },
+      data: { createCart },
     }: any = await createCartMutation({
       variables: { cart},
     });
-    if(saveCart) {
+    if(createCart) {
       alert.success("Cart saved successfully");
       setCreate(true);
-      setSecureKey(saveCart.secureKey);
+      setSecureKey(createCart.secureKey);
     }
   }
 
@@ -154,7 +143,7 @@ export default function Cart() {
         <TextField id="outlined-basic" label="Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} />
         <TextField id="outlined-basic" label="Phone" variant="outlined" value={phone} onChange={(e) => setPhone(e.target.value)} />
         {secureKey &&
-        <Alert severity="success">https://checkout.badals.com/start?token={secureKey}</Alert>
+        <Alert severity="success">https://checkout.badals.com/checkout/start?token={secureKey}</Alert>
 
         }
         <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
@@ -192,7 +181,6 @@ export default function Cart() {
                       >
                       </Button>
                     </TableCell>
-
                   </TableRow>
               ))}
             </TableBody>
@@ -207,8 +195,9 @@ export default function Cart() {
             <input type="url" placeholder="Image URL" name="image" ref={register({required: true})} />
             <input type="url" placeholder="URL" name="url" ref={register({required: true})} />
             <input type="text" placeholder="Title" name="name" ref={register} />
-            <input type="number" placeholder="Cost" name="cost" ref={register} />
-            <input type="number" placeholder="Price" name="price" ref={register} />
+            <input type="number" placeholder="Cost" name="cost" step="any"  ref={register} />
+            <input type="number" placeholder="Price" name="price" step="any"  ref={register} />
+            <input type="number" placeholder="Quantity" name="quantity" ref={register} />
 
             <input type="submit" />
           </form>
