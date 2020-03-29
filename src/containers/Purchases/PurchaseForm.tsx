@@ -375,7 +375,7 @@ export default function PurchaseForm({purchase}) {
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
                     {q.sku ?
                         <TableCell component="th" scope="row">
-                          <a href={`http://www.amazon.com/${q.sku}`} target="_blank">
+                          <a href={`http://www.amazon.com/dp/${q.sku}`} target="_blank">
                             {q.productName}
                           </a>
                         </TableCell> : <TableCell component="th" scope="row">
