@@ -15,6 +15,7 @@ export const SITE_SETTINGS = '/site-settings';
 export const PURCHASES = '/purchases';
 export const PURCHASEDETAILS = '/purchase-details/:slug';
 export const CART = '/cart';
+export const SIGNUP = '/signup';
 // **************** ROUTE CONSTANT END **************************
 
 export const CURRENCY = '$';

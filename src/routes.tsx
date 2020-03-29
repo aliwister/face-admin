@@ -10,7 +10,7 @@ import {
   CUSTOMERS,
   COUPONS,
   STUFF_MEMBERS,
-  SITE_SETTINGS, ORDERDETAILS, PURCHASES, PURCHASEDETAILS, CART
+  SITE_SETTINGS, ORDERDETAILS, PURCHASES, PURCHASEDETAILS, CART, SIGNUP
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
@@ -34,6 +34,7 @@ const Customers = lazy(() => import("./containers/Customers/Customers"));
 const Coupons = lazy(() => import("./containers/Coupons/Coupons"));
 const Login = lazy(() => import("./containers/Login/Login"));
 const NotFound = lazy(() => import("./containers/NotFound/NotFound"));
+const Signup = lazy(() => import("./containers/Signup/Signup"));
 
 /**
  *
@@ -44,7 +45,7 @@ const NotFound = lazy(() => import("./containers/NotFound/NotFound"));
 
 function PrivateRoute({ children, ...rest }) {
   const { isAuthenticated } = useContext(AuthContext);
-
+  console.log('in private route:',isAuthenticated);
   return (
     <Route
       {...rest}
@@ -162,6 +163,9 @@ const Routes = () => {
           </PrivateRoute>
           <Route path={LOGIN}>
             <Login />
+          </Route>
+          <Route path={SIGNUP}>
+            <Signup />
           </Route>
           <Route component={NotFound} />
         </Switch>

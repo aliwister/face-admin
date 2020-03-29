@@ -372,9 +372,15 @@ export default function PurchaseForm({purchase}) {
                   <TableRow key={q.id}>
                     <TableCell align="right">{q.id}</TableCell>
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-                    <TableCell component="th" scope="row">
-                      {q.productName}
-                    </TableCell>
+                    {q.sku ?
+                        <TableCell component="th" scope="row">
+                          <a href={`http://www.amazon.com/${q.productName}`}>
+                            {q.productName}
+                          </a>
+                        </TableCell> : <TableCell component="th" scope="row">
+                          {q.productName}
+                        </TableCell>
+                    }
                     <TableCell align="right">{q.quantity}</TableCell>
                     <TableCell align="right">{q.price}</TableCell>
                     <TableCell align="right">
