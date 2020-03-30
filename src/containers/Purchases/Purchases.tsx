@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { styled, withStyle, createThemedUseStyletron } from 'baseui';
 import Moment from 'react-moment';
-import {
-  Grid,
-  Row as Rows,
-  Col as Column,
-} from '../../components/FlexBox/FlexBox';
+import { useHistory } from 'react-router-dom';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import {useMutation, useQuery} from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import Checkbox from '../../components/CheckBox/CheckBox';
 import { useAlert } from "react-alert";
@@ -19,10 +15,24 @@ import {
 } from '../Orders/Orders.style';
 import NoResult from '../../components/NoResult/NoResult';
 import { Link } from 'react-router-dom';
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {
+  Dialog, DialogActions, DialogContent, DialogContentText,
+  DialogTitle,
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import TextField from "@material-ui/core/TextField";
+import {PURCHASEDETAILS} from "../../settings/constants";
 
 const GET_ORDERS = gql`
   query purchases($state: [OrderState], $limit: Int, $searchText: String) {
@@ -47,7 +57,30 @@ const GET_ORDERS = gql`
     }
   }
 `;
+const MERCHANTS = gql`
+query merchants {
+  merchants {
+    id
+    name
+  }
+}
+`;
+const CREATE_PURCHASE = gql`
+  mutation createPurchase($dto: PurchaseInput) {
+    createPurchase(dto: $dto) {
+      id
+    }
+  }
+`;
 const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
   table: {
     minWidth: 650,
   },
@@ -78,21 +111,7 @@ const Status = styled('div', ({ $theme }) => ({
   },
 }));
 
-const Col = withStyle(Column, () => ({
-  '@media only screen and (max-width: 767px)': {
-    marginBottom: '20px',
 
-    ':last-child': {
-      marginBottom: 0,
-    },
-  },
-}));
-
-const Row = withStyle(Rows, () => ({
-  '@media only screen and (min-width: 768px)': {
-    alignItems: 'center',
-  },
-}));
 
 const statusSelectOptions = [
   { value: 'delivered', label: 'Delivered' },
@@ -106,15 +125,21 @@ const limitSelectOptions = [
   { value: 30, label: 'Last 30 orders' },
 ];
 
+
+
 export default function Purchases() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState([]);
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [merchant, setMerchant] = React.useState(false);
   const alert = useAlert();
   const classes = useStyles();
-
+  const history = useHistory();
+  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
+  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE);
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
     ':before': {
@@ -153,6 +178,20 @@ export default function Purchases() {
   });
   if (error) {
     return <div>Error! {error.message}</div>;
+  }
+
+  const handleCreatePurchase = async () => {
+    // @ts-ignore
+    const dto = {merchantId: merchant.id, currency: "omr"};
+    const {
+      data: { createPurchase },
+    }: any = await createPurchaseMutation({
+      variables: { dto: dto },
+    });
+    if(createPurchase)  {
+      alert.success(createPurchase.id);
+      history.push('/purchase-details/'+createPurchase.id);
+    }
   }
 
   function handleStatus({ value }) {
@@ -202,57 +241,88 @@ export default function Purchases() {
       setCheckedId(prevState => prevState.filter(id => id !== name));
     }
   }
+
+  function handleCreate() {
+
+  }
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  if(merhcnatsLoading) {
+    return <div>Loading</div>
+  }
   return (
-      <Grid fluid={true}>
-        <Row>
-          <Col md={12}>
-            <Header
-                style={{
-                  marginBottom: 30,
-                  boxShadow: '0 0 8px rgba(0, 0 ,0, 0.1)',
-                }}
-            >
-              <Col md={3} xs={12}>
-                <Heading>Orders</Heading>
-              </Col>
+      <>
+        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">New Purchase</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Select Merchant
+            </DialogContentText>
+            <Autocomplete
+                id="combo-box-demo"
+                options={merchants.merchants}
+                getOptionLabel={(option: any) => option.name}
+                style={{ width: 300 }}
+                onChange={(event, value) => setMerchant(value)}
+                renderInput={params => <TextField {...params} label="Merchant Name" variant="outlined" />}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleCreatePurchase} color="primary">
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
+      <Grid container spacing={1}>
 
-              <Col md={9} xs={12}>
-                <Row>
-                  <Col md={3} xs={12}>
-                    <Select
-                        options={statusSelectOptions}
-                        labelKey='label'
-                        valueKey='value'
-                        placeholder='Status'
-                        value={status}
-                        searchable={false}
-                        onChange={handleStatus}
-                    />
-                  </Col>
+            <Grid item  md={3} >
+              <Select
+                  options={statusSelectOptions}
+                  labelKey='label'
+                  valueKey='value'
+                  placeholder='Status'
+                  value={status}
+                  searchable={false}
+                  onChange={handleStatus}
+              />
+            </Grid>
 
-                  <Col md={3} xs={12}>
-                    <Select
-                        options={limitSelectOptions}
-                        labelKey='label'
-                        valueKey='value'
-                        value={limit}
-                        placeholder='Order Limits'
-                        searchable={false}
-                        onChange={handleLimit}
-                    />
-                  </Col>
+            <Grid item  md={2} >
+              <Select
+                  options={limitSelectOptions}
+                  labelKey='label'
+                  valueKey='value'
+                  value={limit}
+                  placeholder='Order Limits'
+                  searchable={false}
+                  onChange={handleLimit}
+              />
+            </Grid>
+            <Grid  item  md={4} >
+              <Input
+                  value={search}
+                  placeholder='Ex: Search By Address'
+                  onChange={handleSearch}
+                  clearable
+              />
+            </Grid>
 
-                  <Col md={6} xs={12}>
-                    <Input
-                        value={search}
-                        placeholder='Ex: Search By Address'
-                        onChange={handleSearch}
-                        clearable
-                    />
-                  </Col>
-                </Row>
-              </Col>
-            </Header>
+            <Grid item  md={3} style={{textAlign: 'right'}}>
+              <Button variant="contained" color="primary" onClick={handleClickOpen} >
+                New Purchase
+              </Button>
+            </Grid>
+
+      <Grid item xs={12}>
 
             <TableContainer component={Paper}>
               <Table className={classes.table} size="small" aria-label="a dense table">
@@ -319,8 +389,8 @@ export default function Purchases() {
                 )}
               </Table>
             </TableContainer>
-          </Col>
-        </Row>
       </Grid>
+      </Grid>
+        </>
   );
 }

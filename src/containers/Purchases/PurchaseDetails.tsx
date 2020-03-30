@@ -26,13 +26,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {useParams} from "react-router-dom";
 import PurchaseForm from "./PurchaseForm";
-const CREATE_PURCHASE = gql`
-  mutation createPurchase($dto: PurchaseInput) {
-    createPurchase(dto: $dto) {
-      id
-    }
-  }
-`;
+
 const PURCHASE = gql`
 query purchase($id: ID) {
   purchase(id: $id) {
@@ -89,7 +83,7 @@ export default function PurchaseDetails(props) {
   console.log('in purchase details')
   let { slug } = useParams();
   console.log(slug);
-  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE);
+
 
   const [po, setPO] = useState(0);
   const [items, setItems] = useState([]);
@@ -102,20 +96,7 @@ export default function PurchaseDetails(props) {
   const alert = useAlert();
   const classes = useStyles();
 
-  const createPurchase = async () => {
-    const dto = {merchantId: 1, currency: "OMR"};
-    const {
-      data: { createPurchase },
-    }: any = await createPurchaseMutation({
-      variables: { dto: dto },
-    });
-    if(createPurchase)  {
-      alert.success(createPurchase.id);
-      setPO(createPurchase.id);
-      setCreate(false);
-      setItems([]);
-    }
-  }
+
 
 
   const addToPurchase = ({id,price,quantity, productName}) => {
@@ -129,25 +110,15 @@ export default function PurchaseDetails(props) {
         orderItemId: id
       }]);
   }
-
-
+  if (lp)
+    return <div>Loading</div>
 
   return (
 
-      <Grid item xs={12} md={12}>
-        <Heading>Purchases</Heading>
+      <>
+        <Heading>Purchase PO {dp.purchase.id}</Heading>
+        <PurchaseForm purchase={dp.purchase}/>
 
-
-        <Button variant="contained" color="primary" onClick={createPurchase} disabled={!create}>
-          Create New Purchase
-        </Button>
-        {dp &&
-            <>
-              <TextField id="outlined-basic" label="PO" variant="outlined" value={dp.purchase.id}/>
-              <PurchaseForm purchase={dp.purchase}/>
-            </>
-        }
-
-    </Grid>
+    </>
   );
 }

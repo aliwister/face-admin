@@ -1,19 +1,15 @@
 import React, {useEffect, useReducer, useState} from 'react';
-import { styled, withStyle, createThemedUseStyletron } from 'baseui';
 import { makeStyles } from '@material-ui/core/styles';
 import Moment from 'react-moment';
-import {
-  Grid,
-} from '../../components/FlexBox/FlexBox';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-
+import {TitleTextField} from '../Orders/Orders.style';
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import { useAlert } from "react-alert";
 import {
+  Grid,
   TableRow,
   TableHead,
   TableContainer,
@@ -26,6 +22,7 @@ import Image from "../../components/Image/Image";
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import _ from 'lodash';
+import TextField from "@material-ui/core/TextField";
 const CREATE_PURCHASE = gql`
   mutation createPurchase($dto: PurchaseInput) {
     createPurchase(dto: $dto) {
@@ -49,6 +46,7 @@ query purchaseQueue {
     price
     image
     sku
+    cost
   }
 }
 `;
@@ -82,6 +80,14 @@ const useStyles = makeStyles(theme => ({
   button: {
     margin: theme.spacing(1),
   },
+  titleField: {
+    width: '25ch',
+    size: 'small'
+  },
+  quantityField: {
+    width: '5ch',
+  },
+
 }));
 
 
@@ -229,17 +235,6 @@ export default function PurchaseForm({purchase}) {
     }
   }
 
-  const addToPurchase = ({id,price,quantity, productName}) => {
-    setItems([
-        ...items,
-      {
-        sequence:items.length+1,
-        price: price,
-        quantity: quantity,
-        description: productName,
-        orderItemId: id
-      }]);
-  }
   if (error) {
     return <div>Error! {error.message}</div>;
   }
@@ -262,7 +257,7 @@ export default function PurchaseForm({purchase}) {
   function handleAdd(q) {
     dispatch({type: 'ADD_ITEM', payload: {
         sequence:state.purchaseItems.length+1,
-        price: q.price,
+        price: q.cost,
         quantity: q.quantity,
         description: q.productName,
         orderItemId: q.id
@@ -281,26 +276,38 @@ export default function PurchaseForm({purchase}) {
   // @ts-ignore
   // @ts-ignore
   return (
+      <Grid container xs={12} md={12}>
 
-      <Grid item xs={12} md={12}>
-        <Heading>Purchases</Heading>
+        <Grid item md={4}>
+          <Autocomplete
+              id="combo-box-demo"
+              value={state.merchantObj}
+              options={merchants.merchants}
+              getOptionLabel={(option: any) => option.name}
+              defaultValue={[merchants.merchants[state.merchantId]]}
+              style={{ width: 300 }}
+              onChange={(event, value) => handleUpdate('UPDATE_MERCHANT',value)}
+              renderInput={params => <TextField size="small" {...params} label="Merchant" variant="outlined" />}
+          />
+        </Grid>
+        <Grid item md={3}>
+          <TextField size="small" id="outlined-basic" label="Shipping Instructions" variant="outlined" value={state.shippingInstructions}   onChange={(e) => handleUpdate('UPDATE_SHIPPING_INSTRUCTIONS', e.target.value)}/>
 
-        <TextField id="outlined-basic" label="Ref" variant="outlined" value={state.id} onChange={(e) => handleUpdate('UPDATE_REF', e.target.value)}/>
-        <TextField id="outlined-basic" label="Shipping Instructions" variant="outlined" value={state.shippingInstructions}   onChange={(e) => handleUpdate('UPDATE_SHIPPING_INSTRUCTIONS', e.target.value)}/>
+        </Grid>
+        <Grid item md={2}>
+          <TextField size="small" id="outlined-basic" label="Ref" variant="outlined" value={state.id} onChange={(e) => handleUpdate('UPDATE_REF', e.target.value)}/>
+        </Grid>
+        <Grid item md={3} style={{textAlign:'right'}}>
+          <Button variant="contained" color="primary" size="large" onClick={savePurchase}>
+            Save
+          </Button>
+        </Grid>
 
-        <Autocomplete
-            id="combo-box-demo"
-            value={state.merchantObj}
-            options={merchants.merchants}
-            getOptionLabel={(option: any) => option.name}
-            defaultValue={[merchants.merchants[state.merchantId]]}
-            style={{ width: 300 }}
-            onChange={(event, value) => handleUpdate('UPDATE_MERCHANT',value)}
-            renderInput={params => <TextField {...params} label="Combo box" variant="outlined" />}
-        />
-        <Button variant="contained" color="primary" size="large" onClick={savePurchase}>
-          Save Purchase
-        </Button>
+
+
+
+        <Grid item md={12}>
+          <Paper>
         <Typography variant="h6">Purchase Items</Typography>
         <TableContainer component={Paper}>
           <Table className={classes.table} size="small" aria-label="a dense table">
@@ -325,10 +332,10 @@ export default function PurchaseForm({purchase}) {
                   <TableRow key={q.orderItemId}>
                     <TableCell align="right">{q.sequence}</TableCell>
                     <TableCell component="th" scope="row">
-                      <TextField variant="filled" placeholder="Description" name="Description" value={q.description} onChange={(e) => handleChangeDescription(q, e.target.value)}/>
+                      <TextField  size="small" variant="filled" className={classes.titleField} placeholder="Description" name="Description" value={q.description} onChange={(e) => handleChangeDescription(q, e.target.value)}/>
                     </TableCell>
-                    <TableCell align="right"><TextField variant="filled" placeholder="Amount" name="Amount" value={q.quantity} onChange={(e) => handleChangeQuantity(q, e.target.value)}/></TableCell>
-                    <TableCell align="right"><TextField variant="filled" placeholder="Price" name="Price" value={q.price} onChange={(e) => handleChangePrice(q, e.target.value)}/></TableCell>
+                    <TableCell align="right"><TextField size="small" variant="filled" placeholder="Amount" name="Amount" value={q.quantity} onChange={(e) => handleChangeQuantity(q, e.target.value)}/></TableCell>
+                    <TableCell align="right"><TextField size="small" variant="filled" placeholder="Price" name="Price" value={q.price} onChange={(e) => handleChangePrice(q, e.target.value)}/></TableCell>
                     <TableCell align="right">
                       <Button
                           variant="contained"
@@ -344,14 +351,16 @@ export default function PurchaseForm({purchase}) {
               ))}
             </TableBody>
           </Table>
-          <TextField id="outlined-basic" label="Subtotal" variant="outlined" value={subtotal} disabled/>
-          <TextField id="outlined-basic" label="Delivery" variant="outlined" value={state.deliveryTotal}  onChange={(e) => handleUpdate('UPDATE_DELIVERY_TOTAL', e.target.value)}/>
-          <TextField id="outlined-basic" label="Taxes" variant="outlined" value={state.taxesTotal}  onChange={(e) => handleUpdate('UPDATE_TAXES_TOTAL', e.target.value)}/>
-          <TextField id="outlined-basic" label="Discount" variant="outlined" value={state.discountTotal}  onChange={(e) => handleUpdate('UPDATE_DISCOUNT_TOTAL', e.target.value)}/>
-          <TextField id="outlined-basic" label="Total" variant="outlined" value={total} disabled/>
-
-
         </TableContainer>
+
+            <TextField size="small" id="outlined-basic" label="Subtotal" variant="outlined" value={subtotal} disabled/>
+            <TextField size="small" id="outlined-basic" label="Delivery" variant="outlined" value={state.deliveryTotal}  onChange={(e) => handleUpdate('UPDATE_DELIVERY_TOTAL', e.target.value)}/>
+            <TextField size="small" id="outlined-basic" label="Taxes" variant="outlined" value={state.taxesTotal}  onChange={(e) => handleUpdate('UPDATE_TAXES_TOTAL', e.target.value)}/>
+            <TextField size="small" id="outlined-basic" label="Discount" variant="outlined" value={state.discountTotal}  onChange={(e) => handleUpdate('UPDATE_DISCOUNT_TOTAL', e.target.value)}/>
+            <TextField size="small" id="outlined-basic" label="Total" variant="outlined" value={total} disabled/>
+          </Paper>
+
+        </Grid>
         <Typography variant="h6">PurchaseQueue</Typography>
         <Button variant="contained" color="secondary" onClick={()=>{refetch({})}}>
           Refresh
@@ -400,6 +409,6 @@ export default function PurchaseForm({purchase}) {
             </TableBody>}
           </Table>
         </TableContainer>
-    </Grid>
+      </Grid>
   );
 }
