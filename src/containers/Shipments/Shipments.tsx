@@ -34,7 +34,7 @@ import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {StatusMultiSelect} from "./components/StatusMultiSelect";
 
 const SHIPMENTS = gql`
-  query shipments($status: ShipmentStatus, $type: ShipmentType) {
+  query shipments($status: [ShipmentStatus], $type: ShipmentType) {
       shipments(status: $status, type:$type) {
         id
         actualShipCost
@@ -97,7 +97,7 @@ const useStyles = makeStyles(theme => ({
 export default function Shipments() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
-  const [status, setStatus] = useState([]);
+  const [status, setStatus] = useState(['PENDING','PROCESSING']);
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const [open, setOpen] = React.useState(false);
@@ -115,7 +115,7 @@ export default function Shipments() {
 
   const { data, error, refetch } = useQuery(SHIPMENTS, {
     variables: {
-      status: 'PENDING',
+      status: status,
       type: 'CUSTOMER'
     },
     fetchPolicy: "network-only",
@@ -198,13 +198,13 @@ export default function Shipments() {
       setTab(newValue);
       if(newValue == 0) {
         refetch({
-            status: 'PENDING',
+            status: status,
             type: 'CUSTOMER'
           });
       }
       if (newValue == 1) {
         refetch({
-          status: 'RECEIVED',
+          status: status,
           type: 'PURCHASE'
         });
       }
