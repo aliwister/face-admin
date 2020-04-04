@@ -19,3 +19,9 @@ export const PACKAGE_TYPES = [
   {value: 'NONSTANDARD', label: 'NONSTANDARD'},
   {value: 'BAG', label: 'BAG'},
 ]
+
+export const SHIPMENT_TYPES = [
+  {value: 'PURCHASE', label: 'PURCHASE'},
+  {value: 'RETURN', label: 'RETURN'},
+  {value: 'TRANSFER', label: 'TRANSFER'},
+]

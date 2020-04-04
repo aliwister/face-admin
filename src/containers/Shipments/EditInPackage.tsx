@@ -78,7 +78,7 @@ export default function EditInPackage({state, dispatch}) {
     let dto = {
       ...data,
       shipmentId: state.shipment.id,
-      pkgId: 1,
+      pkgId: state.pkg.id,
       purchaseItemId: state.item.id,
       description: state.item.description,
       quantity: Number(state.item.accepted) + Number(state.item.rejected),

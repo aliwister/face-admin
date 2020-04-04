@@ -111,7 +111,7 @@ export default function Shipments() {
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
   const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT);
-  const { register, handleSubmit, errors } = useForm();
+
 
   const { data, error, refetch } = useQuery(SHIPMENTS, {
     variables: {
@@ -173,8 +173,12 @@ export default function Shipments() {
     const dto = {
       ...data,
       shipmentStatus: 'PROCESSING',
-      merchantId: merchant.id
+      merchantId: data.merchant.id,
+      shipmentType: data.shipmentType.value,
+      shipmentMethod: data.shipmentMethod.value
     };
+    console.log(dto);
+    delete dto['merchant'];
     const {
       data: { acceptShipment },
     }: any = await acceptShipmentMutation({
@@ -214,7 +218,7 @@ export default function Shipments() {
 
   return (
     <>
-      <CreateShipmentDialog show={acceptnewdialog} handleClose={handleClose} handleSubmit={handleSubmit(handleSubmitNewShipment)} register={register} merchants={merchants} setMerchant={setMerchant}/>
+      <CreateShipmentDialog show={acceptnewdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
       <Grid container spacing={1}>
         <Grid item  md={3} >
           <StatusMultiSelect theme={theme} handleStatus={handleStatus} status={status} />
