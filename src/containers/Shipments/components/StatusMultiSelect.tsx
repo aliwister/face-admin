@@ -58,7 +58,6 @@ const names = [
 ];
 
 function getStyles(name, personName, theme) {
-  console.log('in getStyles', name, personName);
   return {
     fontWeight:
       personName.indexOf(name) === -1

@@ -48,6 +48,9 @@ const SHIPMENTS = gql`
         shipmentStatus
         customerId
         merchantId
+        customerFirstName
+        customerLastName
+        merchantName
       }
   }
 `;
@@ -110,7 +113,7 @@ export default function Shipments() {
 
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
-  const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT);
+  const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT,{context: { clientName: "adminLink" }});
 
 
   const { data, error, refetch } = useQuery(SHIPMENTS, {

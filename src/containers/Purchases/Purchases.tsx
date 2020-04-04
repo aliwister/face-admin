@@ -139,7 +139,7 @@ export default function Purchases() {
   const classes = useStyles();
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
-  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE);
+  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE,{context: { clientName: "shopLink" }});
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
     ':before': {

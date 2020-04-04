@@ -26,11 +26,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => {
+  console.log(shipment);
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
-      ...shipment
+      ...shipment,
+      merchant: merchants[0]
     }
   });
+
+
   const classes = useStyles();
 
   function onSubmitForm(data) {
@@ -46,16 +50,16 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
       />
       <Grid container xs={12} md={12} spacing={1}>
         <Grid item md={6}>
-          <Controller as={<Select
-                            options={merchants.merchants}
-                            getOptionLabel={(option: any) => option.name}
-                            getOptionValue={(option: any) => option.id}
-                          />}
+          <Controller
+            as={<Select
+                  options={merchants.merchants}
+                  getOptionLabel={(option: any) => option.name}
+                  getOptionValue={(option: any) => option.id}
+                />}
             rules={{ required: true }}
             name="merchant"
             register={register}
             control={control}
-            defaultValue=""
           />
         </Grid>
         <Grid item md={6}>

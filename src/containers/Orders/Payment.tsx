@@ -72,9 +72,9 @@ export default function Payment({orderId, orderRef}) {
   const [method, setMethod] = useState(false);
   const [auth, setAuth] = useState(false);
   const { register, handleSubmit, errors } = useForm();
-  const [addPaymentMutation] = useMutation(ADD_PAYMENT_MUTATION);
-  const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL);
-  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS);
+  const [addPaymentMutation] = useMutation(ADD_PAYMENT_MUTATION,{context: { clientName: "shopLink" });
+  const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL,{context: { clientName: "shopLink" });
+  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS,{context: { clientName: "shopLink" });
   const alert = useAlert();
   const classes = useStyles();
 
