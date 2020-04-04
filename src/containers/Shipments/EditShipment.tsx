@@ -127,6 +127,18 @@ function reducer(state, action) {
         ...state,
         prepItemDialog: false,
       }
+    case 'PRINT_LABEL_START':
+      return {
+        ...state,
+        issueItemDialog: false,
+        printLabelDialog: true,
+        label: action.payload.id + '-' + action.payload.shipmentId,
+      }
+    case 'PRINT_LABEL_CANCEL':
+      return {
+        ...state,
+        printLabelDialog: false,
+      }
     default:
       return state;
   }
@@ -146,6 +158,7 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
     acceptItemDialog: false,
     issueItemDialog: false,
     prepItemDialog: false,
+    printLabelDialog: false,
     item: null,
     selectedPkgIndex: -1,
   };

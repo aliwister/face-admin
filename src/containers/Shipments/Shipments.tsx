@@ -101,6 +101,7 @@ export default function Shipments() {
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const [open, setOpen] = React.useState(false);
+  const [tab, setTab] = React.useState(0);
   const [acceptnewdialog, setAcceptnewdialog] = React.useState(false);
   const [merchant, setMerchant] = React.useState({id:0});
   const alert = useAlert();
@@ -191,6 +192,26 @@ export default function Shipments() {
 
   function handlePrepareButton() {
   }
+
+  const handleChange = (event, newValue) => {
+    if(tab != newValue) {
+      setTab(newValue);
+      if(newValue == 0) {
+        refetch({
+            status: 'PENDING',
+            type: 'CUSTOMER'
+          });
+      }
+      if (newValue == 1) {
+        refetch({
+          status: 'RECEIVED',
+          type: 'PURCHASE'
+        });
+      }
+    }
+
+  };
+
   return (
     <>
       <CreateShipmentDialog show={acceptnewdialog} handleClose={handleClose} handleSubmit={handleSubmit(handleSubmitNewShipment)} register={register} merchants={merchants} setMerchant={setMerchant}/>
@@ -213,7 +234,7 @@ export default function Shipments() {
 
         <Grid item xs={12}>
           <AppBar position="static">
-            <Tabs value={0} aria-label="simple tabs example">
+            <Tabs value={tab} onChange={handleChange}>
               <Tab label="Customer Shipments"  />
               <Tab label="Purchase Shipments"  />
               <Tab label="Other"  />
@@ -254,11 +275,11 @@ export default function Shipments() {
                         />
                       </TableCell>
                       <TableCell component="th" scope="row"><Link to={`shipment-details/${row.id}`}>{row.id}</Link></TableCell>
-                      <TableCell align="left">{row.customerId}</TableCell>
+                      <TableCell align="left">{row.customerFirstName} {row.customerLastName}</TableCell>
                       <TableCell align="left">{row.shipmentType}</TableCell>
                       <TableCell align="right">{row.shipmentStatus}</TableCell>
                       <TableCell align="center">OMR {row.reference}</TableCell>
-                      <TableCell align="right"><Moment format='Do MMM YYYY'>{row.latestCancelDate}</Moment></TableCell>
+                      <TableCell align="right">{row.city}</TableCell>
                       <TableCell align="right">{row.shipmentMethod}</TableCell>
                     </TableRow>
                   ))}

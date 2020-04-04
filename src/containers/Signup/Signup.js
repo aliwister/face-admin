@@ -86,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
 const tiers = [
     {
         title: 'Just Starting',
-        price: '20',
+        price: '19',
         description: ['59 SKUs included', '99 orders / month', '15% commission', 'Whatsapp support'],
         buttonText: 'Sign up',
         buttonVariant: 'outlined',
@@ -94,7 +94,7 @@ const tiers = [
     {
         title: 'SMEs',
         subheader: 'Most popular',
-        price: '120',
+        price: '99',
         description: [
             '599 SKUs included',
             'Unlimited Orders',
@@ -106,7 +106,7 @@ const tiers = [
     },
     {
         title: 'Enterprise',
-        price: '800',
+        price: '299',
         description: [
             '5999 SKUs included',
             'Unlimited Orders',
@@ -213,7 +213,7 @@ export default function Signup() {
                             </ListItemIcon>
                             <ListItemText
                                 primary="Largest customer base"
-                                secondary="Over 1K active users per day, with top Alexa ranking among local e-commerce"
+                                secondary="Over 1K daily active users, with top Alexa ranking among local e-commerce"
                             />
                         </ListItem>
                     </List>

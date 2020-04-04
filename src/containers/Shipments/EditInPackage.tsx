@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 
@@ -14,6 +14,9 @@ import {SectionCard} from "./Shipment.style";
 import CardHeader from "@material-ui/core/CardHeader";
 import { AcceptItemDialog } from "./components/AcceptItemDialog";
 import { IssueItemDialog } from "./components/IssueItemDialog";
+import {Dialog, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
+import DialogActions from "@material-ui/core/DialogActions";
+import ReactToPrint from "react-to-print";
 
 const ACCEPT_ITEM = gql`
   mutation acceptItem($shipmentId: Long, $pkgId: Long, $purchaseItemId: Long, $productId: Long, $merchantId: Long, $description: String, $quantity: BigDecimal, $accepted: BigDecimal, $rejected: BigDecimal) {
@@ -25,7 +28,8 @@ const ACCEPT_ITEM = gql`
 const ISSUE_ITEM = gql`
   mutation issueItem($orderItemId : Long, $productId : Long, $description : String, $quantity : BigDecimal) {
     issueItem(orderItemId: $orderItemId, productId: $productId, description: $description, quantity: $quantity) {
-      value
+      id
+      shipmentId
     }
   }
 `;
@@ -67,6 +71,7 @@ export default function EditInPackage({state, dispatch}) {
 
   const alert = useAlert();
   const classes = useStyles();
+  const labelRef = useRef();
 
   const handleAcceptItem = async (data) => {
     console.log('handlin accept',data);
@@ -93,6 +98,7 @@ export default function EditInPackage({state, dispatch}) {
     console.log('handling issue',data);
     let dto = {
       ...data,
+      productId: state.item.productId,
       description: state.item.description
     }
     const {
@@ -101,8 +107,9 @@ export default function EditInPackage({state, dispatch}) {
       variables: { ...dto },
     });
     if(issueItem)  {
-      alert.success(issueItem.value);
-      dispatch({type:'ISSUE_ITEM_END'});
+      alert.success(issueItem.id);
+      //dispatch({type:'ISSUE_ITEM_END'});
+      dispatch({type:'PRINT_LABEL_START', payload:issueItem});
     }
   }
 
@@ -113,12 +120,26 @@ export default function EditInPackage({state, dispatch}) {
   const handleRefetch = async x => {
     refetch({keyword: x.keyword});
   }
-
+  const onClose = () => dispatch({type: 'PRINT_LABEL_CANCEL'})
   const handleAcceptClose = () => dispatch({type: 'SELECT_ACCEPT_ITEM_CANCEL'})
   const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
 
   return (
     <>
+      <Dialog open={state.printLabelDialog} onClose={onClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Prep Item</DialogTitle>
+          <DialogContent>
+            <ReactToPrint
+              trigger={() => <button>Print label!</button>}
+              content={() => labelRef.current}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+          </DialogActions>
+      </Dialog>
+
+      <span ref={labelRef}>{state.label}</span>
       <SectionCard>
         <CardHeader
           subheader="Sort"
