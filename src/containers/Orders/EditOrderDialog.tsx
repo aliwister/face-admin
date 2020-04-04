@@ -19,17 +19,18 @@ import Button from "@material-ui/core/Button";
 
 
 export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
-  console.log(orderItems);
-  const { register, handleSubmit, errors, control } = useForm({
-    defaultValues: orderItems
-  });
+  const { register, handleSubmit, errors, control } = useForm();
 
-  const handleSubmitEdit = (data) => console.log(data);
+  const handleSubmitEdit = (data) => {
+    console.log(data);
+    onClose();
+    onSubmit(data);
+  }
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
       <form onSubmit={handleSubmit(handleSubmitEdit)}>
-      <DialogTitle id="form-dialog-title">Accept Package</DialogTitle>
+      <DialogTitle id="form-dialog-title">Edit Order</DialogTitle>
       <DialogContent>
       <Table size="small" aria-label="a dense table">
         <TableHead>
@@ -42,10 +43,10 @@ export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {orderItems && orderItems.map(row => (
+          {orderItems && orderItems.map((row,i) => (
               <TableRow key={row.sequence}>
                 <TableCell component="th" scope="row">
-                  <TextField type="number" placeholder="Sequence" name={`sequence[${row.sequence}]`} inputRef={register} disabled/>
+                  <TextField type="number" placeholder="Sequence" name={`orderItems[${i}].sequence`} inputRef={register} value={row.sequence} disabled={true}/>
                 </TableCell>
                 <TableCell align="left">
                   <Image url={row.image} className="product-image"
@@ -53,11 +54,11 @@ export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
 
                 <TableCell align="left">{row.productName}</TableCell>
                 <TableCell align="center">
-                  <TextField type="number" placeholder="Sequence" name={`quantity[${row.sequence}]`} inputRef={register} />
-                  {row.quantity}</TableCell>
+                  <TextField type="number" placeholder="Quantity" name={`orderItems[${i}].quantity`} inputRef={register} defaultValue={row.quantity}/>
+                </TableCell>
 
                 <TableCell align="center">
-                  <TextField type="number" placeholder="Sequence" name={`price[${row.sequence}]`} inputRef={register} />
+                  <TextField inputProps={{step: 0.1}} type="number" placeholder="Price" name={`orderItems[${i}].price`} inputRef={register} defaultValue={row.price}/>
                 </TableCell>
 
               </TableRow>

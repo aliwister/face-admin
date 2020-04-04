@@ -85,6 +85,13 @@ mutation sendPaymentSms($id: ID, $mobile: String) {
   }
 }
 `;
+const EDIT_ORDER = gql`
+mutation editOrder($id: ID, $orderItems: [OrderItemInput]) {
+  editOrder(id:$id, orderItems:$orderItems) {
+    id
+  }
+}
+`;
 
 type CustomThemeT = { red400: string; textNormal: string; colors: any };
 const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
@@ -116,6 +123,15 @@ const statusSelectOptions = [
 
 export default function OrderDetails(props) {
   let { slug } = useParams();
+  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
+  const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
+  const { data, loading, error, refetch } = useQuery(GET_ORDER, {
+    variables: {
+      id: slug
+    },
+    fetchPolicy: "network-only",
+    context: { clientName: "shopLink" }
+  });
   const [contactbutton,setContactbutton] = useState(true);
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
@@ -134,14 +150,20 @@ export default function OrderDetails(props) {
       alert.success(sendPaymentSms.value);
     }
   }
-  const { data, loading, error, refetch } = useQuery(GET_ORDER, {
-    variables: {
-      id: slug
-    },
-    fetchPolicy: "network-only",
-    context: { clientName: "shopLink" }
-  });
-  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
+
+  const onEditOrder = async data => {
+    const {
+      data: { editOrder },
+    }: any = await editOrderMutation({
+      variables: {id: slug, orderItems: [...data.orderItems]}
+    });
+    if(editOrder)  {
+      alert.success(editOrder.id);
+      await refetch();
+    }
+  }
+
+
   //const []
 
   if (error) {
@@ -160,13 +182,10 @@ export default function OrderDetails(props) {
   }
   const onEditStart = () => setEditdialog(true);
   const onCancelEdit = () => setEditdialog(false);
-  const onSubmitEdit = async (data) => {
-    console.log(data);
-  }
 
   return (
     <Grid fluid={true}>
-      <EditOrderDialog onSubmit={onSubmitEdit} onClose={onCancelEdit} open={editdialog} orderItems={data.orderA.orderItems} />
+      <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={data.orderA.orderItems} />
       <Row>
         <Col lg={3} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
