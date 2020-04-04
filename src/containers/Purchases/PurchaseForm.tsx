@@ -177,7 +177,7 @@ function reducer(state, action) {
 
 
 export default function PurchaseForm({purchase}) {
-  const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE);
+  const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE,{ context: { clientName: "shopLink" }});
   const [po, setPO] = useState(0);
   const [items, setItems] = useState([]);
   const [create, setCreate] = useState(true);
@@ -188,8 +188,8 @@ export default function PurchaseForm({purchase}) {
   const [subtotal, setSubtotal] = useState(purchase.subtotal);
 
 
-  const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only"});
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
+  const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only", context: { clientName: "shopLink" }});
+  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS,{fetchPolicy: "network-only", context: { clientName: "shopLink" }});
   const [state, dispatch] = useReducer(reducer, purchase);
   //console.log(state);
   // console.log(merchants);

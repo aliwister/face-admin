@@ -157,8 +157,8 @@ export default function Orders() {
       limit: 10,
       searchText: "",
     },
-    fetchPolicy: "network-only"
-
+    fetchPolicy: "network-only",
+    context: { clientName: "shopLink" }
   });
   if (error) {
     return <div>Error! {error.message}</div>;

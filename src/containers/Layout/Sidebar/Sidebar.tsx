@@ -11,6 +11,7 @@ import {
   DASHBOARD,
   PRODUCTS,
   PURCHASES,
+    SHIPMENTS,
   ORDERS,
   CUSTOMERS,
   COUPONS,
@@ -26,6 +27,7 @@ import {
   CouponIcon,
   SettingIcon,
   LogoutIcon,
+  PencilIcon,
 } from '../../../components/AllSvgIcon';
 
 const sidebarMenus = [
@@ -46,6 +48,12 @@ const sidebarMenus = [
     path: PURCHASES,
     exact: false,
     icon: <SidebarCategoryIcon />,
+  },
+  {
+    name: 'Shipments',
+    path: SHIPMENTS,
+    exact: false,
+    icon: <PencilIcon />,
   },
   {
     name: 'Orders',

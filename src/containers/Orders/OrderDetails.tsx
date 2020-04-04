@@ -13,7 +13,6 @@ import Input from '../../components/Input/Input';
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
-import Checkbox from '../../components/CheckBox/CheckBox';
 import { Link, useParams  } from 'react-router-dom';
 import {
   OrderInfoPaper
@@ -37,6 +36,8 @@ import {
 } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Checkbox from "@material-ui/core/Checkbox";
+import {EditOrderDialog} from "./EditOrderDialog";
 
 const GET_ORDER = gql`
   query orderA($id: ID) {
@@ -118,36 +119,8 @@ export default function OrderDetails(props) {
   const [contactbutton,setContactbutton] = useState(true);
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [editdialog, setEditdialog] = useState(false);
   const alert = useAlert();
-  const [useCss, theme] = themedUseStyletron();
-  const sent = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.primary,
-    },
-  });
-  const failed = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.red400,
-    },
-  });
-  const processing = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.textNormal,
-    },
-  });
-  const paid = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.blue400,
-    },
-  });
-
-  const [status, setStatus] = useState([]);
-  const [limit, setLimit] = useState([]);
-  const [search, setSearch] = useState([]);
 
   const onSendSms = async data => {
     console.log(data);
@@ -161,15 +134,14 @@ export default function OrderDetails(props) {
       alert.success(sendPaymentSms.value);
     }
   }
-
-
   const { data, loading, error, refetch } = useQuery(GET_ORDER, {
     variables: {
       id: slug
     },
-    fetchPolicy: "network-only"
+    fetchPolicy: "network-only",
+    context: { clientName: "shopLink" }
   });
-  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS);
+  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
   //const []
 
   if (error) {
@@ -179,45 +151,51 @@ export default function OrderDetails(props) {
     return <div>Loading </div>
 
   function handleCheckbox(event) {
-    const { name } = event.currentTarget;
-    if (!checkedId.includes(name)) {
-      setCheckedId(prevState => [...prevState, name]);
+    let value = event.target.value;
+    if (!checkedId.includes(value)) {
+      setCheckedId(prevState => [...prevState, value]);
     } else {
-      setCheckedId(prevState => prevState.filter(id => id !== name));
+      setCheckedId(prevState => prevState.filter(id => id !== value));
     }
+  }
+  const onEditStart = () => setEditdialog(true);
+  const onCancelEdit = () => setEditdialog(false);
+  const onSubmitEdit = async (data) => {
+    console.log(data);
   }
 
   return (
     <Grid fluid={true}>
+      <EditOrderDialog onSubmit={onSubmitEdit} onClose={onCancelEdit} open={editdialog} orderItems={data.orderA.orderItems} />
       <Row>
         <Col lg={3} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Basic Info</Typography>
             <List>
-                  <ListItem>
-                    <ListItemText
-                        primary={data.orderA.reference}
-                        secondary= 'Order'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                        primary={`${data.orderA.customer.firstname} ${data.orderA.customer.lastname} / ${data.orderA.customer.id}`}
-                        secondary= 'Customer'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                        primary={`${data.orderA.orderState}`}
-                        secondary= 'Status'
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                          primary={`${data.orderA.currency} ${data.orderA.total}`}
-                          secondary= 'Total'
-                      />
-                  </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={data.orderA.reference}
+                  secondary= 'Order'
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={`${data.orderA.customer.firstname} ${data.orderA.customer.lastname} / ${data.orderA.customer.id}`}
+                  secondary= 'Customer'
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={`${data.orderA.orderState}`}
+                  secondary= 'Status'
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemText
+                  primary={`${data.orderA.currency} ${data.orderA.total}`}
+                  secondary= 'Total'
+                  />
+              </ListItem>
             </List>
           </OrderInfoPaper>
         </Col>
@@ -227,26 +205,26 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                    primary={`${data.orderA.deliveryAddress.firstName} ${data.orderA.deliveryAddress.lastName}`}
-                    secondary= 'Name'
+                  primary={`${data.orderA.deliveryAddress.firstName} ${data.orderA.deliveryAddress.lastName}`}
+                  secondary= 'Name'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                    primary={`${data.orderA.deliveryAddress.line1} ${data.orderA.deliveryAddress.line2}`}
-                    secondary= 'Address'
+                  primary={`${data.orderA.deliveryAddress.line1} ${data.orderA.deliveryAddress.line2}`}
+                  secondary= 'Address'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                    primary={data.orderA.deliveryAddress.city}
-                    secondary= 'City'
+                  primary={data.orderA.deliveryAddress.city}
+                  secondary= 'City'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                    primary={data.orderA.deliveryAddress.phone}
-                    secondary= 'Phone'
+                  primary={data.orderA.deliveryAddress.phone}
+                  secondary= 'Phone'
                 />
               </ListItem>
             </List>
@@ -258,6 +236,7 @@ export default function OrderDetails(props) {
             <div>
             <ButtonGroup size="large" color="primary" aria-label="large outlined primary button group">
               <Button onClick={onSendSms} disabled={!contactbutton}>SMS Contact</Button>
+              <Button onClick={onEditStart} >Edit order</Button>
               <Button>Cancel</Button>
             </ButtonGroup>
             </div>
@@ -284,38 +263,32 @@ export default function OrderDetails(props) {
                 </TableRow>
               </TableHead>
               {data && data.orderA.orderItems && (
-                  <TableBody>
+                <TableBody>
+                  {data.orderA.orderItems.map(row => (
+                    <TableRow key={row.sequence}>
+                      <TableCell align="right">
+                        <Checkbox
+                          name={row.orderId}
+                          checked={checkedId.includes(row.sequence)}
+                          onChange={handleCheckbox}
+                          value={row.sequence}
+                      />
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.sequence}
+                      </TableCell>
+                      <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
 
-                    {data.orderA.orderItems.map(row => (
-                        <TableRow key={row.orderId}>
-                          <TableCell align="right"><Checkbox
-                              name={row.id}
-                              checked={checkedId.includes(row.id)}
-                              onChange={handleCheckbox}
-                              overrides={{
-                                Checkmark: {
-                                  style: {
-                                    borderWidth: '2px',
-                                    borderRadius: '4px',
-                                  },
-                                },
-                              }}
-                          /></TableCell>
-                          <TableCell component="th" scope="row">
-                            {row.sequence}
-                          </TableCell>
-                          <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
+                      <TableCell align="left">{row.productName}</TableCell>
+                      <TableCell align="center">{row.quantity}</TableCell>
 
-                          <TableCell align="left">{row.productName}</TableCell>
-                          <TableCell align="center">{row.quantity}</TableCell>
-
-                          <TableCell align="center">{row.price}</TableCell>
-                          <TableCell align="right">OMR {row.lineTotal}</TableCell>
-                          <TableCell align="right">
-                          </TableCell>
-                        </TableRow>
-                    ))}
-                  </TableBody>
+                      <TableCell align="center">{row.price}</TableCell>
+                      <TableCell align="right">OMR {row.lineTotal}</TableCell>
+                      <TableCell align="right">
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               )}
             </Table>
           </TableContainer>

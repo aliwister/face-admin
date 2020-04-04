@@ -10,12 +10,14 @@ import {
   CUSTOMERS,
   COUPONS,
   STUFF_MEMBERS,
-  SITE_SETTINGS, ORDERDETAILS, PURCHASES, PURCHASEDETAILS, CART, SIGNUP
+  SITE_SETTINGS, ORDERDETAILS, PURCHASES, PURCHASEDETAILS, CART, SIGNUP, SHIPMENTS,SHIPMENTDETAILS
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
+import ShipmentDetails from "./containers/Shipments/ShipmentDetails";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
+const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
 const Products = lazy(() => import("./containers/Products/Products"));
 const Cart = lazy(() => import("./containers/Cart/Cart"));
 const AdminLayout = lazy(() => import("./containers/Layout/Layout"));
@@ -116,6 +118,20 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <PurchaseDetails />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={SHIPMENTS}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <Shipments />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={SHIPMENTDETAILS}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <ShipmentDetails />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

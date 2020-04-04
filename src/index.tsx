@@ -13,17 +13,68 @@ import { theme } from './theme';
 import Routes from './routes';
 import ApolloClient from 'apollo-client';
 import { ApolloLink, Observable } from 'apollo-link';
-import { createHttpLink } from 'apollo-link-http';
+import {createHttpLink, HttpLink} from 'apollo-link-http';
 import * as serviceWorker from './serviceWorker';
 import Cookies from 'js-cookie';
 import './theme/global.css';
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
+import { createMuiTheme} from '@material-ui/core/styles';
+import { ThemeProvider } from 'styled-components';
+import {AuthContext} from "./context/auth";
 const options = {
   timeout: 5000,
   position: positions.BOTTOM_CENTER
 };
 
+
+const token = Cookies.get('token');
+
+
+const shopLink = new HttpLink({
+  uri: process.env.REACT_APP_API_URL1,
+  headers: {
+    Authorization: `Bearer ${token}`
+  },
+});
+const adminLink = new HttpLink({
+  uri: process.env.REACT_APP_API_URL2,
+  headers: {
+    Authorization: `Bearer ${token}`
+  },
+
+  // other link options...
+});
+//createHttpLink({ uri: process.env.REACT_APP_API_URL })
+//const adminLink = createHttpLink({ uri: 'fuckyou' })
+/*const authLink = setContext((_, { headers }) => {
+
+  }
+        [
+    onError(({ graphQLErrors, networkError }) => {
+      if (graphQLErrors) {
+        console.log(graphQLErrors);
+        Cookies.remove('token', { path: '' });
+      }
+      if (networkError) {
+        //logoutUser();
+        console.log(graphQLErrors);
+        Cookies.remove('token', { path: '' });
+        //window.location.href='/';
+      }
+    }),
+    auth
+})*/
+const client = new ApolloClient({
+  link: ApolloLink.split(
+      operation => operation.getContext().clientName === "shopLink", // Routes the query to the proper client
+      shopLink,
+      adminLink
+  ),
+  cache: new InMemoryCache()
+});
+
+/*
 const httpLink = createHttpLink({ uri: process.env.REACT_APP_API_URL })
 const authLink = setContext((_, { headers }) => {
   const token = Cookies.get('token');
@@ -53,9 +104,10 @@ const client = new ApolloClient({
 
   cache: new InMemoryCache()
 });
-import { createMuiTheme} from '@material-ui/core/styles';
-import { ThemeProvider } from 'styled-components';
-import {AuthContext} from "./context/auth";
+*/
+
+
+
 const mtheme = createMuiTheme();
 
 function App() {

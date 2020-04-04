@@ -58,7 +58,8 @@ export const DrawerIcon = styled("div", ({ $theme }) => ({
 export const LogoImage = styled("img", () => ({
   display: "block",
   backfaceVisibility: "hidden",
-  maxWidth: "150px"
+  maxWidth: "150px",
+  textAlign: "center"
 }));
 
 export const TopbarRightSide = styled("div", () => ({

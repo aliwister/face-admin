@@ -138,7 +138,7 @@ export default function Purchases() {
   const alert = useAlert();
   const classes = useStyles();
   const history = useHistory();
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
+  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
   const [createPurchaseMutation] = useMutation(CREATE_PURCHASE);
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
@@ -173,8 +173,8 @@ export default function Purchases() {
       limit: 10,
       searchText: "",
     },
-    fetchPolicy: "network-only"
-
+    fetchPolicy: "network-only",
+    context: { clientName: "shopLink" }
   });
   if (error) {
     return <div>Error! {error.message}</div>;

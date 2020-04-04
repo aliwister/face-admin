@@ -80,10 +80,7 @@ function reducer(state, action) {
   }
 }
 export default function PurchaseDetails(props) {
-  console.log('in purchase details')
   let { slug } = useParams();
-  console.log(slug);
-
 
   const [po, setPO] = useState(0);
   const [items, setItems] = useState([]);
@@ -91,13 +88,9 @@ export default function PurchaseDetails(props) {
   const [update, setUpdate] = useState(false);
   const [pqButton, setPQButton] = useState([]);
 
-
-  const { data:dp, loading:lp, error:ep, refetch:rp } = useQuery(PURCHASE, {variables: {id: slug}, fetchPolicy: "network-only"});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = useQuery(PURCHASE, {variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "shopLink" }});
   const alert = useAlert();
   const classes = useStyles();
-
-
-
 
   const addToPurchase = ({id,price,quantity, productName}) => {
     setItems([
@@ -114,11 +107,9 @@ export default function PurchaseDetails(props) {
     return <div>Loading</div>
 
   return (
-
-      <>
-        <Heading>Purchase PO {dp.purchase.id}</Heading>
-        <PurchaseForm purchase={dp.purchase}/>
-
+    <>
+      <Heading>Purchase PO {dp.purchase.id}</Heading>
+      <PurchaseForm purchase={dp.purchase}/>
     </>
   );
 }

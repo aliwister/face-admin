@@ -1,0 +1,40 @@
+import {Dialog, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import DialogActions from "@material-ui/core/DialogActions";
+import Button from "@material-ui/core/Button";
+import React from "react";
+import {useForm} from "react-hook-form";
+
+export const AcceptItemDialog = ({item, open, onClose, onSubmit}) => {
+  const { register, handleSubmit, errors } = useForm({
+    defaultValues: {
+      productId: (item)?item.productId:null,
+      merchantId: (item)?item.merchantId:null
+    }
+  });
+
+  const onSubmitDialog = (data) => {
+    onSubmit(data);
+  }
+
+  return (
+    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
+      <form onSubmit={handleSubmit(onSubmitDialog)}>
+        <DialogTitle id="form-dialog-title">Accept Item</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Package Info
+          </DialogContentText>
+          <TextField fullWidth type="number" placeholder="Product ID" name="productId" inputRef={register({required: true})}  />
+          <TextField fullWidth type="number" placeholder="Merchant ID" name="merchantId" inputRef={register({required: true})} />
+          <TextField fullWidth type="number" placeholder="Accepted" name="accepted" inputRef={register({required: true})} />
+          <TextField fullWidth type="number" placeholder="Rejected" name="rejected" inputRef={register({required: true})} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit">Accept</Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  )
+}
