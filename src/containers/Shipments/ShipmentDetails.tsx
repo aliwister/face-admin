@@ -48,6 +48,8 @@ query shipment($id: ID) {
       shipmentMethod
       shipmentType
       shipmentStatus
+      customerFirstName
+      customerLastName
       customerId
       merchantId
       pkgs {
@@ -57,6 +59,14 @@ query shipment($id: ID) {
         width
         height
         weight
+        shipmentItems {
+          id
+          sequence
+          quantity
+          description
+          shipmentId
+          productId
+        }
       }
       shipmentItems {
         id
@@ -66,6 +76,9 @@ query shipment($id: ID) {
         shipmentId
         productId
       }
+      progressTotal
+      progressDone
+      progressTodo
   }
 }
 `;
@@ -109,7 +122,7 @@ export default function ShipmentDetails(props) {
         </Breadcrumbs>
       </Grid>
       <Grid item xs={6}>
-        <span style={{float: "right"}}><Button color="primary" variant="contained" onClick={sendToDetrack}>Send To Detrack</Button></span>
+
       </Grid>
       <Grid item xs={12}>
         <EditShipment shipment={dp.shipment} merchants={merchants} refreshShipment={rp}/>

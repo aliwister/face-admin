@@ -19,6 +19,7 @@ import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import {ListItem} from "@material-ui/core";
 import ListItemText from "@material-ui/core/ListItemText";
+import {SendToDetrackDialog} from "./components/SendToDetrackDialog";
 const ACCEPT_PACKAGE = gql`
   mutation acceptPackage($pkg: PackageInput) {
     acceptPackage(pkg: $pkg) {
@@ -30,6 +31,13 @@ const SAVE_SHIPMENT = gql`
   mutation saveShipment($shipment: ShipmentInput) {
     saveShipment(shipment: $shipment) {
       id
+    }
+  }
+`;
+const SEND_TO_DETRACK = gql`
+  mutation sendToDetrack($shipmentId: Long, $orderId: Long, $name: String, $instructions: String, $date: String, $time: String, $assignTo: String) {
+    sendToDetrack(shipmentId: $shipmentId, orderId: $orderId, name: $name, instructions: $instructions, date: $date, time: $time, assignTo: $assignTo) {
+      value
     }
   }
 `;
@@ -139,6 +147,17 @@ function reducer(state, action) {
         ...state,
         printLabelDialog: false,
       }
+    case 'SEND_TO_DETRACK_START':
+      return {
+        ...state,
+        sendDetrackDialog: true,
+      }
+    case 'SEND_TO_DETRACK_CANCEL':
+    case 'SEND_TO_DETRACK_END':
+      return {
+        ...state,
+        sendDetrackDialog: false,
+      }
     default:
       return state;
   }
@@ -147,6 +166,7 @@ function reducer(state, action) {
 export default function EditShipment({shipment, merchants, refreshShipment}) {
   const [acceptPackageMutation] = useMutation(ACCEPT_PACKAGE,{ context: { clientName: "adminLink" }});
   const [saveShipmentMutation] = useMutation(SAVE_SHIPMENT,{ context: { clientName: "adminLink" }});
+  const [sendDetrackMutation]  = useMutation(SEND_TO_DETRACK,{ context: { clientName: "adminLink" }});
   const alert = useAlert();
   const classes = useStyles();
 
@@ -161,6 +181,7 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
     printLabelDialog: false,
     item: null,
     selectedPkgIndex: -1,
+    sendDetrackDialog: false
   };
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
@@ -180,6 +201,28 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
       alert.success("Package added successfully");
       refreshShipment({id:shipment.id})
       dispatch({type:'ADD_PACKAGE_END'})
+    }
+  }
+  const handleDetrackSubmit = async (data) => {
+	  console.log(data);
+	  let dto = {
+      orderId: shipment.reference,
+      name: shipment.customerFirstName + " " + shipment.customerLastName,
+      instructions: shipment.handlingInstructions,
+      date: shipment.estimated_ship_date,
+      time: 'morning',
+      assignTo: data.assignTo.value,
+		  shipmentId: shipment.id
+	  }
+    const {
+      data: { sendToDetrack },
+    }: any = await sendDetrackMutation({
+      variables: { ...dto },
+    });
+    if(sendToDetrack)  {
+      alert.success(sendToDetrack.value);
+      refreshShipment({id:shipment.id})
+      dispatch({type:'SEND_TO_DETRACK_END'})
     }
   }
   const handleListItemClick = (event, index) => {
@@ -209,15 +252,24 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
   }
 
 
+  const handleDetrackStart = () => dispatch({type:'SEND_TO_DETRACK_START'});
+  const handleDetrackCancel = () => dispatch({type:'SEND_TO_DETRACK_CANCEL'});
+
+
+
   return (
 	  <Grid container xs={12} md={12} spacing={1}>
 		  <Grid item md={4}>
+        <SendToDetrackDialog onSubmit={handleDetrackSubmit} onClose={handleDetrackCancel} open={state.sendDetrackDialog} />
         {(shipment.shipmentType === 'PURCHASE') &&
           <PurchaseShipmentDetailsForm merchants={merchants} shipment={state.shipment} onSubmit={handleSaveShipment}/>
         }
         {(shipment.shipmentType === 'CUSTOMER') &&
           <CustomerShipmentDetailsForm shipment={state.shipment} onSubmit={handleSaveShipment}/>
         }
+        <SectionCard>
+          <Button color="primary" variant="contained" onClick={handleDetrackStart}>Send To Detrack</Button>
+        </SectionCard>
         <SectionCard>
           <CardHeader subheader="Packages"
             action={<Button variant="contained" color="primary" size="small" onClick={handleAcceptPackageDialog}>Add Package</Button>}
@@ -237,8 +289,10 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
         </SectionCard>
       </Grid>
       <Grid item md={8}>
-        <ShipmentItems state={state} dispatch={dispatch}/>
-
+        <ShipmentItems state={state.shipment} dispatch={dispatch} label={"Shipment Items"}/>
+        {state.pkg &&
+        <ShipmentItems state={state.pkg} dispatch={dispatch} label={"Package Items"}/>
+        }
         {(shipment.shipmentType === 'PURCHASE') &&
           <EditInPackage state={state} dispatch={dispatch}/>
         }

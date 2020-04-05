@@ -51,7 +51,11 @@ const SHIPMENTS = gql`
         customerFirstName
         customerLastName
         merchantName
+        progressTotal
+        progressDone
+        progressTodo
       }
+
   }
 `;
 const MERCHANTS = gql`
@@ -254,12 +258,13 @@ export default function Shipments() {
                 <TableRow>
                   <TableCell>#</TableCell>
                   <TableCell>ID</TableCell>
-                  <TableCell align="left">Ref</TableCell>
                   <TableCell align="left">Name</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="center">Payment</TableCell>
-                  <TableCell align="center">Date</TableCell>
-                  <TableCell align="center">Status</TableCell>
+                  <TableCell align="left">Type</TableCell>
+                  <TableCell align="right">Status</TableCell>
+                  <TableCell align="center">Ref</TableCell>
+                  <TableCell align="center">To</TableCell>
+                  <TableCell align="center">Shipment Method</TableCell>
+                  <TableCell align="center">Progress</TableCell>
                 </TableRow>
               </TableHead>
               {data && data.shipments.length && (
@@ -285,9 +290,10 @@ export default function Shipments() {
                       <TableCell align="left">{row.customerFirstName} {row.customerLastName}</TableCell>
                       <TableCell align="left">{row.shipmentType}</TableCell>
                       <TableCell align="right">{row.shipmentStatus}</TableCell>
-                      <TableCell align="center">OMR {row.reference}</TableCell>
+                      <TableCell align="center">{row.reference}</TableCell>
                       <TableCell align="right">{row.city}</TableCell>
                       <TableCell align="right">{row.shipmentMethod}</TableCell>
+                      <TableCell align="right">{100*row.progressTodo/((row.progressTotal+0) - (row.progressDone+0))} %</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

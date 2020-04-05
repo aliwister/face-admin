@@ -25,3 +25,7 @@ export const SHIPMENT_TYPES = [
   {value: 'RETURN', label: 'RETURN'},
   {value: 'TRANSFER', label: 'TRANSFER'},
 ]
+export const DRIVERS = [
+  {value: 'Shabib', label: 'Shabib'},
+  {value: 'Pickup', label: 'Pickup'},
+]

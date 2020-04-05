@@ -8,6 +8,7 @@ import Button from "@material-ui/core/Button";
 import {Controller, useForm} from "react-hook-form";
 import CardHeader from "@material-ui/core/CardHeader";
 import Select from "react-select";
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -42,11 +43,11 @@ export const CustomerShipmentDetailsForm = ({shipment, onSubmit}) => {
       <form className={classes.form} onSubmit={handleSubmit(onSubmitForm)}>
       <CardHeader
         subheader="Shipment Info"
-        action={<Button variant="contained" color="primary" type="submit" size="small">Save</Button>}
+        action={<><Button variant="contained" color="primary" type="submit" size="small">Save</Button><Link to={`/order-details/${shipment.reference}`}>Go</Link></>}
       />
       <Grid container xs={12} md={12} spacing={1}>
         <Grid item md={6}>
-          <TextField size="small" label="Ref" variant="outlined" className={classes.textField} name="reference" value={shipment.customerId}/>
+          <TextField size="small" label="To" variant="outlined" className={classes.textField} name="reference" value={shipment.customerFirstName + " " + shipment.customerLastName}/>
         </Grid>
         <Grid item md={6}>
           <TextField size="small" label="Ref" variant="outlined" className={classes.textField} name="reference" inputRef={register}/>
@@ -55,7 +56,7 @@ export const CustomerShipmentDetailsForm = ({shipment, onSubmit}) => {
           <TextField fullWidth size="small" label="Shipping Instructions" variant="outlined"  name="handlingInstructions" className={classes.textField} inputRef={register}/>
         </Grid>
         <Grid item md={12}>
-
+          <TextField fullWidth size="small" label="Estimated Date" variant="outlined" type="date" name="estimatedShipDate" className={classes.textField} inputRef={register}/>
         </Grid>
       </Grid>
       </form>

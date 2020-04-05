@@ -8,14 +8,14 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-export const ShipmentItems = ({state, dispatch}) => {
+export const ShipmentItems = ({state, dispatch, label}) => {
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header">
-        <Typography>Content</Typography>
+        <Typography>{label}</Typography>
       </ExpansionPanelSummary>
       <ExpansionPanelDetails>
         <Table  size="small" aria-label="a dense table">
@@ -36,7 +36,7 @@ export const ShipmentItems = ({state, dispatch}) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {state.shipment.shipmentItems && state.shipment.shipmentItems.map((a,b) => (
+            {state.shipmentItems && state.shipmentItems.map((a,b) => (
               <TableRow>
                 <TableCell>{a.sequence}</TableCell>
                 <TableCell>{a.description}</TableCell>
