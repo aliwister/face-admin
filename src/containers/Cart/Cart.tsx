@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function Cart() {
-  const [createCartMutation] = useMutation(CREATE_CART);
+  const [createCartMutation] = useMutation(CREATE_CART, { context: { clientName: "shopLink" }});
   const [po, setPO] = useState(0);
   const [items, setItems] = useState([]);
   const [secureKey, setSecureKey] = useState('');
@@ -83,7 +83,7 @@ export default function Cart() {
   const [subtotal, setSubtotal] = useState();
   const { register, handleSubmit, errors } = useForm();
 
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS);
+  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, { context: { clientName: "shopLink" }});
   const alert = useAlert();
   const classes = useStyles();
 
