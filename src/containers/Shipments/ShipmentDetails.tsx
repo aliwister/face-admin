@@ -66,6 +66,7 @@ query shipment($id: ID) {
           description
           shipmentId
           productId
+          image
         }
       }
       shipmentItems {
@@ -75,6 +76,7 @@ query shipment($id: ID) {
         description
         shipmentId
         productId
+        image
       }
       progressTotal
       progressDone
