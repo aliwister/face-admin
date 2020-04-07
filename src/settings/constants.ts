@@ -20,4 +20,4 @@ export const CART = '/cart';
 export const SIGNUP = '/signup';
 // **************** ROUTE CONSTANT END **************************
 
-export const CURRENCY = '$';
+export const CURRENCY = 'OMR';

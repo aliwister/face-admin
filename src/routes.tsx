@@ -46,13 +46,57 @@ const Signup = lazy(() => import("./containers/Signup/Signup"));
  */
 
 function PrivateRoute({ children, ...rest }) {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, isAdmin, isMerchant } = useContext(AuthContext);
   console.log('in private route:',isAuthenticated);
   return (
     <Route
       {...rest}
       render={({ location }) =>
         isAuthenticated ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
+function EmployeeRoute({ children, ...rest }) {
+  const { isAuthenticated, isAdmin, isMerchant  } = useContext(AuthContext);
+  console.log('in private route:',isAuthenticated);
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isAuthenticated && isAdmin ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
+function MerchantRoute({ children, ...rest }) {
+  const { isAuthenticated, isAdmin, isMerchant  } = useContext(AuthContext);
+  console.log('in private route:',isAuthenticated);
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isAuthenticated && isMerchant? (
           children
         ) : (
           <Redirect
@@ -79,13 +123,13 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
-          <PrivateRoute path={PRODUCTS}>
+          <MerchantRoute path={PRODUCTS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Products />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
+          </MerchantRoute>
           <PrivateRoute path={CATEGORY}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
@@ -93,13 +137,13 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
-          <PrivateRoute path={ORDERS}>
+          <EmployeeRoute path={ORDERS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Orders />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
+          </EmployeeRoute>
           <PrivateRoute path={ORDERDETAILS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
@@ -107,27 +151,27 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
-          <PrivateRoute path={PURCHASES}>
+          <EmployeeRoute path={PURCHASES}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Purchases />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
-          <PrivateRoute path={PURCHASEDETAILS}>
+          </EmployeeRoute>
+          <EmployeeRoute path={PURCHASEDETAILS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <PurchaseDetails />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
-          <PrivateRoute path={SHIPMENTS}>
+          </EmployeeRoute>
+          <EmployeeRoute path={SHIPMENTS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Shipments />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
+          </EmployeeRoute>
           <PrivateRoute path={SHIPMENTDETAILS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
@@ -135,48 +179,48 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
-          <PrivateRoute path={CUSTOMERS}>
+          <EmployeeRoute path={CUSTOMERS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Customers />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
-          <PrivateRoute path={COUPONS}>
+          </EmployeeRoute>
+          <EmployeeRoute path={COUPONS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Coupons />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
+          </EmployeeRoute>
           <PrivateRoute path={CART}>
-            <AdminLayout>
+            <EmployeeRoute>
               <Suspense fallback={<InLineLoader />}>
                 <Cart />
               </Suspense>
-            </AdminLayout>
+            </EmployeeRoute>
           </PrivateRoute>
-          <PrivateRoute path={SETTINGS}>
+          <EmployeeRoute path={SETTINGS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <Settings />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
-          <PrivateRoute path={STUFF_MEMBERS}>
+          </EmployeeRoute>
+          <EmployeeRoute path={STUFF_MEMBERS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <StaffMembers />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
-          <PrivateRoute path={SITE_SETTINGS}>
+          </EmployeeRoute>
+          <EmployeeRoute path={SITE_SETTINGS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <SiteSettingForm />
               </Suspense>
             </AdminLayout>
-          </PrivateRoute>
+          </EmployeeRoute>
           <Route path={LOGIN}>
             <Login />
           </Route>

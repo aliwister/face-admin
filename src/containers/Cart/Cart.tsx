@@ -70,12 +70,7 @@ export default function Cart() {
   const [items, setItems] = useState([]);
   const [secureKey, setSecureKey] = useState('');
   const [create, setCreate] = useState(true);
-  const [update, setUpdate] = useState(false);
-  // const [image, setImage] = useState('');
-  // const [url, setUrl] = useState('');
-  // const [price, setPrice] = useState('');
-  // const [cost, setCost] = useState('');
-  // const [title, setTitle] = useState('');
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');

@@ -42,7 +42,7 @@ const data = [
 ];
 const Topbar = ({ refs }: any) => {
   const dispatch = useDrawerDispatch();
-  const { signout } = React.useContext(AuthContext);
+  const { signout, isMerchant, isAdmin } = React.useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const openDrawer = useCallback(
     () => dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'PRODUCT_FORM' }),
@@ -102,8 +102,9 @@ const Topbar = ({ refs }: any) => {
       </DrawerWrapper>
 
       <TopbarRightSide>
+        {isMerchant &&
         <Button onClick={openDrawer}>Add Products</Button>
-
+        }
         <Popover
           content={({ close }) => <Notification data={data} onClear={close} />}
           accessibilityType={'tooltip'}
@@ -133,12 +134,15 @@ const Topbar = ({ refs }: any) => {
         <Popover
           content={({ close }) => (
             <UserDropdowItem>
+              {isAdmin &&
               <NavLink to={STUFF_MEMBERS} exact={false} onClick={close}>
                 Staff
-              </NavLink>
+              </NavLink>}
+              {isAdmin &&
               <NavLink to={SETTINGS} exact={false} onClick={close}>
                 Settings
               </NavLink>
+              }
               <LogoutBtn
                 onClick={() => {
                   signout();

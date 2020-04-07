@@ -65,31 +65,45 @@ export const LoaderItem = styled('div', () => ({
   marginBottom: '30px',
 }));
 
-const GET_PRODUCTS = gql`
-  query getProducts(
+export const MERCHANT_PRODUCTS = gql`
+  query merchantProducts(
     $type: String
-    $sortByPrice: String
-    $searchText: String
+    $limit: Int
+    $text: String
     $offset: Int
+    $lang: Int
   ) {
-    products(
+    merchantProducts(
       type: $type
-      sortByPrice: $sortByPrice
-      searchText: $searchText
+      limit: $limit
+      text: $text
       offset: $offset
+      lang: $lang
     ) {
       items {
         id
+        ref
         name
+        brand
         description
+        features               
+        name_ar
+        brand_ar
+        description_ar
+        features_ar
         image
-        type
         price
         unit
+        sku
         salePrice
         discountInPercent
+        upc
+        availability
+        weight
+        cost
+        quantity
       }
-      totalCount
+      total
       hasMore
     }
   }
@@ -107,7 +121,7 @@ const priceSelectOptions = [
 ];
 
 export default function Products() {
-  const { data, error, refetch, fetchMore } = useQuery(GET_PRODUCTS);
+  const { data, error, refetch, fetchMore } = useQuery(MERCHANT_PRODUCTS,{ context: { clientName: "shopLink" }});
   const [type, setType] = useState([]);
   const [priceOrder, setPriceOrder] = useState([]);
   const [search, setSearch] = useState([]);
@@ -170,7 +184,7 @@ export default function Products() {
             <Col md={2} xs={12}>
               <Heading>Products</Heading>
             </Col>
-
+{/*
             <Col md={10} xs={12}>
               <Row>
                 <Col md={3} xs={12}>
@@ -206,13 +220,13 @@ export default function Products() {
                   />
                 </Col>
               </Row>
-            </Col>
+            </Col>*/}
           </Header>
 
           <Row>
             {data ? (
-              data.products && data.products.items.length !== 0 ? (
-                data.products.items.map((item: any, index: number) => (
+              data.merchantProducts && data.merchantProducts.items.length !== 0 ? (
+                data.merchantProducts.items.map((item: any, index: number) => (
                   <Col
                     md={4}
                     lg={3}
@@ -223,8 +237,8 @@ export default function Products() {
                   >
                     <Fade bottom duration={800} delay={index * 10}>
                       <ProductCard
-                        title={item.name}
-                        weight={item.unit}
+                        title={item.title}
+                        weight={item.brand}
                         image={item.image}
                         currency={CURRENCY}
                         price={item.price}

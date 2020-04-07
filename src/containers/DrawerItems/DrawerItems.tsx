@@ -15,7 +15,7 @@ import Sidebar from '../Layout/Sidebar/Sidebar';
 /** Components Name Constants */
 const DRAWER_COMPONENTS = {
   PRODUCT_FORM: ProductForm,
-  PRODUCT_UPDATE_FORM: ProductUpdateForm,
+  PRODUCT_UPDATE_FORM: ProductForm,
   CAMPAING_FORM: CampaingForm,
   CATEGORY_FORM: CategoryForm,
   STAFF_MEMBER_FORM: StaffMemberForm,

@@ -35,48 +35,56 @@ const sidebarMenus = [
     name: 'Dashboard',
     path: DASHBOARD,
     exact: true,
+    isAdmin: 1,
     icon: <DashboardIcon />,
   },
   {
     name: 'Products',
     path: PRODUCTS,
     exact: false,
+    isMerchant: 1,
     icon: <ProductIcon />,
   },
   {
     name: 'Purchasing',
     path: PURCHASES,
     exact: false,
+    isAdmin: 1,
     icon: <SidebarCategoryIcon />,
   },
   {
     name: 'Shipments',
     path: SHIPMENTS,
     exact: false,
+    isAdmin: 1,
     icon: <PencilIcon />,
   },
   {
     name: 'Orders',
     path: ORDERS,
     exact: false,
+    isAdmin: 1,
     icon: <OrderIcon />,
   },
   {
     name: 'Customers',
     path: CUSTOMERS,
     exact: false,
+    isAdmin: 1,
     icon: <CustomerIcon />,
   },
   {
     name: 'Coupons',
     path: COUPONS,
     exact: false,
+    isAdmin: 1,
     icon: <CouponIcon />,
   },
   {
     name: 'Settings',
     path: SETTINGS,
     exact: false,
+    isAdmin: 1,
     icon: <SettingIcon />,
   },
 ];
@@ -86,25 +94,43 @@ export default withRouter(function Sidebar({
   style,
   onMenuItemClick,
 }: any) {
-  const { signout } = useContext(AuthContext);
+  const { signout, isMerchant, isAdmin } = useContext(AuthContext);
   return (
     <SidebarWrapper ref={refs} style={style}>
       <MenuWrapper>
         {sidebarMenus.map((menu: any, index: number) => (
-          <NavLink
-            to={menu.path}
-            key={index}
-            exact={menu.exact}
-            activeStyle={{
-              color: '#00C58D',
-              backgroundColor: '#f7f7f7',
-              borderRadius: '50px 0 0 50px',
-            }}
-            onClick={onMenuItemClick}
-          >
-            {menu.icon ? <Svg>{menu.icon}</Svg> : ''}
-            {menu.name}
-          </NavLink>
+          <>
+          {isMerchant && menu.isMerchant &&
+            <NavLink
+              to={menu.path}
+              key={index}
+              exact={menu.exact}
+              activeStyle={{
+                color: '#00C58D',
+                backgroundColor: '#f7f7f7',
+                borderRadius: '50px 0 0 50px',
+              }}
+              onClick={onMenuItemClick}
+            >
+              {menu.icon ? <Svg>{menu.icon}</Svg> : ''}
+              {menu.name}
+            </NavLink>}
+          {isAdmin && menu.isAdmin &&
+            <NavLink
+              to={menu.path}
+              key={index}
+              exact={menu.exact}
+              activeStyle={{
+                color: '#00C58D',
+                backgroundColor: '#f7f7f7',
+                borderRadius: '50px 0 0 50px',
+              }}
+              onClick={onMenuItemClick}
+            >
+              {menu.icon ? <Svg>{menu.icon}</Svg> : ''}
+              {menu.name}
+            </NavLink>}
+        </>
         ))}
       </MenuWrapper>
 

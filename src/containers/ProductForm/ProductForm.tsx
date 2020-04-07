@@ -4,7 +4,7 @@ import uuidv4 from 'uuid/v4';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { useDrawerDispatch } from '../../context/DrawerContext';
+import {useDrawerDispatch, useDrawerState} from '../../context/DrawerContext';
 import Uploader from '../../components/Uploader/Uploader';
 import Button, { KIND } from '../../components/Button/Button';
 import DrawerBox from '../../components/DrawerBox/DrawerBox';
@@ -21,6 +21,7 @@ import {
   FieldDetails,
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
+import {MERCHANT_PRODUCTS} from "../Products/Products";
 
 const options = [
   { value: 'Fruits & Vegetables', name: 'Fruits & Vegetables', id: '1' },
@@ -41,53 +42,44 @@ const typeOptions = [
   { value: 'bags', name: 'Bags', id: '3' },
   { value: 'makeup', name: 'Makeup', id: '4' },
 ];
-const GET_PRODUCTS = gql`
-  query getProducts(
-    $type: String
-    $sortByPrice: String
-    $searchText: String
-    $offset: Int
-  ) {
-    products(
-      type: $type
-      sortByPrice: $sortByPrice
-      searchText: $searchText
-      offset: $offset
-    ) {
-      items {
-        id
-        name
-        image
-        type
-        price
-        unit
-        salePrice
-        discountInPercent
-      }
-      totalCount
-      hasMore
+
+const GET_IMAGE_UPLOAD_URL = gql`
+  mutation getImageUploadUrl($filename: String) {
+    getImageUploadUrl(filename: $filename) {
+      uploadUrl
+      imageUrl
+      status
     }
-  }
+  }    
 `;
-const CREATE_PRODUCT = gql`
-  mutation createProduct($product: AddProductInput!) {
-    createProduct(product: $product) {
+export const CREATE_PRODUCT = gql`
+  mutation createMerchantProduct($product: AddProductInput!) {
+    createMerchantProduct(product: $product) {
       id
-      name
-      image
       slug
+      name
+      name_ar
       type
-      price
       unit
-      description
+      price
       salePrice
+      description
+      description_ar
+      features
+      features_ar
+      sku
+      unit
+      cost
       discountInPercent
-      # per_unit
-      quantity
-      # creation_date
+      availability
+      image
     }
   }
 `;
+
+
+
+
 type Props = any;
 
 const AddProduct: React.FC<Props> = props => {
@@ -95,10 +87,14 @@ const AddProduct: React.FC<Props> = props => {
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);
-  const { register, handleSubmit, setValue } = useForm();
+  const updateData = useDrawerState('data');
+  console.log(updateData);
+  const { register, handleSubmit, setValue } = useForm({defaultValues: updateData});
   const [type, setType] = useState([]);
   const [tag, setTag] = useState([]);
+  const [files, setFiles] = useState([]);
   const [description, setDescription] = useState('');
+  const [description_ar, setDescriptionar] = useState('');
 
   React.useEffect(() => {
     register({ name: 'type' });
@@ -107,24 +103,38 @@ const AddProduct: React.FC<Props> = props => {
     register({ name: 'description' });
   }, [register]);
 
+  React.useEffect(() => {
+    if(updateData && updateData.description_ar)
+      setDescriptionar(updateData.description_ar);
+  },[updateData]);
+
+
   const handleDescriptionChange = e => {
     const value = e.target.value;
     setValue('description', value);
     setDescription(value);
   };
+  const handleDescriptionChangeAr = e => {
+    const value = e.target.value;
+    setValue('description_ar', value);
+    setDescriptionar(value);
+  };
 
-  const [createProduct] = useMutation(CREATE_PRODUCT, {
-    update(cache, { data: { createProduct } }) {
+  const [getImageUrl] = useMutation(GET_IMAGE_UPLOAD_URL, { context: { clientName: "shopLink" }});
+
+  const [createMerchantProduct] = useMutation(CREATE_PRODUCT, {
+    context: { clientName: "shopLink" },
+    update(cache, { data: { createMerchantProduct } }) {
       const { products } = cache.readQuery({
-        query: GET_PRODUCTS,
+        query: MERCHANT_PRODUCTS,
       });
 
       cache.writeQuery({
-        query: GET_PRODUCTS,
+        query: MERCHANT_PRODUCTS,
         data: {
           products: {
             __typename: products.__typename,
-            items: [createProduct, ...products.items],
+            items: [createMerchantProduct, ...products.items],
             hasMore: true,
             totalCount: products.items.length + 1,
           },
@@ -141,30 +151,75 @@ const AddProduct: React.FC<Props> = props => {
     setValue('type', value);
     setType(value);
   };
-  const handleUploader = files => {
-    setValue('image', files[0].path);
+  const handleUploader = async files => {
+    console.log(files);
+    setFiles(files);
   };
-  const onSubmit = data => {
+  const onSubmit = async data => {
     const newProduct = {
-      id: uuidv4(),
+      id: updateData?Number(updateData.id):null,
+      sku: data.sku,
       name: data.name,
+      name_ar: data.name_ar,
+      brand: data.brand,
+      brand_ar: data.brand_ar,
       type: data.type[0].value,
       description: data.description,
+      description_ar: data.description_ar,
+      features: data.features,
+      features_ar: data.features_ar,
       image: data.image && data.image.length !== 0 ? data.image : '',
+      upc: data.upc,
+      cost: data.cost,
+      weight: data.weight,
+      availability: data.availability,
       price: Number(data.price),
       unit: data.unit,
       salePrice: Number(data.salePrice),
-      discountInPercent: Number(data.discountInPercent),
+      //discountInPercent: Number(data.discountInPercent),
       quantity: Number(data.quantity),
-      slug: data.name,
-      creation_date: new Date(),
+      //slug: data.name,
+      //creation_date: new Date(),
     };
-    console.log(newProduct, 'newProduct data');
-    createProduct({
+    if (!data.image && !files.length ) {
+      alert("image is required");
+      return;
+    }
+    if(files.length > 0)
+      newProduct.image = await handleUpload();
+    //setValue('image', "https://cdn.badals.com/"+files[0].path);
+
+    console.log(newProduct);
+
+    createMerchantProduct({
       variables: { product: newProduct },
     });
     closeDrawer();
   };
+
+  const handleUpload = async () => {
+    const [pendingImage] = files;
+    console.log(pendingImage);
+    const filename = pendingImage.path;
+    const { data: { getImageUploadUrl },}: any = await getImageUrl({variables: {filename: filename, contentType: pendingImage.type}});
+
+    let myHeaders = new Headers();
+    myHeaders.append("Content-Type", pendingImage.type);
+
+    await fetch(getImageUploadUrl.uploadUrl, {
+      method: 'put',
+      headers: myHeaders,
+      body: pendingImage,
+      redirect: 'follow'
+    }).then(function(data) {
+      console.log(data);
+    }).catch(function(err){
+      console.log(err);
+    });
+    return getImageUploadUrl.imageUrl;
+    ///console.log(res);
+    //return { fields: {}, meta: { fileUrl: "https://badal-assets.s3-eu-west-1.amazonaws.com/"+name }, url: getImageUploadUrl.value }
+  }
 
   return (
     <>
@@ -207,7 +262,7 @@ const AddProduct: React.FC<Props> = props => {
                   },
                 }}
               >
-                <Uploader onChange={handleUploader} />
+                <Uploader onChange={handleUploader} handleUpload={handleUpload } />
               </DrawerBox>
             </Col>
           </Row>
@@ -221,22 +276,88 @@ const AddProduct: React.FC<Props> = props => {
 
             <Col lg={8}>
               <DrawerBox>
+                <Row>
+                  <Col lg={6}>
+
+                    <FormFields>
+                      <FormLabel>Name</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 20 })}
+                        name="name"
+                      />
+                    </FormFields>
+
+                    <FormFields>
+                      <FormLabel>Description</FormLabel>
+                      <Textarea
+                        value={description}
+                        onChange={handleDescriptionChange}
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Brand</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 20 })}
+                        name="brand"
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Features - List semicolon(;) separated</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 800 })}
+                        name="features"
+                      />
+                    </FormFields>
+                  </Col>
+                  <Col lg={6}>
+                    <FormFields>
+                      <FormLabel>Name(AR)</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 20 })}
+                        name="name_ar"
+                      />
+                    </FormFields>
+
+                    <FormFields>
+                      <FormLabel>Description(AR)</FormLabel>
+                      <Textarea
+                        value={description_ar}
+                        onChange={handleDescriptionChangeAr}
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Brand(AR)</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 20 })}
+                        name="brand_ar"
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Features(ar) - List semicolon(;) separated</FormLabel>
+                      <Input
+                        inputRef={register({ required: true, maxLength: 800 })}
+                        name="features_ar"
+                      />
+                    </FormFields>
+                  </Col>
+
+                </Row>.
                 <FormFields>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>UPC</FormLabel>
                   <Input
-                    inputRef={register({ required: true, maxLength: 20 })}
-                    name="name"
+                    type="number"
+                    inputRef={register({ required: true })}
+                    name="upc"
                   />
                 </FormFields>
-
                 <FormFields>
-                  <FormLabel>Description</FormLabel>
-                  <Textarea
-                    value={description}
-                    onChange={handleDescriptionChange}
+                  <FormLabel>SKU</FormLabel>
+                  <Input
+                    type="text"
+                    inputRef={register({ required: true })}
+                    name="sku"
                   />
                 </FormFields>
-
                 <FormFields>
                   <FormLabel>Unit</FormLabel>
                   <Input type="text" inputRef={register} name="unit" />
@@ -273,7 +394,33 @@ const AddProduct: React.FC<Props> = props => {
                     name="quantity"
                   />
                 </FormFields>
+                <FormFields>
+                  <FormLabel>Availability</FormLabel>
+                  <Input
+                    type="number"
+                    inputRef={register({ required: true })}
+                    name="availability"
+                  />
+                </FormFields>
+                <FormFields>
+                  <FormLabel>Cost</FormLabel>
+                  <Input
+                    type="number"
+                    inputRef={register({ required: true })}
+                    name="cost"
+                    step=".01"
+                  />
+                </FormFields>
 
+                <FormFields>
+                  <FormLabel>Product Weight</FormLabel>
+                  <Input
+                    type="number"
+                    inputRef={register({ required: true })}
+                    name="weight"
+                    step=".01"
+                  />
+                </FormFields>
                 <FormFields>
                   <FormLabel>Type</FormLabel>
                   <Select
