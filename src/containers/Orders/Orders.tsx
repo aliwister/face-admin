@@ -23,6 +23,7 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
+import {LoadOrderForm} from "./components/LoadOrderForm";
 
 const GET_ORDERS = gql`
   query getOrders($state: [OrderState], $limit: Int, $searchText: String) {
@@ -251,13 +252,8 @@ export default function Orders() {
                   />
                 </Col>
 
-                <Col md={6} xs={12}>
-                  <Input
-                    value={search}
-                    placeholder='Ex: Search By Address'
-                    onChange={handleSearch}
-                    clearable
-                  />
+                <Col md={6} xs={12} style={{textAlign:"right"}}>
+                  <LoadOrderForm />
                 </Col>
               </Row>
             </Col>
