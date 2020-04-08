@@ -387,7 +387,7 @@ const AddProduct: React.FC<Props> = props => {
 
                 <FormFields>
                   <FormLabel>Sale Price (OMR)</FormLabel>
-                  <Input type="number" inputRef={register} name="salePrice" />
+                  <Input type="number" inputRef={register} name="salePrice" step=".01" />
                 </FormFields>
 
                 <FormFields>

@@ -68,7 +68,8 @@ const GET_ORDER = gql`
       }
       orderItems {
         sequence
-        sku
+        productSku
+        productUrl
         productName
         price
         quantity
@@ -263,7 +264,7 @@ export default function OrderDetails(props) {
           </OrderInfoPaper>
         </Col>
         <Col lg={3} sm={6} xs={12} className='mb-30'>
-          <Payment orderId={slug} orderRef={data.orderA.reference}/>
+          <Payment orderId={data.orderA.id} orderRef={data.orderA.reference}/>
         </Col>
       </Row>
       <Row>
@@ -298,8 +299,14 @@ export default function OrderDetails(props) {
                         {row.sequence}
                       </TableCell>
                       <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-
-                      <TableCell align="left">{row.productName}</TableCell>
+                      <TableCell component="th" scope="row">
+                      {row.productSku ?
+                          <a href={`http://www.amazon.com/dp/${row.productSku}`} target="_blank">
+                            {row.productName}
+                          </a>:
+                        <span>{row.productName}</span>
+                      }
+                        </TableCell>
                       <TableCell align="center">{row.quantity}</TableCell>
 
                       <TableCell align="center">{row.price}</TableCell>
