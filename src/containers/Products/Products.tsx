@@ -237,7 +237,7 @@ export default function Products() {
                   >
                     <Fade bottom duration={800} delay={index * 10}>
                       <ProductCard
-                        title={item.title}
+                        title={item.name}
                         weight={item.brand}
                         image={item.image}
                         currency={CURRENCY}

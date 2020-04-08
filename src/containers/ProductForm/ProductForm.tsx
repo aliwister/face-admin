@@ -24,7 +24,8 @@ import {
 import {MERCHANT_PRODUCTS} from "../Products/Products";
 
 const typeOptions = [
-  { value: 'Bookstore > Children Books', name: 'Bookstore > Children Books', id: '1' }
+  { value: 'Bookstore > Children Books', name: 'Bookstore > Children Books', id: '1' },
+  { value: 'Beauty > Perfumes', name: 'Beauty > Perfumes', id: '2' },
 ];
 
 const options = [
@@ -149,18 +150,23 @@ const AddProduct: React.FC<Props> = props => {
   };
 
   const handleTypeChange = ({ value }) => {
+    console.log(value);
     setValue('type', value);
-    setType(value.value);
+    setType(value);
   };
   const handleUploader = async files => {
     //console.log(files);
     setFiles(files);
   };
 
-  const arrayToObject = (array) =>
-    array.map(t => t.id);
+  const arrayToObject = (array,prop) =>
+    array.map(t => t[prop]);
 
   const onSubmit = async data => {
+    console.log(tag);
+    console.log(type);
+    console.log(data);
+
     const newProduct = {
       id: updateData?Number(updateData.id):null,
       sku: data.sku,
@@ -168,7 +174,7 @@ const AddProduct: React.FC<Props> = props => {
       name_ar: data.name_ar,
       brand: data.brand,
       brand_ar: data.brand_ar,
-      shopIds: arrayToObject(data.type),
+      shopIds: arrayToObject(tag,'id'),
       description: description,
       description_ar: description_ar,
       features: data.features,
@@ -183,7 +189,7 @@ const AddProduct: React.FC<Props> = props => {
       salePrice: Number(data.salePrice),
       //discountInPercent: Number(data.discountInPercent),
       quantity: Number(data.quantity),
-      browseNode: type,
+      browseNode: arrayToObject(type,'value')[0],
       //slug: data.name,
       //creation_date: new Date(),
     };
@@ -370,7 +376,7 @@ const AddProduct: React.FC<Props> = props => {
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Price (OMR)</FormLabel>
                   <Input
                     type="number"
                     inputRef={register({ required: true })}
@@ -380,16 +386,17 @@ const AddProduct: React.FC<Props> = props => {
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Sale Price</FormLabel>
+                  <FormLabel>Sale Price (OMR)</FormLabel>
                   <Input type="number" inputRef={register} name="salePrice" />
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Discount In Percent</FormLabel>
+                  <FormLabel>Discount In Percent (Calculated automatically)</FormLabel>
                   <Input
                     type="number"
                     inputRef={register}
                     name="discountInPercent"
+                    disable={true}
                   />
                 </FormFields>
 
@@ -402,7 +409,7 @@ const AddProduct: React.FC<Props> = props => {
                   />
                 </FormFields>
                 <FormFields>
-                  <FormLabel>Availability</FormLabel>
+                  <FormLabel>Availability (Hours)</FormLabel>
                   <Input
                     type="number"
                     inputRef={register({ required: true })}
@@ -410,17 +417,17 @@ const AddProduct: React.FC<Props> = props => {
                   />
                 </FormFields>
                 <FormFields>
-                  <FormLabel>Cost</FormLabel>
+                  <FormLabel>Cost (For reference/Overriden by agreement)</FormLabel>
                   <Input
                     type="number"
-                    inputRef={register({ required: true })}
+                    inputRef={register}
                     name="cost"
                     step=".01"
                   />
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Product Weight</FormLabel>
+                  <FormLabel>Product Weight (KG)</FormLabel>
                   <Input
                     type="number"
                     inputRef={register({ required: true })}
@@ -487,7 +494,7 @@ const AddProduct: React.FC<Props> = props => {
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Categories</FormLabel>
+                  <FormLabel>Shops</FormLabel>
                   <Select
                     options={options}
                     labelKey="name"

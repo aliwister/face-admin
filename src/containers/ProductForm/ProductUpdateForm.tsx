@@ -19,6 +19,7 @@ import {
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
 
+
 const options = [
   { value: 'Fruits & Vegetables', name: 'Fruits & Vegetables', id: '1' },
   { value: 'Meat & Fish', name: 'Meat & Fish', id: '2' },
@@ -53,6 +54,8 @@ const AddProduct: React.FC<Props> = () => {
   const [type, setType] = useState([{ value: data.type }]);
   const [tag, setTag] = useState([]);
   const [description, setDescription] = useState(data.description);
+
+
   React.useEffect(() => {
     register({ name: 'type' });
     register({ name: 'categories' });
