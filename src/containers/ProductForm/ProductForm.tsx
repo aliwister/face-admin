@@ -23,24 +23,17 @@ import {
 } from '../DrawerItems/DrawerItems.style';
 import {MERCHANT_PRODUCTS} from "../Products/Products";
 
-const options = [
-  { value: 'Fruits & Vegetables', name: 'Fruits & Vegetables', id: '1' },
-  { value: 'Meat & Fish', name: 'Meat & Fish', id: '2' },
-  { value: 'Purse', name: 'Purse', id: '3' },
-  { value: 'Hand bags', name: 'Hand bags', id: '4' },
-  { value: 'Shoulder bags', name: 'Shoulder bags', id: '5' },
-  { value: 'Wallet', name: 'Wallet', id: '6' },
-  { value: 'Laptop bags', name: 'Laptop bags', id: '7' },
-  { value: 'Women Dress', name: 'Women Dress', id: '8' },
-  { value: 'Outer Wear', name: 'Outer Wear', id: '9' },
-  { value: 'Pants', name: 'Pants', id: '10' },
+const typeOptions = [
+  { value: 'Bookstore > Children Books', name: 'Bookstore > Children Books', id: '1' }
 ];
 
-const typeOptions = [
+const options = [
   { value: 'grocery', name: 'Grocery', id: '1' },
-  { value: 'women-cloths', name: 'Women Cloths', id: '2' },
-  { value: 'bags', name: 'Bags', id: '3' },
-  { value: 'makeup', name: 'Makeup', id: '4' },
+  { value: '7roof', name: 'حروف', id: '2' },
+  { value: 'Beauty', name: 'Beauty', id: '3' },
+  { value: 'Fashion', name: 'Fashion', id: '4' },
+  { value: 'Delicates', name: 'Delicates', id: '5' },
+  { value: 'Fresh', name: 'Fresh', id: '6' },
 ];
 
 const GET_IMAGE_UPLOAD_URL = gql`
@@ -88,7 +81,7 @@ const AddProduct: React.FC<Props> = props => {
     dispatch,
   ]);
   const updateData = useDrawerState('data');
-  console.log(updateData);
+  //console.log(updateData);
   const { register, handleSubmit, setValue } = useForm({defaultValues: updateData});
   const [type, setType] = useState([]);
   const [tag, setTag] = useState([]);
@@ -104,8 +97,15 @@ const AddProduct: React.FC<Props> = props => {
   }, [register]);
 
   React.useEffect(() => {
-    if(updateData && updateData.description_ar)
+    if(updateData && updateData.description_ar) {
+      setDescription(updateData.description);
       setDescriptionar(updateData.description_ar);
+    }
+    if(updateData && updateData.shopIds) {
+      updateData.shopIds.each(i =>
+        handleMultiChange(options[i+1])
+      );
+    }
   },[updateData]);
 
 
@@ -143,18 +143,23 @@ const AddProduct: React.FC<Props> = props => {
     },
   });
   const handleMultiChange = ({ value }) => {
+    //console.log(value);
     setValue('categories', value);
     setTag(value);
   };
 
   const handleTypeChange = ({ value }) => {
     setValue('type', value);
-    setType(value);
+    setType(value.value);
   };
   const handleUploader = async files => {
-    console.log(files);
+    //console.log(files);
     setFiles(files);
   };
+
+  const arrayToObject = (array) =>
+    array.map(t => t.id);
+
   const onSubmit = async data => {
     const newProduct = {
       id: updateData?Number(updateData.id):null,
@@ -163,9 +168,9 @@ const AddProduct: React.FC<Props> = props => {
       name_ar: data.name_ar,
       brand: data.brand,
       brand_ar: data.brand_ar,
-      type: data.type[0].value,
-      description: data.description,
-      description_ar: data.description_ar,
+      shopIds: arrayToObject(data.type),
+      description: description,
+      description_ar: description_ar,
       features: data.features,
       features_ar: data.features_ar,
       image: data.image && data.image.length !== 0 ? data.image : '',
@@ -178,6 +183,7 @@ const AddProduct: React.FC<Props> = props => {
       salePrice: Number(data.salePrice),
       //discountInPercent: Number(data.discountInPercent),
       quantity: Number(data.quantity),
+      browseNode: type,
       //slug: data.name,
       //creation_date: new Date(),
     };
@@ -282,7 +288,7 @@ const AddProduct: React.FC<Props> = props => {
                     <FormFields>
                       <FormLabel>Name</FormLabel>
                       <Input
-                        inputRef={register({ required: true, maxLength: 20 })}
+                        inputRef={register({ required: true, maxLength: 100 })}
                         name="name"
                       />
                     </FormFields>
@@ -297,7 +303,7 @@ const AddProduct: React.FC<Props> = props => {
                     <FormFields>
                       <FormLabel>Brand</FormLabel>
                       <Input
-                        inputRef={register({ required: true, maxLength: 20 })}
+                        inputRef={register({ required: true, maxLength: 50 })}
                         name="brand"
                       />
                     </FormFields>
@@ -313,7 +319,7 @@ const AddProduct: React.FC<Props> = props => {
                     <FormFields>
                       <FormLabel>Name(AR)</FormLabel>
                       <Input
-                        inputRef={register({ required: true, maxLength: 20 })}
+                        inputRef={register({ required: true, maxLength: 100 })}
                         name="name_ar"
                       />
                     </FormFields>
@@ -328,7 +334,7 @@ const AddProduct: React.FC<Props> = props => {
                     <FormFields>
                       <FormLabel>Brand(AR)</FormLabel>
                       <Input
-                        inputRef={register({ required: true, maxLength: 20 })}
+                        inputRef={register({ required: true, maxLength: 50 })}
                         name="brand_ar"
                       />
                     </FormFields>
@@ -369,6 +375,7 @@ const AddProduct: React.FC<Props> = props => {
                     type="number"
                     inputRef={register({ required: true })}
                     name="price"
+                    step=".01"
                   />
                 </FormFields>
 

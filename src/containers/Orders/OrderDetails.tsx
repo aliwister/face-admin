@@ -123,6 +123,7 @@ const statusSelectOptions = [
 
 export default function OrderDetails(props) {
   let { slug } = useParams();
+  console.log(slug);
   const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const { data, loading, error, refetch } = useQuery(GET_ORDER, {
