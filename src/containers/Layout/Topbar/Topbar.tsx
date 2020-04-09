@@ -32,6 +32,7 @@ import { useDrawerDispatch } from '../../../context/DrawerContext';
 import { MenuIcon } from '../../../components/AllSvgIcon';
 import Drawer, { ANCHOR } from '../../../components/Drawer/Drawer';
 import Sidebar from '../Sidebar/Sidebar';
+import {LoadOrderForm} from "../../Orders/components/LoadOrderForm";
 
 const data = [
   {
@@ -102,6 +103,9 @@ const Topbar = ({ refs }: any) => {
       </DrawerWrapper>
 
       <TopbarRightSide>
+        {isAdmin &&
+        <LoadOrderForm />
+        }
         {isMerchant &&
         <Button onClick={openDrawer}>Add Products</Button>
         }

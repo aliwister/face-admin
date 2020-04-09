@@ -92,13 +92,7 @@ const useStyles = makeStyles(theme => ({
   button: {
     margin: theme.spacing(1),
   },
-  chip: {
-    margin: 2,
-  },
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
+
 }));
 
 export default function Shipments() {
@@ -228,7 +222,7 @@ export default function Shipments() {
       <CreateShipmentDialog show={acceptnewdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
       <Grid container spacing={1}>
         <Grid item  md={3} >
-          <StatusMultiSelect theme={theme} handleStatus={handleStatus} status={status} />
+          <StatusMultiSelect handleStatus={handleStatus} status={status} />
         </Grid>
         <Grid item  md={2} >
         </Grid>

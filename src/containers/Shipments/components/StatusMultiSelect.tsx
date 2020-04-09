@@ -7,6 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import {Grid} from "@material-ui/core";
 import React from "react";
 import {makeStyles} from "@material-ui/core/styles";
+import useTheme from "@material-ui/core/styles/useTheme";
 
 
 const useStyles = makeStyles(theme => ({
@@ -35,6 +36,7 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     flexWrap: 'wrap',
   },
+
 }));
 
 const ITEM_HEIGHT = 48;
@@ -65,7 +67,9 @@ function getStyles(name, personName, theme) {
         : theme.typography.fontWeightMedium,
   };
 }
-export const StatusMultiSelect = ({handleStatus, theme, status}) => {
+export const StatusMultiSelect = ({handleStatus, status}) => {
+  console.log(status);
+  const theme = useTheme();
   const classes = useStyles();
   return (
     <FormControl className={classes.formControl}>

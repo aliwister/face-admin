@@ -89,6 +89,8 @@ const AddProduct: React.FC<Props> = props => {
   const [files, setFiles] = useState([]);
   const [description, setDescription] = useState('');
   const [description_ar, setDescriptionar] = useState('');
+  const [price, setPrice] = useState(1);
+  const [salePrice, setSaleprice] = useState(0);
 
   React.useEffect(() => {
     register({ name: 'type' });
@@ -378,24 +380,25 @@ const AddProduct: React.FC<Props> = props => {
                 <FormFields>
                   <FormLabel>Price (OMR)</FormLabel>
                   <Input
-                    type="number"
                     inputRef={register({ required: true })}
                     name="price"
-                    step=".01"
+                    pattern="^\d*(\.\d{0,2})?$"
+                    onChange={(e) => setPrice(e.target.value)}
                   />
                 </FormFields>
 
                 <FormFields>
                   <FormLabel>Sale Price (OMR)</FormLabel>
-                  <Input type="number" inputRef={register} name="salePrice" step=".01" />
+                  <Input inputRef={register} name="salePrice" pattern="^\d*(\.\d{0,2})?$" onChange={e => setSaleprice(e.target.value)}/>
                 </FormFields>
 
                 <FormFields>
-                  <FormLabel>Discount In Percent (Calculated automatically)</FormLabel>
+                  <FormLabel>Discount % (Calculated automatically)</FormLabel>
                   <Input
                     type="number"
                     inputRef={register}
                     name="discountInPercent"
+                    value = {Math.round(100*(price-salePrice)/price)}
                     disable={true}
                   />
                 </FormFields>
@@ -419,20 +422,18 @@ const AddProduct: React.FC<Props> = props => {
                 <FormFields>
                   <FormLabel>Cost (For reference/Overriden by agreement)</FormLabel>
                   <Input
-                    type="number"
                     inputRef={register}
                     name="cost"
-                    step=".01"
+                    pattern="^\d*(\.\d{0,2})?$"
                   />
                 </FormFields>
 
                 <FormFields>
                   <FormLabel>Product Weight (KG)</FormLabel>
                   <Input
-                    type="number"
                     inputRef={register({ required: true })}
                     name="weight"
-                    step=".01"
+                    pattern="^\d*(\.\d{0,2})?$"
                   />
                 </FormFields>
                 <FormFields>
