@@ -23,6 +23,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
+import {Link} from "react-router-dom";
 const CREATE_PURCHASE = gql`
   mutation createPurchase($dto: PurchaseInput) {
     createPurchase(dto: $dto) {
@@ -47,6 +48,7 @@ query purchaseQueue {
     image
     sku
     cost
+    orderId
   }
 }
 `;
@@ -375,6 +377,7 @@ export default function PurchaseForm({purchase}) {
                 <TableCell align="right">Quantity</TableCell>
                 <TableCell align="right">Price</TableCell>
                 <TableCell align="right">Link</TableCell>
+                <TableCell align="right">Order</TableCell>
               </TableRow>
             </TableHead>
             {data && <TableBody>
@@ -403,7 +406,7 @@ export default function PurchaseForm({purchase}) {
                           onClick={()=>handleAdd(q)}
                       />
                     </TableCell>
-
+                    <TableCell align="right"><Link to={`order-details/${q.orderId}`}>{q.orderId}</Link></TableCell>
                   </TableRow>
               ))}
             </TableBody>}
