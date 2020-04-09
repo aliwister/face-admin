@@ -406,7 +406,7 @@ export default function PurchaseForm({purchase}) {
                           onClick={()=>handleAdd(q)}
                       />
                     </TableCell>
-                    <TableCell align="right"><Link to={`order-details/${q.orderId}`}>{q.orderId}</Link></TableCell>
+                    <TableCell align="right"><Link to={`/order-details/${q.orderId}`}>{q.orderId}</Link></TableCell>
                   </TableRow>
               ))}
             </TableBody>}
