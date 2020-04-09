@@ -107,7 +107,7 @@ const Topbar = ({ refs }: any) => {
         <LoadOrderForm />
         }
         {isMerchant &&
-        <Button onClick={openDrawer}>Add Products</Button>
+        <Button onClick={openDrawer}>Add Product</Button>
         }
         <Popover
           content={({ close }) => <Notification data={data} onClear={close} />}

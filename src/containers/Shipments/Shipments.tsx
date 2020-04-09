@@ -287,7 +287,7 @@ export default function Shipments() {
                       <TableCell align="center">{row.reference}</TableCell>
                       <TableCell align="right">{row.city}</TableCell>
                       <TableCell align="right">{row.shipmentMethod}</TableCell>
-                      <TableCell align="right">{100*row.progressTodo/((row.progressTotal+0) - (row.progressDone+0))} %</TableCell>
+                      <TableCell align="right">{Math.round(100*row.progressTodo/((row.progressTotal+0) - (row.progressDone+0)))} %</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

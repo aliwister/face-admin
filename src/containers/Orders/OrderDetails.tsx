@@ -38,6 +38,7 @@ import Typography from "@material-ui/core/Typography";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Checkbox from "@material-ui/core/Checkbox";
 import {EditOrderDialog} from "./EditOrderDialog";
+import TableFooter from "@material-ui/core/TableFooter";
 
 const GET_ORDER = gql`
   query orderA($id: ID) {
@@ -67,6 +68,7 @@ const GET_ORDER = gql`
           city
       }
       orderItems {
+        id
         sequence
         productSku
         productUrl
@@ -90,6 +92,13 @@ const EDIT_ORDER = gql`
 mutation editOrder($id: ID, $orderItems: [OrderItemInput]) {
   editOrder(id:$id, orderItems:$orderItems) {
     id
+  }
+}
+`;
+const SEND_VOLTAGE_EMAIL = gql`
+mutation sendProductLevelEmail($orderId: ID, $orderItems: [Long], $template: String) {
+  sendProductLevelEmail(orderId:$orderId, orderItems:$orderItems, template: $template) {
+    value
   }
 }
 `;
@@ -126,6 +135,7 @@ export default function OrderDetails(props) {
   let { slug } = useParams();
   console.log(slug);
   const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
+  const [sendVoltageEmailMutation] = useMutation(SEND_VOLTAGE_EMAIL, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const { data, loading, error, refetch } = useQuery(GET_ORDER, {
     variables: {
@@ -141,12 +151,12 @@ export default function OrderDetails(props) {
   const alert = useAlert();
 
   const onSendSms = async data => {
-    console.log(data);
+
     setContactbutton(false);
     const {
       data: { sendPaymentSms },
     }: any = await sendPaymentSmsMutation({
-      variables: {id: slug}
+      variables: {id: data.orderA.id}
     });
     if(sendPaymentSms)  {
       alert.success(sendPaymentSms.value);
@@ -157,7 +167,7 @@ export default function OrderDetails(props) {
     const {
       data: { editOrder },
     }: any = await editOrderMutation({
-      variables: {id: slug, orderItems: [...data.orderItems]}
+      variables: {id: data.orderA.id, orderItems: [...data.orderItems]}
     });
     if(editOrder)  {
       alert.success(editOrder.id);
@@ -165,7 +175,23 @@ export default function OrderDetails(props) {
     }
   }
 
+  const sendVoltageEmail = async () => {
+    if(checkedId.length < 1) {
+      alert.error("Must select one or more products");
+      return;
+    }
+    const {
+      data: { sendProductLevelEmail },
+    }: any = await sendVoltageEmailMutation({
+      variables: {orderId: data.orderA.id, orderItems: checkedId, template: 'VOLTAGE'}
+    });
+    if(sendProductLevelEmail)  {
+      alert.success(sendProductLevelEmail.value);
+      await refetch();
+    }
 
+
+  }
   //const []
 
   if (error) {
@@ -175,7 +201,9 @@ export default function OrderDetails(props) {
     return <div>Loading </div>
 
   function handleCheckbox(event) {
+
     let value = event.target.value;
+    console.log('handleCheckbox',value)
     if (!checkedId.includes(value)) {
       setCheckedId(prevState => [...prevState, value]);
     } else {
@@ -289,10 +317,10 @@ export default function OrderDetails(props) {
                     <TableRow key={row.sequence}>
                       <TableCell align="right">
                         <Checkbox
-                          name={row.orderId}
-                          checked={checkedId.includes(row.sequence)}
+                          name={row.id}
+                          checked={checkedId.includes(row.id)}
                           onChange={handleCheckbox}
-                          value={row.sequence}
+                          value={row.id}
                       />
                       </TableCell>
                       <TableCell component="th" scope="row">
@@ -316,7 +344,11 @@ export default function OrderDetails(props) {
                     </TableRow>
                   ))}
                 </TableBody>
+
               )}
+              <TableFooter>
+                <Button onClick={sendVoltageEmail}>Send Voltage Email</Button>
+              </TableFooter>
             </Table>
           </TableContainer>
 
