@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { styled, withStyle, createThemedUseStyletron } from 'baseui';
 import Moment from 'react-moment';
-import {
-  Grid,
-  Row as Rows,
-  Col as Column,
-} from '../../components/FlexBox/FlexBox';
-import Select from '../../components/Select/Select';
-import Input from '../../components/Input/Input';
+
 
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
@@ -19,11 +13,14 @@ import {
 } from './Orders.style';
 import NoResult from '../../components/NoResult/NoResult';
 import { Link } from 'react-router-dom';
-import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
 import {LoadOrderForm} from "./components/LoadOrderForm";
+import  Select from "react-select";
+import {theme} from "../../theme";
+import {ORDER_STATES} from "./components/Constants";
 
 const GET_ORDERS = gql`
   query getOrders($state: [OrderState], $limit: Int, $searchText: String) {
@@ -66,43 +63,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-type CustomThemeT = { red400: string; textNormal: string; colors: any };
-const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
 
-const Status = styled('div', ({ $theme }) => ({
-  ...$theme.typography.fontBold14,
-  color: $theme.colors.textDark,
-  display: 'flex',
-  alignItems: 'center',
-  lineHeight: '1',
-  textTransform: 'capitalize',
-
-  ':before': {
-    content: '""',
-    width: '10px',
-    height: '10px',
-    display: 'inline-block',
-    borderRadius: '10px',
-    backgroundColor: $theme.borders.borderE6,
-    marginRight: '10px',
-  },
-}));
-
-const Col = withStyle(Column, () => ({
-  '@media only screen and (max-width: 767px)': {
-    marginBottom: '20px',
-
-    ':last-child': {
-      marginBottom: 0,
-    },
-  },
-}));
-
-const Row = withStyle(Rows, () => ({
-  '@media only screen and (min-width: 768px)': {
-    alignItems: 'center',
-  },
-}));
 
 const statusSelectOptions = [
   { value: 'delivered', label: 'Delivered' },
@@ -119,42 +80,18 @@ const limitSelectOptions = [
 export default function Orders() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
-  const [status, setStatus] = useState([]);
+  const [status, setStatus] = useState([ORDER_STATES[4]]);
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const alert = useAlert();
   const classes = useStyles();
 
-  const [useCss, theme] = themedUseStyletron();
-  const sent = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.primary,
-    },
-  });
-  const failed = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.red400,
-    },
-  });
-  const processing = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.textNormal,
-    },
-  });
-  const paid = useCss({
-    ':before': {
-      content: '""',
-      backgroundColor: theme.colors.blue400,
-    },
-  });
-
+  const arrayToObject = (array,prop) =>
+    array.map(t => t[prop]);
 
   const { data, error, refetch } = useQuery(GET_ORDERS, {
     variables: {
-      status: ['PAYMENT_ACCEPTED'],
+      state: arrayToObject(status, 'value'),
       limit: 10,
       searchText: "",
     },
@@ -165,20 +102,22 @@ export default function Orders() {
     return <div>Error! {error.message}</div>;
   }
 
-  function handleStatus({ value }) {
+  function handleStatus(value) {
+    console.log(value);
     setStatus(value);
-    if (value.length) {
+
+    if (value && value.length) {
       refetch({
-        status: [value[0].value],
-        limit: limit.length ? limit[0].value : null,
+        state: arrayToObject(value, 'value'),
+        limit: 15, //limit.length ? limit[0].value : null,
         searchText: "",
       });
     } else {
-      refetch({ status: [], limit:10, searchText:"" });
+      refetch({ state: [], limit:10, searchText:"" });
     }
   }
 
-  function handleLimit({ value }) {
+/*  function handleLimit({ value }) {
     setLimit(value);
     if (value.length) {
       refetch({
@@ -189,12 +128,8 @@ export default function Orders() {
     } else {
       refetch({ status: [], limit:10, searchText:"" });
     }
-  }
-  function handleSearch(event) {
-    const { value } = event.currentTarget;
-    setSearch(value);
-    refetch({ status: [], limit:10, searchText:value });
-  }
+  }*/
+
   function onAllCheck(event) {
     if (event.target.checked) {
       const idx = data && data.orders.map(order => order.id);
@@ -213,119 +148,72 @@ export default function Orders() {
     }
   }
   return (
-    <Grid fluid={true}>
-      <Row>
-        <Col md={12}>
-          <Header
-            style={{
-              marginBottom: 30,
-              boxShadow: '0 0 8px rgba(0, 0 ,0, 0.1)',
-            }}
-          >
-            <Col md={3} xs={12}>
-              <Heading>Orders</Heading>
-            </Col>
-
-            <Col md={9} xs={12}>
-              <Row>
-                <Col md={3} xs={12}>
-                  <Select
-                    options={statusSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    placeholder='Status'
-                    value={status}
-                    searchable={false}
-                    onChange={handleStatus}
-                  />
-                </Col>
-
-                <Col md={3} xs={12}>
-                  <Select
-                    options={limitSelectOptions}
-                    labelKey='label'
-                    valueKey='value'
-                    value={limit}
-                    placeholder='Order Limits'
-                    searchable={false}
-                    onChange={handleLimit}
-                  />
-                </Col>
-
-                <Col md={6} xs={12} style={{textAlign:"right"}}>
-                  <LoadOrderForm />
-                </Col>
-              </Row>
-            </Col>
-          </Header>
-
-          <TableContainer component={Paper}>
-            <Table className={classes.table} size="small" aria-label="a dense table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>#</TableCell>
-                  <TableCell>ID</TableCell>
-                  <TableCell align="left">Ref</TableCell>
-                  <TableCell align="left">Name</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="center">Payment</TableCell>
-                  <TableCell align="center">Date</TableCell>
-                  <TableCell align="center">Status</TableCell>
-                </TableRow>
-              </TableHead>
-              {data && data.ordersA.length && (
+    <Grid container spacing={1}>
+      <Grid item  md={5} >
+        <Select
+          value={status}
+          onChange={handleStatus}
+          options={ORDER_STATES}
+          isMulti={true}
+        />
+      </Grid>
+      <Grid  item  md={4} >
+      </Grid>
+      <Grid item  md={3} style={{textAlign: 'right'}}>
+      </Grid>
+      <Grid item xs={12}>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>ID</TableCell>
+                <TableCell align="left">Ref</TableCell>
+                <TableCell align="left">Name</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell align="center">Payment</TableCell>
+                <TableCell align="center">Date</TableCell>
+                <TableCell align="center">Status</TableCell>
+              </TableRow>
+            </TableHead>
+            {data && data.ordersA.length && (
               <TableBody>
 
                 {data.ordersA.map(row => (
-                    <TableRow key={row.orderId}>
-                      <TableCell align="right"><Checkbox
-                              name={row.id}
-                              checked={checkedId.includes(row.id)}
-                              onChange={handleCheckbox}
-                              overrides={{
-                                Checkmark: {
-                                  style: {
-                                    borderWidth: '2px',
-                                    borderRadius: '4px',
-                                  },
-                                },
-                              }}
-                            /></TableCell>
-                      <TableCell component="th" scope="row">
-                       <Link to={`order-details/${row.id}`}>{row.id}</Link>
-                      </TableCell>
-                      <TableCell align="left">{row.reference}</TableCell>
+                  <TableRow key={row.orderId}>
+                    <TableCell align="right"><Checkbox
+                      name={row.id}
+                      checked={checkedId.includes(row.id)}
+                      onChange={handleCheckbox}
+                      overrides={{
+                        Checkmark: {
+                          style: {
+                            borderWidth: '2px',
+                            borderRadius: '4px',
+                          },
+                        },
+                      }}
+                    /></TableCell>
+                    <TableCell component="th" scope="row">
+                      <Link to={`order-details/${row.id}`}>{row.id}</Link>
+                    </TableCell>
+                    <TableCell align="left">{row.reference}</TableCell>
 
-                      <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
-                      <TableCell align="right">OMR {row.total}</TableCell>
+                    <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
+                    <TableCell align="right">OMR {row.total}</TableCell>
 
-                      <TableCell align="center">{row.paymentMethod}</TableCell>
-                      <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
-                      <TableCell align="right">
-                        <Status
-                            className={
-                              row.orderState === 'Delivered'
-                                  ? sent
-                                  : row.orderState === 'PAYMENT_ACCEPTED'
-                                  ? paid
-                                  : row.orderState === 'AWAITING_PAYMENT'
-                                      ? processing
-                                      : row.orderState === 'CANCELLED'
-                                          ? failed
-                                          : ''
-                            }
-                        >
-                          {row.orderState}
-                        </Status>
-                      </TableCell>
-                    </TableRow>
+                    <TableCell align="center">{row.paymentMethod}</TableCell>
+                    <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
+                    <TableCell align="right">
+                      {row.orderState}
+                    </TableCell>
+                  </TableRow>
                 ))}
               </TableBody>
-                  )}
-            </Table>
-          </TableContainer>
-        </Col>
-      </Row>
+            )}
+          </Table>
+        </TableContainer>
+      </Grid>
     </Grid>
   );
 }

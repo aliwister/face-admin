@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
-import {Snackbar} from "@material-ui/core";
+import {Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
@@ -12,16 +12,16 @@ import {OrderInfoPaper} from "./Orders.style";
 import MenuItem from "@material-ui/core/MenuItem";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import FormControl from "@material-ui/core/FormControl";
+import Checkbox from "@material-ui/core/Checkbox";
+import Image from "../../components/Image/Image";
+import TableFooter from "@material-ui/core/TableFooter";
+import {errorHandler} from "../../api/config";
+import Typography from "@material-ui/core/Typography";
+import {PaymentFormDialog} from "./components/PaymentFormDialog";
+import {RefundFormDialog} from "./components/RefundFormDialog";
 
 //const
 
-const SEND_ORDER_EMAIL = gql`
-mutation sendOrderLevelEmail($id:ID, $template:String) {
-    sendOrderLevelEmail(id: $id, template: $template) {
-        value
-    } 
-}
-`;
 
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
@@ -49,37 +49,23 @@ mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: St
 }
 `;
 
-const useStyles = makeStyles(theme => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 180,
-    },
-    selectEmpty: {
-        marginTop: theme.spacing(2),
-    },
-    textbox: {
-        width: 120,
-        margin: theme.spacing(1)
-    }
-}));
 
-export default function Payment({orderId, orderRef}) {
+
+export default function Payment({payments, orderId, balance}) {
   const [b1,setB1] = useState(true);
-  const [b2,setB2] = useState(true);
 
-  const [amount, setAmount] = useState([]);
-  const [snack, setSnack] = useState(false);
-  const [method, setMethod] = useState(false);
-  const [auth, setAuth] = useState(false);
-  const { register, handleSubmit, errors } = useForm();
+  const [paymentDialog,setPaymentdialog] = useState(false);
+  const [refundDialog,setRefunddialog] = useState(false);
+  const [activePayment,setActivepayment] = useState({});
+
+
   const [addPaymentMutation] = useMutation(ADD_PAYMENT_MUTATION,{context: { clientName: "shopLink" }});
-  const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL,{context: { clientName: "shopLink" }});
-  const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS,{context: { clientName: "shopLink" }});
+
+
   const alert = useAlert();
-  const classes = useStyles();
+
 
   const onSubmit = async data => {
-    console.log(data);
     setB1(false);
     const {
       data: { addPayment },
@@ -91,45 +77,63 @@ export default function Payment({orderId, orderRef}) {
     }
   }
 
-  const onSendOrderCreateEmail = async data => {
-    console.log(data);
-    setB2(false);
-    const {
-        data: { sendOrderLevelEmail },
-    }: any = await sendOrderLevelEmailMutation({
-        variables: {id: orderId, template: "NEW_ORDER"}
-    });
-    if(sendOrderLevelEmail)  {
-        alert.success("Payment added");
-    }
-  }
 
+  const handleClose = () => {
+    setPaymentdialog(false);
+    setRefunddialog(false);
+  }
+  const handlePaymentDialogOpen = () => setPaymentdialog(true);
+  const handleRefundDialogOpen = (payment) => {
+    setActivepayment(payment);
+    setRefunddialog(true);
+  }
 
   return (
     <>
         <OrderInfoPaper>
-        <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography variant="caption">Payments</Typography>
+          <Table  size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>#</TableCell>
+                <TableCell>Method</TableCell>
+                <TableCell>Authcode</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            {payments && (
+              <TableBody>
+                {payments.map(row => (
+                  <TableRow key={row.id}>
+                    <TableCell component="th" scope="row">
+                      {row.id}
+                    </TableCell>
+                    <TableCell align="left">{row.paymentMethod}</TableCell>
+                    <TableCell align="left">{row.authCode}</TableCell>
+                    <TableCell align="left">OMR {row.amount}</TableCell>
+                    <TableCell align="right"><Button variant="contained" onClick={() => handleRefundDialogOpen(row)}>Refund</Button></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-            <TextField variant="filled" placeholder="Amount" name="amount" className={classes.textbox} inputRef={register({required: true, max: 1000, min: 1, maxLength: 5})} />
-            <TextField variant="filled" type="text" placeholder="Auth Code" name="authCode" className={classes.textbox} inputRef={register({required: true, maxLength: 6})} />
-            <FormControl variant="filled" className={classes.formControl}>
-                <Select native name="method" inputRef={register({ required: true })}>
-                    <option value="POS">POS</option>
-                    <option value="CHECKOUTCOM">CHECKOUTCOM</option>
-                    <option value="BMB">Bank Transfer</option>
-                    <option value="CASH">CASH</option>
-                </Select>
-            </FormControl>
-            <Button variant="contained" color="primary" type="submit" size="large" disabled={!b1}>Add</Button>
-        </form>
-        <Button onClick={onSendOrderCreateEmail} disabled={!b2}>Send Order Confirmation</Button>
+            )}
+          </Table>
+          <Typography variant="caption">Balance</Typography>
+          <div>OMR {balance}</div>
+          <Button variant="contained" color="primary" onClick={handlePaymentDialogOpen}>New Payment</Button>
+
+          <PaymentFormDialog onSubmit={onSubmit} open={paymentDialog} onClose={handleClose}/>
+          <RefundFormDialog onSubmit={onSubmit} open={refundDialog} onClose={handleClose} payment={activePayment}/>
+
+
+
         </OrderInfoPaper>
 {/*        <Snackbar open={snack} autoHideDuration={6000} onClose={()=>{setSnack(false)}}>
             <Alert onClose={handleClose} severity="success">
                 This is a success message!
             </Alert>
         </Snackbar>*/}
-
     </>
   );
 }

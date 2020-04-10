@@ -78,6 +78,13 @@ const GET_ORDER = gql`
         image
         lineTotal
       }
+      payments {
+        id
+        paymentMethod
+        authCode
+        amount
+      }
+      balance
     }
   }
 `;
@@ -103,10 +110,15 @@ mutation sendProductLevelEmail($orderId: ID, $orderItems: [Long], $template: Str
 }
 `;
 
+const SEND_ORDER_EMAIL = gql`
+mutation sendOrderLevelEmail($id:ID, $template:String) {
+    sendOrderLevelEmail(id: $id, template: $template) {
+        value
+    } 
+}
+`;
 type CustomThemeT = { red400: string; textNormal: string; colors: any };
 const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
-
-
 
 const Col = withStyle(Column, () => ({
   '@media only screen and (max-width: 767px)': {
@@ -124,16 +136,11 @@ const Row = withStyle(Rows, () => ({
   },
 }));
 
-const statusSelectOptions = [
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'failed', label: 'Failed' },
-];
 
 export default function OrderDetails(props) {
   let { slug } = useParams();
   console.log(slug);
+  const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL,{context: { clientName: "shopLink" }});
   const [sendPaymentSmsMutation] = useMutation(SEND_PAYMENT_SMS, { context: { clientName: "shopLink" }});
   const [sendVoltageEmailMutation] = useMutation(SEND_VOLTAGE_EMAIL, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
@@ -148,6 +155,7 @@ export default function OrderDetails(props) {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [editdialog, setEditdialog] = useState(false);
+  const [b2,setB2] = useState(true);
   const alert = useAlert();
 
   const onSendSms = async data => {
@@ -189,10 +197,19 @@ export default function OrderDetails(props) {
       alert.success(sendProductLevelEmail.value);
       await refetch();
     }
-
-
   }
-  //const []
+  const onSendOrderCreateEmail = async data => {
+    setB2(false);
+    const {
+      data: { sendOrderLevelEmail },
+    }: any = await sendOrderLevelEmailMutation({
+      variables: {id: data.orderA.id, template: "NEW_ORDER"}
+    });
+    if(sendOrderLevelEmail)  {
+      alert.success("Payment added");
+    }
+  }
+
 
   if (error) {
     return <div>Error! {error.message}</div>;
@@ -279,20 +296,24 @@ export default function OrderDetails(props) {
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={3} sm={6} xs={12} className='mb-30'>
-          <OrderInfoPaper>
-            <Typography variant="caption">Actions</Typography>
-            <div>
-            <ButtonGroup size="large" color="primary" aria-label="large outlined primary button group">
-              <Button onClick={onSendSms} disabled={!contactbutton}>SMS Contact</Button>
-              <Button onClick={onEditStart} >Edit order</Button>
-              <Button>Cancel</Button>
-            </ButtonGroup>
-            </div>
-          </OrderInfoPaper>
+        <Col lg={6} sm={6} xs={12} className='mb-30'>
+          <Payment orderId={data.orderA.id} balance={data.orderA.balance} payments={data.orderA.payments}/>
         </Col>
-        <Col lg={3} sm={6} xs={12} className='mb-30'>
-          <Payment orderId={data.orderA.id} orderRef={data.orderA.reference}/>
+      </Row>
+      <Row>
+        <Col lg={12} sm={12} xs={12} className='mb-30'>
+          <Paper>
+            <Typography variant="caption">Payment</Typography>
+            <div>
+              <ButtonGroup size="large" variant="contained" color="primary" aria-label="large outlined primary button group">
+                <Button onClick={onSendSms} disabled={!contactbutton}>Send Payment SMS</Button>
+                <Button onClick={onEditStart}>Edit Order</Button>
+                <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
+                <Button color="secondary">Cancel Order</Button>
+              </ButtonGroup>
+
+            </div>
+          </Paper>
         </Col>
       </Row>
       <Row>
