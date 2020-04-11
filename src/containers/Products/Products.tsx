@@ -67,10 +67,10 @@ export const LoaderItem = styled('div', () => ({
 
 export const MERCHANT_PRODUCTS = gql`
   query merchantProducts(
-    $type: String
-    $limit: Int
+    $type: String 
+    $limit: Int = 12
     $text: String
-    $offset: Int
+    $offset: Int = 0
     $lang: Int
   ) {
     merchantProducts(
@@ -132,15 +132,15 @@ export default function Products() {
   function loadMore() {
     fetchMore({
       variables: {
-        offset: data.products.items.length,
+        offset: data.merchantProducts.items.length,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
         return Object.assign({}, prev, {
-          products: {
-            __typename: prev.products.__typename,
-            items: [...prev.products.items, ...fetchMoreResult.products.items],
-            hasMore: fetchMoreResult.products.hasMore,
+          merchantProducts: {
+            __typename: prev.merchantProducts.__typename,
+            items: [...prev.merchantProducts.items, ...fetchMoreResult.merchantProducts.items],
+            hasMore: fetchMoreResult.merchantProducts.hasMore,
           },
         });
       },
@@ -269,7 +269,7 @@ export default function Products() {
               </LoaderWrapper>
             )}
           </Row>
-          {data && data.products && data.products.hasMore && (
+          {data && data.merchantProducts && data.merchantProducts.hasMore && (
             <Row>
               <Col
                 md={12}
