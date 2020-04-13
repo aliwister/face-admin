@@ -171,11 +171,11 @@ export default function OrderDetails(props) {
     }
   }
 
-  const onEditOrder = async data => {
+  const onEditOrder = async formData => {
     const {
       data: { editOrder },
     }: any = await editOrderMutation({
-      variables: {id: data.orderA.id, orderItems: [...data.orderItems]}
+      variables: {id: data.orderA.id, orderItems: [...formData.orderItems]}
     });
     if(editOrder)  {
       alert.success(editOrder.id);
