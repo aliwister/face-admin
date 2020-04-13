@@ -22,20 +22,8 @@ import {
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
 import {MERCHANT_PRODUCTS} from "../Products/Products";
+import {OPTIONS, TYPE_OPTIONS} from "../Products/components/Constants";
 
-const typeOptions = [
-  { value: 'Bookstore > Children Books', name: 'Bookstore > Children Books', id: '1' },
-  { value: 'Beauty > Perfumes', name: 'Beauty > Perfumes', id: '2' },
-];
-
-const options = [
-  { value: 'grocery', name: 'Grocery', id: '1' },
-  { value: '7roof', name: 'حروف', id: '2' },
-  { value: 'Beauty', name: 'Beauty', id: '3' },
-  { value: 'Fashion', name: 'Fashion', id: '4' },
-  { value: 'Delicates', name: 'Delicates', id: '5' },
-  { value: 'Fresh', name: 'Fresh', id: '6' },
-];
 
 const GET_IMAGE_UPLOAD_URL = gql`
   mutation getImageUploadUrl($filename: String) {
@@ -106,7 +94,7 @@ const AddProduct: React.FC<Props> = props => {
     }
     if(updateData && updateData.shopIds) {
       updateData.shopIds.each(i =>
-        handleMultiChange(options[i+1])
+        handleMultiChange(OPTIONS[i+1])
       );
     }
   },[updateData]);
@@ -439,7 +427,7 @@ const AddProduct: React.FC<Props> = props => {
                 <FormFields>
                   <FormLabel>Type</FormLabel>
                   <Select
-                    options={typeOptions}
+                    options={TYPE_OPTIONS}
                     labelKey="name"
                     valueKey="value"
                     placeholder="Product Type"
@@ -497,7 +485,7 @@ const AddProduct: React.FC<Props> = props => {
                 <FormFields>
                   <FormLabel>Shops</FormLabel>
                   <Select
-                    options={options}
+                    options={OPTIONS}
                     labelKey="name"
                     valueKey="value"
                     placeholder="Product Tag"

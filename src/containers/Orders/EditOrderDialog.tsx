@@ -16,6 +16,7 @@ import TextField from "@material-ui/core/TextField";
 import {useForm} from "react-hook-form";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
+import TableFooter from "@material-ui/core/TableFooter";
 
 
 export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
