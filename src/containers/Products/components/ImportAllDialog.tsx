@@ -46,6 +46,7 @@ export const ImportAllDialog = ({open, onSubmit, onClose}) =>{
                          name="option"
                          register={register}
                          control={control}
+                         label="Shop Name"
                          defaultValue=""
         /></div>
         <br/><br/>
@@ -58,6 +59,7 @@ export const ImportAllDialog = ({open, onSubmit, onClose}) =>{
                          name="type"
                          register={register}
                          control={control}
+                         label="Browse Node"
                          defaultValue=""
         /></div>
       </DialogContent>

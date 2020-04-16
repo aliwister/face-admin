@@ -13,7 +13,7 @@ import Input from '../../components/Input/Input';
 import { Textarea } from '../../components/Textarea/Textarea';
 import Select from '../../components/Select/Select';
 import { FormFields, FormLabel } from '../../components/FormFields/FormFields';
-
+import { useAlert } from "react-alert";
 import {
   Form,
   DrawerTitleWrapper,
@@ -23,6 +23,9 @@ import {
 } from '../DrawerItems/DrawerItems.style';
 import {MERCHANT_PRODUCTS} from "../Products/Products";
 import {OPTIONS, TYPE_OPTIONS} from "../Products/components/Constants";
+import green from "@material-ui/core/colors/green";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import {CircularProgress} from "@material-ui/core";
 
 
 const GET_IMAGE_UPLOAD_URL = gql`
@@ -35,32 +38,23 @@ const GET_IMAGE_UPLOAD_URL = gql`
   }    
 `;
 export const CREATE_PRODUCT = gql`
-  mutation createMerchantProduct($product: AddProductInput!) {
+  mutation createMerchantProduct($message: Message!) {
     createMerchantProduct(product: $product) {
-      id
-      slug
-      name
-      name_ar
-      type
-      unit
-      price
-      salePrice
-      description
-      description_ar
-      features
-      features_ar
-      sku
-      unit
-      cost
-      discountInPercent
-      availability
-      image
+      value
     }
   }
 `;
 
-
-
+const useStyles = makeStyles((theme) => ({
+  buttonProgress: {
+    color: green[500],
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginTop: -12,
+      marginLeft: -12,
+  },
+}));
 
 type Props = any;
 
@@ -79,6 +73,11 @@ const AddProduct: React.FC<Props> = props => {
   const [description_ar, setDescriptionar] = useState('');
   const [price, setPrice] = useState(1);
   const [salePrice, setSaleprice] = useState(0);
+  const [buttonlabel, setButtonlabel] = useState("Create Product");
+  const classes = useStyles();
+  const [loading, setLoading] = useState(false);
+
+  const alert = useAlert();
 
   React.useEffect(() => {
     register({ name: 'type' });
@@ -91,6 +90,7 @@ const AddProduct: React.FC<Props> = props => {
     if(updateData && updateData.description_ar) {
       setDescription(updateData.description);
       setDescriptionar(updateData.description_ar);
+      setButtonlabel("Update Product");
     }
     if(updateData && updateData.shopIds) {
       updateData.shopIds.each(i =>
@@ -156,7 +156,7 @@ const AddProduct: React.FC<Props> = props => {
     console.log(tag);
     console.log(type);
     console.log(data);
-
+    setLoading(true);
     const newProduct = {
       id: updateData?Number(updateData.id):null,
       sku: data.sku,
@@ -164,7 +164,7 @@ const AddProduct: React.FC<Props> = props => {
       name_ar: data.name_ar,
       brand: data.brand,
       brand_ar: data.brand_ar,
-      shopIds: arrayToObject(tag,'id'),
+      //shopIds: arrayToObject(tag,'id'),
       description: description,
       description_ar: description_ar,
       features: data.features,
@@ -179,12 +179,13 @@ const AddProduct: React.FC<Props> = props => {
       salePrice: Number(data.salePrice),
       //discountInPercent: Number(data.discountInPercent),
       quantity: Number(data.quantity),
-      browseNode: arrayToObject(type,'value')[0],
+      //browseNode: arrayToObject(type,'value')[0],
       //slug: data.name,
       //creation_date: new Date(),
     };
     if (!data.image && !files.length ) {
-      alert("image is required");
+      alert.error("image is required");
+      setLoading(false);
       return;
     }
     if(files.length > 0)
@@ -197,11 +198,13 @@ const AddProduct: React.FC<Props> = props => {
       variables: { product: newProduct },
     });
     closeDrawer();
+    setLoading(false);
+    alert.success("Product saved successfully");
   };
 
   const handleUpload = async () => {
     const [pendingImage] = files;
-    console.log(pendingImage);
+    //console.log(pendingImage);
     const filename = pendingImage.path;
     const { data: { getImageUploadUrl },}: any = await getImageUrl({variables: {filename: filename, contentType: pendingImage.type}});
 
@@ -424,7 +427,7 @@ const AddProduct: React.FC<Props> = props => {
                     pattern="^\d*(\.\d{0,2})?$"
                   />
                 </FormFields>
-                <FormFields>
+{/*                <FormFields>
                   <FormLabel>Type</FormLabel>
                   <Select
                     options={TYPE_OPTIONS}
@@ -520,7 +523,7 @@ const AddProduct: React.FC<Props> = props => {
                     }}
                     multi
                   />
-                </FormFields>
+                </FormFields>*/}
               </DrawerBox>
             </Col>
           </Row>
@@ -549,6 +552,7 @@ const AddProduct: React.FC<Props> = props => {
 
           <Button
             type="submit"
+            disabled={loading}
             overrides={{
               BaseButton: {
                 style: ({ $theme }) => ({
@@ -561,8 +565,9 @@ const AddProduct: React.FC<Props> = props => {
               },
             }}
           >
-            Create Product
+            {loading ? <CircularProgress size={24} className={classes.buttonProgress} />:buttonlabel}
           </Button>
+
         </ButtonGroup>
       </Form>
     </>
