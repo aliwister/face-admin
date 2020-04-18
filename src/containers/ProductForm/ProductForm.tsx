@@ -21,11 +21,11 @@ import {
   FieldDetails,
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
-import {MERCHANT_PRODUCTS} from "../Products/Products";
 import {OPTIONS, TYPE_OPTIONS} from "../Products/components/Constants";
 import green from "@material-ui/core/colors/green";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {CircularProgress} from "@material-ui/core";
+import {MerchantProductsDocument} from "../../codegen/generated/_graphql";
 
 
 const GET_IMAGE_UPLOAD_URL = gql`
@@ -117,11 +117,11 @@ const AddProduct: React.FC<Props> = props => {
     context: { clientName: "shopLink" },
     update(cache, { data: { createMerchantProduct } }) {
       const { products } = cache.readQuery({
-        query: MERCHANT_PRODUCTS,
+        query: MerchantProductsDocument,
       });
 
       cache.writeQuery({
-        query: MERCHANT_PRODUCTS,
+        query: MerchantProductsDocument,
         data: {
           products: {
             __typename: products.__typename,

@@ -49,6 +49,15 @@ mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: St
 }
 `;
 
+const ADD_REFUND_MUTATION = gql`
+mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankName: String, $bankAccountNumber: String, $bankOwnerName: String, $ref: Long, $paymentMethod: String) {
+  refundPayment(id: $id, amount: $amount, ref: $ref, authCode: $authCode, bankName: $bankName, bankAccountNumber: $bankAccountNumber, bankOwnerName: $bankOwnerName, paymentMethod: $paymentMethod)  {
+    paymentMethod
+    amount
+  }
+}
+`;
+
 
 
 export default function Payment({payments, orderId, balance}) {
@@ -60,6 +69,7 @@ export default function Payment({payments, orderId, balance}) {
 
 
   const [addPaymentMutation] = useMutation(ADD_PAYMENT_MUTATION,{context: { clientName: "shopLink" }});
+  const [addRefundMutation] = useMutation(ADD_REFUND_MUTATION,{context: { clientName: "shopLink" }});
 
 
   const alert = useAlert();
@@ -73,6 +83,17 @@ export default function Payment({payments, orderId, balance}) {
       variables: {id: orderId, ...data}
     });
     if(addPayment)  {
+      alert.success("Payment added");
+    }
+  }
+  const onRefundSubmit = async data => {
+    setB1(false);
+    const {
+      data: { addRefund },
+    }: any = await addRefundMutation({
+      variables: {id: orderId, ...data}
+    });
+    if(addRefund)  {
       alert.success("Payment added");
     }
   }
@@ -124,9 +145,7 @@ export default function Payment({payments, orderId, balance}) {
           <Button variant="contained" color="primary" onClick={handlePaymentDialogOpen}>New Payment</Button>
 
           <PaymentFormDialog onSubmit={onSubmit} open={paymentDialog} onClose={handleClose}/>
-          <RefundFormDialog onSubmit={onSubmit} open={refundDialog} onClose={handleClose} payment={activePayment}/>
-
-
+          <RefundFormDialog onSubmit={onRefundSubmit} open={refundDialog} onClose={handleClose} payment={activePayment}/>
 
         </OrderInfoPaper>
 {/*        <Snackbar open={snack} autoHideDuration={6000} onClose={()=>{setSnack(false)}}>

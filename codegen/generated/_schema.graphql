@@ -1,0 +1,583 @@
+input AddProductInput {
+  id: Long
+  sku: String
+  upc: String
+  price: BigDecimal
+  image: String
+  name: String
+  name_ar: String
+  brand: String
+  brand_ar: String
+  description: String
+  description_ar: String
+  features: String
+  features_ar: String
+  cost: BigDecimal
+  weight: BigDecimal
+  shopIds: [Long]
+  browseNode: String
+
+  """slug"""
+  type: String
+  unit: String
+  availability: Int
+  salePrice: BigDecimal
+  quantity: BigDecimal
+  ref: String
+  discountInPercent: Int
+}
+
+type Address {
+  id: ID
+  firstName: String
+  lastName: String
+  line1: String
+  line2: String
+  city: String
+  mobile: String
+}
+
+type Attribute {
+  name: String
+  value: String
+}
+
+"""Built-in java.math.BigDecimal"""
+scalar BigDecimal
+
+type Cart {
+  id: ID!
+  secureKey: String
+  gift: Boolean
+  giftMessage: String
+
+  """customer: Customer,"""
+  cartItems: [CartItem]
+}
+
+type CartItem {
+  id: ID
+  productId: Long
+  quantity: Int
+  image: String
+  url: String
+  title: String
+  price: String
+  salePrice: String
+  slug: String
+  unit: String
+}
+
+input CartItemInput {
+  productId: Long
+  quantity: Int
+}
+
+type Category {
+  id: Int!
+  title: String!
+  children: [Category!]!
+
+  """type: String!"""
+  icon: String!
+  slug: String!
+}
+
+type CheckoutCart {
+  id: ID!
+  ref: String
+  name: String
+  phone: String
+  email: String
+  secureKey: String
+  carrier: String
+  currency: String
+  items: [LineItem]
+}
+
+input CheckoutCartInput {
+  id: ID
+  ref: String
+  name: String
+  phone: String
+  email: String
+  secureKey: String
+
+  """addresses: [Address]"""
+  carrier: String
+  currency: String
+  items: [LineItemInput]
+}
+
+type CheckoutSession {
+  redirectUrl: String
+  secureKey: String
+}
+
+enum Condition {
+  NEW
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
+type Customer {
+  id: ID!
+  firstname: String
+  lastname: String
+  email: String
+  mobile: String
+}
+
+"""java.util.Date implementation"""
+scalar Date
+
+type Gallery {
+  url: String!
+}
+
+type LineItem {
+  productId: Int
+  sku: String
+  image: String
+  name: String
+  quantity: Float
+  price: Float
+  cost: Float
+  subTotal: Float
+  url: String
+}
+
+input LineItemInput {
+  productId: Int
+  sku: String
+  image: String
+  name: String
+  quantity: Float
+  price: Float
+  cost: Float
+  subTotal: Float
+  url: String
+}
+
+"""java.time.LocalDate implementation"""
+scalar LocalDate
+
+"""Long type"""
+scalar Long
+
+type Merchant {
+  id: ID
+  name: String
+}
+
+type MerchantProduct {
+  id: ID
+  sku: String
+  upc: String
+  ref: String
+  slug: String
+  price: BigDecimal
+  image: String
+  name: String
+  name_ar: String
+  brand: String
+  brand_ar: String
+  description: String
+  description_ar: String
+  features: String
+  features_ar: String
+  cost: BigDecimal
+  weight: BigDecimal
+
+  """slug"""
+  type: String
+  unit: String
+  availability: Int
+  salePrice: BigDecimal
+  quantity: BigDecimal
+  discountInPercent: Int
+  shopIds: [Long]
+  gallery: [String]
+}
+
+type MerchantProductResponse {
+  items: [MerchantProduct]
+  total: Int!
+  hasMore: Boolean!
+}
+
+type MerchantStock {
+  quantity: BigDecimal
+  availability: Int
+  allow_backorder: Boolean
+  link: String
+  location: String
+  price: BigDecimal
+}
+
+type Message {
+  value: String
+}
+
+type Meta {
+  publisher: String!
+  isbn: String!
+  edition: String!
+  country: String!
+  languages: [String!]!
+  numberOfReader: String!
+  numberOfPage: String!
+  samplePDF: String!
+}
+
+type Mutation {
+  updateCart(secureKey: String, items: [CartItemInput]): Cart
+  setCart(secureKey: String, items: [CartItemInput]): Cart
+  createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+  resetPassword(email: String): String
+  createMerchantProduct(product: AddProductInput): Message
+  approveProduct(id: ID): Product
+  getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+  importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
+  createOrder(id: Int): Order
+  contact(id: Int): Message
+
+  """createOrderFromCart(cart: CartInput): Order"""
+  createPurchase(dto: PurchaseInput): Purchase
+  updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+  sendPaymentSms(id: ID, mobile: String): Message
+  discountOrder(id: ID): Order
+  setOrderState(id: ID, state: OrderState): Order
+  cancelOrder(id: ID, reason: String): Order
+  addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+  sendOrderLevelEmail(id: ID, template: String): Message
+  sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
+  createCart(cart: CheckoutCartInput): CheckoutCart
+  editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
+  createProduct(ref: Int, parent: Int, sku: String, upc: String, releaseDate: LocalDate): Product
+  createNewProduct(product: ProductInput): Product
+  indexProduct(id: Int): Attribute
+  addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
+  pasLookup(sku: String): Product
+  addToPricingQ(sku: String): Message
+  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): Product
+  completePricingRequest(id: Long): Message
+  completePricingRequestAndEmail(id: Long): Message
+  addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
+}
+
+type Order {
+  id: ID!
+  reference: String
+  orderState: OrderState
+  invoiceDate: LocalDate
+  deliveryDate: LocalDate
+  customer: Customer!
+  cart: Cart
+  currency: String
+  deliveryAddress: Address!
+  invoiceAddress: Address!
+  orderItems: [OrderItem]
+  total: BigDecimal
+  deliveryTotal: BigDecimal
+  discountsTotal: BigDecimal
+  subtotal: BigDecimal
+  carrier: String
+  paymentMethod: String
+  createdDate: Date
+  payments: [Payment]
+  balance: BigDecimal
+}
+
+type OrderItem {
+  id: ID
+  sequence: Int
+  productName: String
+  quantity: Int
+  price: BigDecimal
+  comment: String
+  image: String
+  weight: BigDecimal
+  unit: String
+  lineTotal: BigDecimal
+  productUrl: String
+  productSku: String
+}
+
+input OrderItemInput {
+  id: ID
+  sequence: Int
+  quantity: Int
+  price: BigDecimal
+}
+
+enum OrderState {
+  AWAITING_PAYMENT
+  DRAFT
+  CONTACTED
+  PAYMENT_AUTHORIZED
+  PAYMENT_ACCEPTED
+  IN_PROGRESS
+  READY
+  PARTIALLY_DELIVERED
+  DELIVERED
+  SHIPPED
+  CANCELLED
+}
+
+enum OverrideType {
+  COST
+  WEIGHT
+  SHIPPING
+  AVAILABILITY
+  CONDITION
+  PRICE
+}
+
+type Payment {
+  id: ID
+  paymentMethod: String
+  orderId: Long
+  amount: BigDecimal
+  authCode: String
+}
+
+type PresignedUrl {
+  uploadUrl: String
+  imageUrl: String
+  status: String
+}
+
+type PricingRequest {
+  id: ID
+  sku: String
+  ref: String
+  email: String
+  parent: String
+}
+
+type Product {
+  id: ID!
+  ref: Long
+  parent: Int
+  sku: String
+  upc: String
+
+  """price: Price"""
+  image: String
+  gallery: [Gallery]
+  releaseDate: LocalDate
+  active: Boolean
+  similarProducts: [Int]
+  url: String
+  title: String
+  brand: String
+  group: ProductGroup
+  condition: Condition
+  isUsed: Boolean
+  availableForOrder: Boolean
+  weight: Float
+  volumeWeight: Float
+  variationDimensions: [String]
+  variationOptions: [VariationOption]
+  variationAttributes: [Attribute]
+  variations: [Variation]
+  price: String
+  salePrice: String
+  discountInPercent: Float
+  slug: String
+  categories: [Category]
+  type: ProductType
+  author: String
+  unit: String
+  description: String
+  meta: Meta
+  merchantStock: [MerchantStock]
+  hours: Int
+  availability: String
+  features: [String]
+}
+
+enum ProductGroup {
+  BAGS
+  ART
+  BEAUTY
+  BEDDINGS
+  BOOKS
+  CAMERA
+  AUTO
+  FASHION
+  ELECTRONICS
+  HEALTH
+  MUSIC
+  PC
+  SPORTS
+  TOOLS
+  TOYS
+  WATCHES
+}
+
+type ProductI18n {
+  title: String
+  description: String
+  model: String
+  features: [String]
+}
+
+input ProductI18nInput {
+  title: String
+  description: String
+  model: String
+  features: [String]
+  lang: String
+}
+
+input ProductInput {
+  sku: String
+  upc: String
+  price: BigDecimal
+  salePrice: BigDecimal
+
+  """currency: String,"""
+  image: String
+
+  """
+  images: [String],
+  releaseDate: LocalDate,
+  active: Boolean,
+  similarProducts: [Int],
+  url: String,
+  """
+  name: String
+  brand: String
+  group: String
+  features: String
+  name_ar: String
+  brand_ar: String
+  group_ar: String
+  features_ar: String
+
+  """
+  condition: Condition,
+  isUsed: Boolean,
+  availableForOrder: Boolean,
+  """
+  cost: BigDecimal
+  weight: Float
+  availability: Int
+  quantity: Int
+}
+
+type ProductResponse {
+  items: [Product!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+enum ProductType {
+  CHILDREN_BOOKS
+  TEEN_BOOKS
+  ADULT_BOOKS
+}
+
+type Purchase {
+  id: ID
+  purchaseItems: [PurchaseItem]
+  currency: String
+  invoiceDate: LocalDate
+  subtotal: BigDecimal
+  deliveryTotal: BigDecimal
+  taxesTotal: BigDecimal
+  discountTotal: BigDecimal
+  total: BigDecimal
+  merchantObj: Merchant
+}
+
+input PurchaseInput {
+  id: ID
+  currency: String
+  subtotal: Float
+  deliveryTotal: Float
+  taxesTotal: Float
+  discountTotal: Float
+  total: Float
+  deliveryAddressId: Int
+  invoiceAddressId: Int
+  merchantId: Int
+  orderState: OrderState
+  ref: String
+}
+
+type PurchaseItem {
+  id: ID
+  sequence: Int
+  price: BigDecimal
+  quantity: BigDecimal
+  description: String
+  orderItemId: Long
+  orderId: Long
+}
+
+input PurchaseItemInput {
+  sequence: Int
+  price: Float
+  quantity: Float
+  description: String
+  orderItemId: Int
+}
+
+type PurchaseQueue {
+  id: ID
+  productName: String
+  quantity: BigDecimal
+  price: BigDecimal
+  cost: BigDecimal
+  image: String
+  weight: BigDecimal
+  url: String
+  sku: String
+  orderId: Long
+}
+
+type Query {
+  getAddresses(customerId: Int): [Address]
+
+  """getAddress(addressId: Int): Address"""
+  me: Customer
+  customers: [Customer]
+  merchantProducts(text: String = "", type: String = "", offset: Int = 0, limit: Int = 10, lang: Int = 1, imported: Boolean = true): MerchantProductResponse
+
+  """getOrders(): [Orders]"""
+  orderConfirmation(ref: String, key: String): Order
+  orders(limit: Int = 10): [Order]
+  ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
+  orderA(id: ID): Order
+  purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+  purchase(id: ID): Purchase
+  purchaseQueue: [PurchaseQueue]
+  merchants: [Merchant]
+  payments(orderId: ID): [Payment]
+  product(slug: String!): Product!
+  products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
+  relatedProducts(type: String, slug: String!): [Product!]!
+  categories(type: String!): [Category!]!
+  category(id: Int!): Category!
+  productAny(id: ID): Product
+  productAdmin(id: ID): Product
+  getProductBySku(sku: String, isParent: Boolean = false): Product
+  pricingRequests: [PricingRequest]
+  parentOf(sku: String): String
+}
+
+type Variation {
+  ref: ID!
+  variationAttributes: [Attribute]
+}
+
+type VariationOption {
+  label: String
+  name: String
+  values: [String]
+}

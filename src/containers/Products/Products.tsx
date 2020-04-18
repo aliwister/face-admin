@@ -21,6 +21,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import {ImportAllDialog} from "./components/ImportAllDialog";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import {useMerchantProductsQuery} from "../../codegen/generated/_graphql";
 
 export const ProductsRow = styled('div', ({ $theme }) => ({
   display: 'flex',
@@ -58,52 +59,6 @@ export const LoaderItem = styled('div', () => ({
   marginBottom: '30px',
 }));
 
-export const MERCHANT_PRODUCTS = gql`
-  query merchantProducts(
-    $type: String 
-    $limit: Int = 12
-    $text: String
-    $offset: Int = 0
-    $lang: Int
-    $imported: Boolean = true
-  ) {
-    merchantProducts(
-      type: $type
-      limit: $limit
-      text: $text
-      offset: $offset
-      lang: $lang
-      imported: $imported
-    ) {
-      items {
-        id
-        ref
-        name
-        brand
-        description
-        features               
-        name_ar
-        brand_ar
-        description_ar
-        features_ar
-        image
-        price
-        unit
-        sku
-        salePrice
-        discountInPercent
-        upc
-        availability
-        weight
-        cost
-        quantity
-      }
-      total
-      hasMore
-    }
-  }
-`;
-
 const typeSelectOptions = [
   { value: 'grocery', label: 'Grocery' },
   { value: 'women-cloths', label: 'Women Cloths' },
@@ -116,7 +71,7 @@ const priceSelectOptions = [
 ];
 
 export default function Products() {
-  const { data, error, refetch, fetchMore } = useQuery(MERCHANT_PRODUCTS,{ context: { clientName: "shopLink" }});
+  const { data, error, refetch, fetchMore } = useMerchantProductsQuery({ context: { clientName: "shopLink" }});
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {}
   });
@@ -150,6 +105,7 @@ export default function Products() {
       },
     });
   }
+/*
   function handlePriceSort({ value }) {
     setPriceOrder(value);
     if (value.length) {
@@ -162,15 +118,18 @@ export default function Products() {
       });
     }
   }
+*/
 
 
   function handleSearch(data) {
     const value = data.search;
+    // @ts-ignore
     refetch({ text: value });
   }
 
   const handleTabChange = (event, newValue) =>  {
     if(tab !== newValue) {
+      // @ts-ignore
       refetch({imported: newValue});
       setTab(newValue);
     }

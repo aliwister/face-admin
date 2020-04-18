@@ -1,0 +1,43 @@
+  query merchantProducts(
+    $type: String 
+    $limit: Int = 12
+    $text: String
+    $offset: Int = 0
+    $lang: Int
+    $imported: Boolean = true
+  ) {
+    merchantProducts(
+      type: $type
+      limit: $limit
+      text: $text
+      offset: $offset
+      lang: $lang
+      imported: $imported
+    ) {
+      items {
+        id
+        ref
+        name
+        brand
+        description
+        features               
+        name_ar
+        brand_ar
+        description_ar
+        features_ar
+        image
+        price
+        unit
+        sku
+        salePrice
+        discountInPercent
+        upc
+        availability
+        weight
+        cost
+        quantity
+      }
+      total
+      hasMore
+    }
+  }

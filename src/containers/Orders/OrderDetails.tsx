@@ -40,55 +40,8 @@ import Checkbox from "@material-ui/core/Checkbox";
 import {EditOrderDialog} from "./EditOrderDialog";
 import TableFooter from "@material-ui/core/TableFooter";
 import {CancelOrderDialog} from "./components/CancelOrderDialog";
+import {useOrderAQuery} from "../../codegen/generated/_graphql";
 
-const GET_ORDER = gql`
-  query orderA($id: ID) {
-    orderA(id: $id) {
-      id
-      reference
-      createdDate
-      invoiceDate
-      total
-      invoiceDate
-      paymentMethod
-      subtotal
-      orderState
-      deliveryTotal
-      discountsTotal
-      deliveryDate
-      customer {
-        id
-        firstname
-        lastname
-      }
-      deliveryAddress {
-          firstName
-          lastName
-          line1
-          line1
-          city
-      }
-      orderItems {
-        id
-        sequence
-        productSku
-        productUrl
-        productName
-        price
-        quantity
-        image
-        lineTotal
-      }
-      payments {
-        id
-        paymentMethod
-        authCode
-        amount
-      }
-      balance
-    }
-  }
-`;
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
   sendPaymentSms(id:$id, mobile:$mobile) {
@@ -153,7 +106,7 @@ export default function OrderDetails(props) {
   const [sendVoltageEmailMutation] = useMutation(SEND_VOLTAGE_EMAIL, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
-  const { data, loading, error, refetch } = useQuery(GET_ORDER, {
+  const { data, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
     },
@@ -313,7 +266,7 @@ export default function OrderDetails(props) {
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={data.orderA.deliveryAddress.phone}
+                  primary={data.orderA.deliveryAddress.mobile}
                   secondary= 'Phone'
                 />
               </ListItem>

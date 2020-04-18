@@ -86,15 +86,15 @@ const useStyles = makeStyles((theme) => ({
 const tiers = [
     {
         title: 'Just Starting',
-        price: '19',
-        description: ['59 SKUs included', '99 orders / month', '15% commission', 'Whatsapp support'],
+        price: '2.5',
+        description: ['39 SKUs included', '99 orders / month', '15% commission', 'Whatsapp support'],
         buttonText: 'Sign up',
         buttonVariant: 'outlined',
     },
     {
         title: 'SMEs',
         subheader: 'Most popular',
-        price: '99',
+        price: '20',
         description: [
             '599 SKUs included',
             'Unlimited Orders',
@@ -106,7 +106,7 @@ const tiers = [
     },
     {
         title: 'Enterprise',
-        price: '299',
+        price: '220',
         description: [
             '5999 SKUs included',
             'Unlimited Orders',

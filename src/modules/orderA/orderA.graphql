@@ -1,0 +1,48 @@
+  query orderA($id: ID) {
+    orderA(id: $id) {
+      id
+      reference
+      createdDate
+      invoiceDate
+      total
+      invoiceDate
+      paymentMethod
+      subtotal
+      orderState
+      deliveryTotal
+      discountsTotal
+      deliveryDate
+      customer {
+        id
+        firstname
+        lastname
+      }
+      deliveryAddress {
+          firstName
+          lastName
+          line1
+          line2
+          city
+          mobile
+      }
+      orderItems {
+        id
+        sequence
+        productSku
+        productUrl
+        productName
+        price
+        quantity
+        image
+        lineTotal
+      }
+      payments {
+        id
+        paymentMethod
+        authCode
+        amount
+      }
+      currency
+      balance
+    }
+  }
