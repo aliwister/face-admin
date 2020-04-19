@@ -10,11 +10,21 @@ import {
   CUSTOMERS,
   COUPONS,
   STUFF_MEMBERS,
-  SITE_SETTINGS, ORDERDETAILS, PURCHASES, PURCHASEDETAILS, CART, SIGNUP, SHIPMENTS, SHIPMENTDETAILS, IMPORT_PRODUCTS
+  SITE_SETTINGS,
+  ORDERDETAILS,
+  PURCHASES,
+  PURCHASEDETAILS,
+  CART,
+  SIGNUP,
+  SHIPMENTS,
+  SHIPMENTDETAILS,
+  IMPORT_PRODUCTS,
+  INVENTORY
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
 import ShipmentDetails from "./containers/Shipments/ShipmentDetails";
+import Inventory from "./containers/Shipments/Inventory";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
 const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
@@ -184,6 +194,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <ShipmentDetails />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={INVENTORY}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <Inventory />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

@@ -235,6 +235,7 @@ export default function Shipments() {
           <Button variant="contained" color="primary" onClick={handlePrepareButton} >
             Prepare
           </Button>
+          <Link to="inventory">Inventory</Link>
         </Grid>
 
         <Grid item xs={12}>

@@ -49,6 +49,7 @@ query purchaseQueue {
     sku
     cost
     orderId
+    productId
   }
 }
 `;
@@ -213,12 +214,14 @@ export default function PurchaseForm({purchase}) {
     delete dto.merchantObj;
     delete dto.__typename;
 
-    const purchaseItems = state.purchaseItems.map(({orderItemId, price, quantity, description, sequence}) => ({
+    const purchaseItems = state.purchaseItems.map(({id, orderItemId, price, quantity, description, sequence, productId}) => ({
+      id,
       orderItemId,
       price,
       quantity,
       description,
-      sequence
+      sequence,
+      productId
     }));
     //console.log(dto);
     //console.log(purchaseItems);
@@ -258,11 +261,13 @@ export default function PurchaseForm({purchase}) {
 
   function handleAdd(q) {
     dispatch({type: 'ADD_ITEM', payload: {
+
         sequence:state.purchaseItems.length+1,
         price: q.cost,
         quantity: q.quantity,
         description: q.productName,
-        orderItemId: q.id
+        orderItemId: q.id,
+        productId: q.productId
       }});
   }
 
