@@ -87,7 +87,7 @@ const tiers = [
     {
         title: 'Just Starting',
         price: '2.5',
-        description: ['39 SKUs included', '99 orders / month', '15% commission', 'Whatsapp support'],
+        description: ['29 SKUs included', '99 orders / month', '15% commission', 'Whatsapp support'],
         buttonText: 'Sign up',
         buttonVariant: 'outlined',
     },
@@ -96,7 +96,7 @@ const tiers = [
         subheader: 'Most popular',
         price: '20',
         description: [
-            '599 SKUs included',
+            '199 SKUs included',
             'Unlimited Orders',
             '12% commission on sales',
             'Phone support',
@@ -108,7 +108,7 @@ const tiers = [
         title: 'Enterprise',
         price: '220',
         description: [
-            '5999 SKUs included',
+            '1999 SKUs included',
             'Unlimited Orders',
             '8% commission on sales',
             'Priority Phone support',
