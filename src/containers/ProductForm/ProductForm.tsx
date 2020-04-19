@@ -38,7 +38,7 @@ const GET_IMAGE_UPLOAD_URL = gql`
   }    
 `;
 export const CREATE_PRODUCT = gql`
-  mutation createMerchantProduct($message: Message!) {
+  mutation createMerchantProduct($product: AddProductInput!) {
     createMerchantProduct(product: $product) {
       value
     }
