@@ -33,6 +33,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import {PURCHASEDETAILS} from "../../settings/constants";
+import NewPurchaseDialog from "./components/NewPurchaseDialog";
 
 const GET_ORDERS = gql`
   query purchases($state: [OrderState], $limit: Int, $searchText: String) {
@@ -65,13 +66,7 @@ query merchants {
   }
 }
 `;
-const CREATE_PURCHASE = gql`
-  mutation createPurchase($dto: PurchaseInput) {
-    createPurchase(dto: $dto) {
-      id
-    }
-  }
-`;
+
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -134,12 +129,12 @@ export default function Purchases() {
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const [open, setOpen] = React.useState(false);
-  const [merchant, setMerchant] = React.useState(false);
+
   const alert = useAlert();
   const classes = useStyles();
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
-  const [createPurchaseMutation] = useMutation(CREATE_PURCHASE,{context: { clientName: "shopLink" }});
+
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
     ':before': {
@@ -180,19 +175,6 @@ export default function Purchases() {
     return <div>Error! {error.message}</div>;
   }
 
-  const handleCreatePurchase = async () => {
-    // @ts-ignore
-    const dto = {merchantId: merchant.id, currency: "omr"};
-    const {
-      data: { createPurchase },
-    }: any = await createPurchaseMutation({
-      variables: { dto: dto },
-    });
-    if(createPurchase)  {
-      alert.success(createPurchase.id);
-      history.push('/purchase-details/'+createPurchase.id);
-    }
-  }
 
   function handleStatus({ value }) {
     setStatus(value);
@@ -258,30 +240,7 @@ export default function Purchases() {
   }
   return (
       <>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">New Purchase</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Select Merchant
-            </DialogContentText>
-            <Autocomplete
-                id="combo-box-demo"
-                options={merchants.merchants}
-                getOptionLabel={(option: any) => option.name}
-                style={{ width: 300 }}
-                onChange={(event, value) => setMerchant(value)}
-                renderInput={params => <TextField {...params} label="Merchant Name" variant="outlined" />}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleCreatePurchase} color="primary">
-              Create
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <NewPurchaseDialog open={open} onClose={handleClose} merchants={merchants} />
       <Grid container spacing={1}>
 
             <Grid item  md={3} >

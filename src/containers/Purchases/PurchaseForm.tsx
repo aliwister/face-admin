@@ -24,6 +24,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import {Link} from "react-router-dom";
+import NewPurchaseDialog from "./components/NewPurchaseDialog";
 const CREATE_PURCHASE = gql`
   mutation createPurchase($dto: PurchaseInput) {
     createPurchase(dto: $dto) {
@@ -189,6 +190,7 @@ export default function PurchaseForm({purchase}) {
 
   const [total, setTotal] = useState(purchase.total);
   const [subtotal, setSubtotal] = useState(purchase.subtotal);
+  const [newPurchaseDialog, setNewpurchasedialog] = useState(purchase.subtotal);
 
 
   const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only", context: { clientName: "shopLink" }});
@@ -271,6 +273,8 @@ export default function PurchaseForm({purchase}) {
       }});
   }
 
+  const onClose = () => setNewpurchasedialog(false);
+
   function handleRemove(q) {
     dispatch({type: 'REMOVE_ITEM', payload: q.orderItemId});
   }
@@ -284,7 +288,7 @@ export default function PurchaseForm({purchase}) {
   // @ts-ignore
   return (
       <Grid container xs={12} md={12}>
-
+        <NewPurchaseDialog open={newPurchaseDialog} onClose={onClose} merchants={merchants} />
         <Grid item md={4}>
           <Autocomplete
               id="combo-box-demo"
@@ -307,6 +311,9 @@ export default function PurchaseForm({purchase}) {
         <Grid item md={3} style={{textAlign:'right'}}>
           <Button variant="contained" color="primary" size="large" onClick={savePurchase}>
             Save
+          </Button>
+          <Button variant="contained" color="primary" size="large" onClick={()=> setNewpurchasedialog(true)}>
+            New Purchase
           </Button>
         </Grid>
 
