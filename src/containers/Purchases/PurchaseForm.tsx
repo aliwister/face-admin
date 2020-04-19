@@ -372,6 +372,9 @@ export default function PurchaseForm({purchase}) {
         <Button variant="contained" color="secondary" onClick={()=>{refetch({})}}>
           Refresh
         </Button>
+        <Button variant="contained" color="primary" size="large" onClick={savePurchase}>
+          Save
+        </Button>
         <TableContainer component={Paper}>
           <Table className={classes.table} size="small" aria-label="a dense table">
             <TableHead>
