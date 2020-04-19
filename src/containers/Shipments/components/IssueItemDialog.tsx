@@ -5,11 +5,11 @@ import Button from "@material-ui/core/Button";
 import React from "react";
 import {useForm} from "react-hook-form";
 
-export const IssueItemDialog = ({item, open, onClose, onSubmit}) => {
+export const IssueItemDialog = ({item, open, onClose, onSubmit, productId}) => {
+  console.log(item);
   const { register, handleSubmit, errors } = useForm({
     defaultValues: {
-      productId: item.productId,
-      orderId: item.orderId,
+      productId: productId,
       orderItemId: item.orderItemId
     }
   });
@@ -26,10 +26,10 @@ export const IssueItemDialog = ({item, open, onClose, onSubmit}) => {
           <DialogContentText>
             Package Info
           </DialogContentText>
-          <TextField fullWidth type="number" placeholder="Product ID" name="productId" inputRef={register({required: true})} />
-          <TextField fullWidth type="number" placeholder="Quantity" name="quantity" inputRef={register({required: true})} />
+          <TextField fullWidth type="number" placeholder="Product ID" name="productId" value={productId} inputRef={register({required: true})} />
+          <TextField fullWidth type="number" placeholder="Quantity" name="quantity"  inputRef={register({required: true})} />
           <TextField fullWidth type="number" placeholder="Order Id" name="orderId" inputRef={register} />
-          <TextField fullWidth type="number" placeholder="Order Item Id" name="orderItemId" inputRef={register} />
+          <TextField fullWidth type="number" placeholder="Order Item Id" name="orderItemId" value={item.orderItemId} inputRef={register} />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

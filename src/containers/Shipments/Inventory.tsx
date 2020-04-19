@@ -55,6 +55,7 @@ query inventory {
     received
     issued
     quantityOnHand    
+    image
   }
 }
 `;
@@ -80,7 +81,8 @@ export default function Inventory() {
   const [issueItemDialog, setIssueitemdialog] = useState(false);
   const [printLabelDialog, setPrintlabeldialog] = useState(false);
   const [label, setLabel] = useState('');
-  const [item, setItem] = useState(-1)
+  const [item, setItem] = useState(-1);
+  const [selected, setSelected] = useState([]);
 
 
   const alert = useAlert();
@@ -101,19 +103,47 @@ export default function Inventory() {
     });
     if(issueItem)  {
       alert.success(issueItem.id);
+      setIssueitemdialog(false);
+      setLabel(issueItem.id + '-' +issueItem.shipmentId);
+      setPrintlabeldialog(true);
       //dispatch({type:'ISSUE_ITEM_END'});
       //dispatch({type:'PRINT_LABEL_START', payload:issueItem});
     }
   }
 
   const handleProcess = (item) => {
-   // dispatch({type: 'SELECT_ACCEPT_ITEM_START', payload:item})
+    console.log(item);
+    setItem(item);
+    setIssueitemdialog(true);
+  };
+
+  const handleSelect = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelected(newSelected);
   };
 
   const handleRefetch = async x => {
     refetch({keyword: x.keyword});
   }
-  const onClose = () => setIssueitemdialog(false)
+  const onClose = () => {
+    setIssueitemdialog(false)
+    setPrintlabeldialog(false)
+  }
  // const handleAcceptClose = () => dispatch({type: 'SELECT_ACCEPT_ITEM_CANCEL'})
  // const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
 
@@ -156,8 +186,8 @@ export default function Inventory() {
         <InventoryList
           data={dataInventory}
           classes={classes}
-          handleProcess={handleProcess}
-          selected={item}
+          handleSelect={handleSelect}
+          selected={selected}
         />
       </SectionCard>
 
@@ -168,7 +198,7 @@ export default function Inventory() {
           action={
             <form onSubmit={hs3(handleRefetch)}>
               <TextField name="keyword" inputRef={r3({required: true})}/>
-              <Button variant="contained" color="secondary" size="small" type="submit" >
+              <Button variant="contained" color="secondary" size="small" type="submit"  disabled={selected.length != 1}>
                 Search
               </Button>
             </form>
@@ -180,9 +210,7 @@ export default function Inventory() {
           handleProcess={handleProcess}
         />
       </SectionCard>
-{/*      {issueItemDialog &&
-      <IssueItemDialog item={item} open={issueItemDialog} onClose={handleIssueClose} onSubmit={handleIssueItem} />
-      }*/}
+      <IssueItemDialog item={item} open={issueItemDialog} onClose={onClose} onSubmit={handleIssueItem} productId={selected[0]} />
     </>
   );
 }

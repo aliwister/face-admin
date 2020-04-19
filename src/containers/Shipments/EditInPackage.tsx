@@ -162,7 +162,7 @@ export default function EditInPackage({state, dispatch}) {
       <AcceptItemDialog item={state.item} open={state.acceptItemDialog} onClose={handleAcceptClose} onSubmit={handleAcceptItem}/>
       }
       {state.issueItemDialog &&
-      <IssueItemDialog item={state.item} open={state.issueItemDialog} onClose={handleIssueClose} onSubmit={handleIssueItem} />
+      <IssueItemDialog item={state.item} open={state.issueItemDialog} onClose={handleIssueClose} onSubmit={handleIssueItem} productId={state.item.productId} />
       }
     </>
   );
