@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -24,6 +24,7 @@ import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
 import Logoimage from '../../image/logo.svg';
 import {LogoImage} from "../Layout/Topbar/Topbar.style";
+import SignupForm from "./SignupForm";
 
 function Copyright() {
     return (
@@ -138,8 +139,13 @@ const footers = [
 
 export default function Signup() {
     const classes = useStyles();
+    const [form, setForm] = useState(false);
 
-    return (
+  function showForm() {
+    setForm(true);
+  }
+
+  return (
         <React.Fragment>
             <CssBaseline />
             <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
@@ -162,13 +168,19 @@ export default function Signup() {
                     {/*    </Link>*/}
                     {/*</nav>*/}
                     <Link to='/'>
-                    <Button href="#" color="primary" variant="outlined" className={classes.link}>
+                    <Button href="#" color="primary" variant="outlined" className={classes.link} >
                         Login
                     </Button>
                     </Link>
                 </Toolbar>
             </AppBar>
             {/* Hero unit */}
+          {form?
+
+              <SignupForm />
+
+            :
+            <>
             <Container maxWidth="sm" component="main" className={classes.heroContent}>
                 <Typography component="h1" variant="h2" align="center" color="textPrimary" gutterBottom>
                     <center>
@@ -252,7 +264,7 @@ export default function Signup() {
                                     </ul>
                                 </CardContent>
                                 <CardActions>
-                                    <Button fullWidth variant={tier.buttonVariant} color="primary">
+                                    <Button fullWidth variant={tier.buttonVariant} color="primary" onClick={showForm}>
                                         {tier.buttonText}
                                     </Button>
                                 </CardActions>
@@ -261,6 +273,7 @@ export default function Signup() {
                     ))}
                 </Grid>
             </Container>
+            </>}
             {/* Footer */}
             <Container maxWidth="md" component="footer" className={classes.footer}>
                 {/*<Grid container spacing={4} justify="space-evenly">*/}
