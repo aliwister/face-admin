@@ -273,8 +273,50 @@ export default function OrderDetails(props) {
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={6} sm={6} xs={12} className='mb-30'>
-          <Payment orderId={data.orderA.id} balance={data.orderA.balance} payments={data.orderA.payments}/>
+        <Col lg={3} sm={3} xs={12} className='mb-30'>
+          <OrderInfoPaper>
+            <Typography variant="caption">Totals</Typography>
+            <Table  size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                  </TableCell>
+                  <TableCell align="left">Subtotal</TableCell>
+                  <TableCell align="left"></TableCell>
+                  <TableCell align="left">OMR {data.orderA.subtotal}</TableCell>
+                  <TableCell align="right"></TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                  </TableCell>
+                  <TableCell align="left">Delivery</TableCell>
+                  <TableCell align="left">{data.orderA.carrier}</TableCell>
+                  <TableCell align="left">OMR {data.orderA.deliveryTotal}</TableCell>
+                  <TableCell align="right"></TableCell>
+                </TableRow>
+                {data.orderA.discountsTotal &&
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                  </TableCell>
+                  <TableCell align="left">Discount</TableCell>
+                  <TableCell align="left"></TableCell>
+                  <TableCell align="left">OMR {data.orderA.discountsTotal}</TableCell>
+                  <TableCell align="right"></TableCell>
+                </TableRow>}
+                <TableRow>
+                  <TableCell component="th" scope="row">
+                  </TableCell>
+                  <TableCell align="left">Total</TableCell>
+                  <TableCell align="left"></TableCell>
+                  <TableCell align="left">OMR {data.orderA.total}</TableCell>
+                  <TableCell align="right"></TableCell>
+                </TableRow>
+              </TableHead>
+            </Table>
+          </OrderInfoPaper>
+        </Col>
+        <Col lg={3} sm={3} xs={12} className='mb-30'>
+          <Payment order={data.orderA} refetch={refetch}/>
         </Col>
       </Row>
       <Row>

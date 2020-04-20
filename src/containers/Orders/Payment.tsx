@@ -60,7 +60,7 @@ mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankNam
 
 
 
-export default function Payment({payments, orderId, balance}) {
+export default function Payment({order, refetch}) {
   const [b1,setB1] = useState(true);
 
   const [paymentDialog,setPaymentdialog] = useState(false);
@@ -80,10 +80,12 @@ export default function Payment({payments, orderId, balance}) {
     const {
       data: { addPayment },
     }: any = await addPaymentMutation({
-      variables: {id: orderId, ...data}
+      variables: {id: order.id, ...data}
     });
     if(addPayment)  {
+      handleClose();
       alert.success("Payment added");
+      refetch();
     }
   }
   const onRefundSubmit = async data => {
@@ -91,10 +93,12 @@ export default function Payment({payments, orderId, balance}) {
     const {
       data: { addRefund },
     }: any = await addRefundMutation({
-      variables: {id: orderId, ...data}
+      variables: {id: order.id, ...data}
     });
     if(addRefund)  {
+      handleClose();
       alert.success("Payment added");
+      refetch();
     }
   }
 
@@ -111,6 +115,7 @@ export default function Payment({payments, orderId, balance}) {
 
   return (
     <>
+
         <OrderInfoPaper>
           <Typography variant="caption">Payments</Typography>
           <Table  size="small" aria-label="a dense table">
@@ -123,9 +128,10 @@ export default function Payment({payments, orderId, balance}) {
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
-            {payments && (
+            {order && order.payments && (
               <TableBody>
-                {payments.map(row => (
+
+                {order.payments.map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       {row.id}
@@ -133,15 +139,29 @@ export default function Payment({payments, orderId, balance}) {
                     <TableCell align="left">{row.paymentMethod}</TableCell>
                     <TableCell align="left">{row.authCode}</TableCell>
                     <TableCell align="left">OMR {row.amount}</TableCell>
-                    <TableCell align="right"><Button variant="contained" onClick={() => handleRefundDialogOpen(row)}>Refund</Button></TableCell>
+                    <TableCell align="right"><Button variant="contained" size="small" onClick={() => handleRefundDialogOpen(row)}>Refund</Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
 
+
+
             )}
+            <TableFooter>
+
+
+              <TableRow>
+                <TableCell component="th" scope="row">
+                </TableCell>
+                <TableCell align="left">Balance</TableCell>
+                <TableCell align="left"></TableCell>
+                <TableCell align="left">OMR {order.balance}</TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
+
+          </TableFooter>
+
           </Table>
-          <Typography variant="caption">Balance</Typography>
-          <div>OMR {balance}</div>
           <Button variant="contained" color="primary" onClick={handlePaymentDialogOpen}>New Payment</Button>
 
           <PaymentFormDialog onSubmit={onSubmit} open={paymentDialog} onClose={handleClose}/>

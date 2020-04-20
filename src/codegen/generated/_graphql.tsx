@@ -284,6 +284,8 @@ export type Mutation = {
   sendProductLevelEmail: Maybe<Message>;
   createCart: Maybe<CheckoutCart>;
   editOrder: Maybe<Order>;
+  /** cancelOrder(id: ID): Order */
+  refundPayment: Maybe<Payment>;
   createProduct: Maybe<Product>;
   createNewProduct: Maybe<Product>;
   indexProduct: Maybe<Attribute>;
@@ -417,6 +419,18 @@ export type MutationEditOrderArgs = {
   id: Maybe<Scalars['ID']>;
   orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
   reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationRefundPaymentArgs = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
+  authCode: Maybe<Scalars['String']>;
+  bankName: Maybe<Scalars['String']>;
+  bankAccountNumber: Maybe<Scalars['String']>;
+  bankOwnerName: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['Long']>;
+  paymentMethod: Maybe<Scalars['String']>;
 };
 
 
@@ -741,11 +755,13 @@ export type PurchaseItem = {
 };
 
 export type PurchaseItemInput = {
+  id: Maybe<Scalars['Long']>;
   sequence: Maybe<Scalars['Int']>;
   price: Maybe<Scalars['Float']>;
   quantity: Maybe<Scalars['Float']>;
   description: Maybe<Scalars['String']>;
   orderItemId: Maybe<Scalars['Int']>;
+  productId: Maybe<Scalars['Long']>;
 };
 
 export type PurchaseQueue = {
@@ -759,6 +775,7 @@ export type PurchaseQueue = {
   weight: Maybe<Scalars['BigDecimal']>;
   url: Maybe<Scalars['String']>;
   sku: Maybe<Scalars['String']>;
+  productId: Maybe<Scalars['Long']>;
   orderId: Maybe<Scalars['Long']>;
 };
 
@@ -942,7 +959,7 @@ export type OrderAQuery = (
   { __typename?: 'Query' }
   & { orderA: Maybe<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'currency' | 'balance'>
+    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'currency' | 'balance' | 'carrier'>
     & { customer: (
       { __typename?: 'Customer' }
       & Pick<Customer, 'id' | 'firstname' | 'lastname'>
@@ -1088,6 +1105,7 @@ export const OrderADocument = gql`
     }
     currency
     balance
+    carrier
   }
 }
     `;

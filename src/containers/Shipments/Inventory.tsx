@@ -19,6 +19,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import ReactToPrint from "react-to-print";
 import Grid from "@material-ui/core/Grid";
 import {InventoryList} from "./components/InventoryList";
+import {OutstandingQueue} from "./components/OutstandingQueue";
 
 
 const ISSUE_ITEM = gql`
@@ -29,19 +30,16 @@ const ISSUE_ITEM = gql`
     }
   }
 `;
-const SORT_QUEUE = gql`
-query sortQueue($keyword: String) {
-  sortQueue(keyword: $keyword) {
+const OUTSTANDING_Q = gql`
+query outstandingQueue($keyword: String) {
+  outstandingQueue(keyword: $keyword) {
     id
     description
     quantity
     price
     image
     sku
-    cost
-    url
     productId
-    merchantId
     orderItemId
   }
 }
@@ -74,7 +72,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Inventory() {
   const [issueItemMutation] = useMutation(ISSUE_ITEM,{ context: { clientName: "adminLink" }});
-  const { data, loading, error, refetch } = useQuery(SORT_QUEUE, { context: { clientName: "adminLink" }});
+  const { data, loading, error, refetch } = useQuery(OUTSTANDING_Q, { context: { clientName: "adminLink" }});
   const { data: dataInventory, loading: loadingInventory, error: errorInventory, refetch: refetchInventory } = useQuery(INVENTORY, { context: { clientName: "adminLink" }});
   const { register:r3, handleSubmit:hs3, errors:e3 } = useForm();
 
@@ -197,18 +195,19 @@ export default function Inventory() {
           subheader="Sort"
           action={
             <form onSubmit={hs3(handleRefetch)}>
-              <TextField name="keyword" inputRef={r3({required: true})}/>
+              <TextField name="keyword" inputRef={r3}/>
               <Button variant="contained" color="secondary" size="small" type="submit"  disabled={selected.length != 1}>
                 Search
               </Button>
             </form>
           }
         />
-        <SortQueue
-          data={data}
+        {data &&
+        <OutstandingQueue
+          queue={data.outstandingQueue}
           classes={classes}
           handleProcess={handleProcess}
-        />
+        />}
       </SectionCard>
       <IssueItemDialog item={item} open={issueItemDialog} onClose={onClose} onSubmit={handleIssueItem} productId={selected[0]} />
     </>
