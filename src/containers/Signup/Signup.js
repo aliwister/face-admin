@@ -107,7 +107,7 @@ const tiers = [
     },
     {
         title: 'Enterprise',
-        price: '220',
+        price: '450',
         description: [
             '1999 SKUs included',
             'Unlimited Orders',
