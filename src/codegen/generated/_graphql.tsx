@@ -534,6 +534,7 @@ export type OrderItem = {
   lineTotal: Maybe<Scalars['BigDecimal']>;
   productUrl: Maybe<Scalars['String']>;
   productSku: Maybe<Scalars['String']>;
+  productId: Maybe<Scalars['Long']>;
 };
 
 export type OrderItemInput = {
@@ -866,6 +867,7 @@ export type QueryPaymentsArgs = {
 
 export type QueryProductArgs = {
   slug: Scalars['String'];
+  cookie?: Maybe<Scalars['String']>;
 };
 
 
@@ -962,13 +964,13 @@ export type OrderAQuery = (
     & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'currency' | 'balance' | 'carrier'>
     & { customer: (
       { __typename?: 'Customer' }
-      & Pick<Customer, 'id' | 'firstname' | 'lastname'>
+      & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
     ), deliveryAddress: (
       { __typename?: 'Address' }
       & Pick<Address, 'firstName' | 'lastName' | 'line1' | 'line2' | 'city' | 'mobile'>
     ), orderItems: Maybe<Array<Maybe<(
       { __typename?: 'OrderItem' }
-      & Pick<OrderItem, 'id' | 'sequence' | 'productSku' | 'productUrl' | 'productName' | 'price' | 'quantity' | 'image' | 'lineTotal'>
+      & Pick<OrderItem, 'id' | 'sequence' | 'productId' | 'productSku' | 'productUrl' | 'productName' | 'price' | 'quantity' | 'image' | 'lineTotal'>
     )>>>, payments: Maybe<Array<Maybe<(
       { __typename?: 'Payment' }
       & Pick<Payment, 'id' | 'paymentMethod' | 'authCode' | 'amount'>
@@ -1077,6 +1079,8 @@ export const OrderADocument = gql`
       id
       firstname
       lastname
+      email
+      mobile
     }
     deliveryAddress {
       firstName
@@ -1089,6 +1093,7 @@ export const OrderADocument = gql`
     orderItems {
       id
       sequence
+      productId
       productSku
       productUrl
       productName

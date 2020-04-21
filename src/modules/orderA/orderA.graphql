@@ -16,6 +16,8 @@
         id
         firstname
         lastname
+        email
+        mobile
       }
       deliveryAddress {
           firstName
@@ -28,6 +30,7 @@
       orderItems {
         id
         sequence
+        productId
         productSku
         productUrl
         productName

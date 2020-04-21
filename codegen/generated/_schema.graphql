@@ -307,6 +307,7 @@ type OrderItem {
   lineTotal: BigDecimal
   productUrl: String
   productSku: String
+  productId: Long
 }
 
 input OrderItemInput {
@@ -565,7 +566,7 @@ type Query {
   purchaseQueue: [PurchaseQueue]
   merchants: [Merchant]
   payments(orderId: ID): [Payment]
-  product(slug: String!): Product!
+  product(slug: String!, cookie: String = ""): Product!
   products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
   relatedProducts(type: String, slug: String!): [Product!]!
   categories(type: String!): [Category!]!

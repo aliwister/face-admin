@@ -41,6 +41,7 @@ import {EditOrderDialog} from "./EditOrderDialog";
 import TableFooter from "@material-ui/core/TableFooter";
 import {CancelOrderDialog} from "./components/CancelOrderDialog";
 import {useOrderAQuery} from "../../codegen/generated/_graphql";
+import LaunchIcon from '@material-ui/icons/Launch';
 
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
@@ -211,7 +212,7 @@ export default function OrderDetails(props) {
       <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={data.orderA.orderItems} />
       <CancelOrderDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} />
       <Row>
-        <Col lg={3} sm={6} xs={12} className='mb-30'>
+        <Col lg={2} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Basic Info</Typography>
             <List>
@@ -235,14 +236,14 @@ export default function OrderDetails(props) {
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.currency} ${data.orderA.total}`}
+                  primary={`${data.orderA.customer.email}`}
                   secondary= 'Total'
                   />
               </ListItem>
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={3} sm={6} xs={12} className='mb-30'>
+        <Col lg={2} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Delivery Info</Typography>
             <List>
@@ -273,7 +274,7 @@ export default function OrderDetails(props) {
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={3} sm={3} xs={12} className='mb-30'>
+        <Col lg={4} sm={3} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Totals</Typography>
             <Table  size="small" aria-label="a dense table">
@@ -315,7 +316,7 @@ export default function OrderDetails(props) {
             </Table>
           </OrderInfoPaper>
         </Col>
-        <Col lg={3} sm={3} xs={12} className='mb-30'>
+        <Col lg={4} sm={3} xs={12} className='mb-30'>
           <Payment order={data.orderA} refetch={refetch}/>
         </Col>
       </Row>
@@ -348,7 +349,7 @@ export default function OrderDetails(props) {
                   <TableCell align="left">Quantity</TableCell>
                   <TableCell align="right">Price</TableCell>
                   <TableCell align="center">Line Total</TableCell>
-                  <TableCell align="center">Sku</TableCell>
+                  <TableCell align="center">id</TableCell>
                 </TableRow>
               </TableHead>
               {data && data.orderA.orderItems && (
@@ -368,18 +369,25 @@ export default function OrderDetails(props) {
                       </TableCell>
                       <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
                       <TableCell component="th" scope="row">
-                      {row.productSku ?
-                          <a href={`http://www.amazon.com/dp/${row.productSku}`} target="_blank">
+                      {row.productId ?
+                        <a href={`http://www.badals.com/product/${row.productId}`} target="_blank">
+
                             {row.productName}
                           </a>:
                         <span>{row.productName}</span>
                       }
+                        {row.productSku &&
+                          <a href={`http://www.amazon.com/dp/${row.productSku}`} target="_blank">
+                            <LaunchIcon/>
+                          </a>
+                        }
                         </TableCell>
                       <TableCell align="center">{row.quantity}</TableCell>
 
                       <TableCell align="center">{row.price}</TableCell>
                       <TableCell align="right">OMR {row.lineTotal}</TableCell>
                       <TableCell align="right">
+
                       </TableCell>
                     </TableRow>
                   ))}
