@@ -27,7 +27,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment}) =>{
   const classes = useStyles();
   //console.log(payment)
   const formSubmit = async (data) => {
-    let refund = {...data};
+    let refund = {...data, amount : -1*data.amount};
     refund.ref = payment.id;
     onSubmit(refund);
   }
@@ -38,7 +38,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment}) =>{
     <form onSubmit={handleSubmit(formSubmit)}>
       <DialogTitle id="form-dialog-title">Add Negative Payment (Refund)</DialogTitle>
       <DialogContent>
-      <TextField variant="filled" size="small" placeholder="Amount" name="amount" className={classes.textBox} inputRef={register({required: true, max: -.1, min:-9999, maxLength: 5})} />
+      <TextField variant="filled" size="small" placeholder="Amount" name="amount" className={classes.textBox} inputRef={register({required: true, max: 1500, min:0, maxLength: 5})} />
       <br/>
       <TextField variant="filled" size="small" type="text" placeholder="Auth Code" name="authCode" value={payment.authCode} className={classes.textBox} inputRef={register({required: true, maxLength: 10})} />
       <br/>

@@ -42,6 +42,7 @@ import TableFooter from "@material-ui/core/TableFooter";
 import {CancelOrderDialog} from "./components/CancelOrderDialog";
 import {useOrderAQuery} from "../../codegen/generated/_graphql";
 import LaunchIcon from '@material-ui/icons/Launch';
+import {Shipments} from "./components/Shipments";
 
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
@@ -79,6 +80,55 @@ mutation sendOrderLevelEmail($id:ID, $template:String) {
     } 
 }
 `;
+const SHIPMENTS = gql`
+query shipmentsByRef($ref: String) {
+    shipmentsByRef(ref: $ref) {
+       id
+      actualShipCost
+      latestCancelDate
+      handlingInstructions
+      reference
+      trackingNum
+      trackingLink
+      shipmentMethod
+      shipmentType
+      shipmentStatus
+      customerFirstName
+      customerLastName
+      customerId
+      merchantId
+      pkgs {
+        id
+        packageType
+        length
+        width
+        height
+        weight
+        shipmentItems {
+          id
+          sequence
+          quantity
+          description
+          shipmentId
+          productId
+          image
+        }
+      }
+      shipmentItems {
+        id
+        sequence
+        quantity
+        description
+        shipmentId
+        productId
+        image
+      }
+      progressTotal
+      progressDone
+      progressTodo
+  }
+}
+`;
 type CustomThemeT = { red400: string; textNormal: string; colors: any };
 const themedUseStyletron = createThemedUseStyletron<CustomThemeT>();
 
@@ -113,6 +163,12 @@ export default function OrderDetails(props) {
     },
     fetchPolicy: "network-only",
     context: { clientName: "shopLink" }
+  });
+  const { data:dShip, loading:lShip, error:eError, refetch:eRef } = useQuery(SHIPMENTS, {
+    variables: {
+      ref: slug
+    },
+    context: { clientName: "adminLink" }
   });
   const [contactbutton,setContactbutton] = useState(true);
   const [checkedId, setCheckedId] = useState([]);
@@ -218,7 +274,7 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={data.orderA.reference}
+                  primary={`${data.orderA.reference} ${data.orderA.id}`}
                   secondary= 'Order'
                 />
               </ListItem>
@@ -230,14 +286,14 @@ export default function OrderDetails(props) {
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.orderState}`}
+                  primary={`${data.orderA.createdDate} ${data.orderA.orderState}`}
                   secondary= 'Status'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   primary={`${data.orderA.customer.email}`}
-                  secondary= 'Total'
+                  secondary= 'Email'
                   />
               </ListItem>
             </List>
@@ -400,6 +456,11 @@ export default function OrderDetails(props) {
             </Table>
           </TableContainer>
 
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          <Shipments shipments={dShip} />
         </Col>
       </Row>
     </Grid>
