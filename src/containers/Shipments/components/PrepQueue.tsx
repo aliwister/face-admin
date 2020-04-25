@@ -16,10 +16,10 @@ export const PrepQueue = ({queue, classes, handleProcess }) => {
             <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell></TableCell>
-                <TableCell align="right">Description</TableCell>
-                <TableCell align="right">Quantity</TableCell>
+                <TableCell align="left">Description</TableCell>
+                <TableCell align="right">Qty</TableCell>
                 <TableCell align="right">Price</TableCell>
-                <TableCell align="right">Link</TableCell>
+                <TableCell align="left">Action</TableCell>
             </TableRow>
           </TableHead>
           {queue &&

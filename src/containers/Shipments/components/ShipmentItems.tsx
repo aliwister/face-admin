@@ -21,27 +21,33 @@ export const ShipmentItems = ({state, dispatch, label}) => {
         <Table  size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell></TableCell>
+              <TableCell>Id</TableCell>
+              <TableCell>Seq</TableCell>
+              <TableCell align="left">
+Description              </TableCell>
               <TableCell align="right">
-
+Qty
               </TableCell>
               <TableCell align="right">
-
+Product
               </TableCell>
-              <TableCell align="right">
-
-              </TableCell>
-              <TableCell align="right">Link</TableCell>
+              <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {state.shipmentItems && state.shipmentItems.map((a,b) => (
               <TableRow>
+                <TableCell>{a.id}</TableCell>
                 <TableCell>{a.sequence}</TableCell>
                 <TableCell>{a.description}</TableCell>
                 <TableCell>{a.quantity}</TableCell>
-                <TableCell>{a.productId}</TableCell>
+                <TableCell>{a.productId ?
+                  <a href={`http://www.badals.com/product/${a.productId}`} target="_blank">
+
+                  {a.productId}
+                  </a>:
+                  <span>{a.productId}</span>
+                }</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -297,7 +297,7 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
           <EditInPackage state={state} dispatch={dispatch}/>
         }
         {(shipment.shipmentType === 'CUSTOMER') &&
-          <EditOutPackage state={state} dispatch={dispatch}/>
+          <EditOutPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
         }
       </Grid>
       <CreatePkgDialog onSubmit={handleAcceptPackage} handleClose={handleClose} open={state.pkgDialog} />

@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EditOutPackage({state, dispatch}) {
+export default function EditOutPackage({state, dispatch, refreshShipment}) {
   const [prepItemMutation] = useMutation(PREP_ITEM,{ context: { clientName: "adminLink" }});
 
   const alert = useAlert();
@@ -71,6 +71,7 @@ export default function EditOutPackage({state, dispatch}) {
     });
     if(prepItem)  {
       alert.success(prepItem.value);
+      refreshShipment();
       dispatch({type: 'PREP_ITEM_END'})
     }
   }
