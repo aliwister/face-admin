@@ -90,6 +90,7 @@ export default function EditInPackage({state, dispatch}) {
     });
     if(acceptItem)  {
       alert.success(acceptItem.value);
+      refetch();
       dispatch({type:'ISSUE_ITEM_START'});
     }
   }
