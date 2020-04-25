@@ -23,8 +23,11 @@ import {theme} from "../../theme";
 import {ORDER_STATES} from "./components/Constants";
 
 const GET_ORDERS = gql`
-  query getOrders($state: [OrderState], $limit: Int, $searchText: String) {
-    ordersA(state: $state, limit: $limit, searchText: $searchText) {
+  query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String) {
+    ordersA(state: $state, offset: $offset, limit: $limit, searchText: $searchText) {
+      total,
+      hasMore,
+      items {
       id
       reference
       createdDate
@@ -51,6 +54,7 @@ const GET_ORDERS = gql`
         image
         lineTotal
       }
+    }
     }
   }
 `;
@@ -89,10 +93,10 @@ export default function Orders() {
   const arrayToObject = (array,prop) =>
     array.map(t => t[prop]);
 
-  const { data, error, refetch } = useQuery(GET_ORDERS, {
+  const { data, error, refetch, fetchMore } = useQuery(GET_ORDERS, {
     variables: {
       state: arrayToObject(status, 'value'),
-      limit: 10,
+      limit: 15,
       searchText: "",
     },
     fetchPolicy: "network-only",
@@ -115,6 +119,27 @@ export default function Orders() {
     } else {
       refetch({ state: [], limit:10, searchText:"" });
     }
+  }
+  function loadMore() {
+    fetchMore({
+      variables: {
+        offset: data.ordersA.items.length,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev;
+
+        return Object.assign({}, prev, {
+          ordersA: {
+            // @ts-ignore
+            __typename: prev.ordersA.__typename,
+            // @ts-ignore
+            items: [...prev.ordersA.items, ...fetchMoreResult.ordersA.items],
+            // @ts-ignore
+            hasMore: fetchMoreResult.ordersA.hasMore,
+          },
+        });
+      },
+    });
   }
 
 /*  function handleLimit({ value }) {
@@ -176,10 +201,10 @@ export default function Orders() {
                 <TableCell align="center">Status</TableCell>
               </TableRow>
             </TableHead>
-            {data && data.ordersA.length && (
+            {data && data.ordersA.items.length && (
               <TableBody>
 
-                {data.ordersA.map(row => (
+                {data.ordersA.items.map(row => (
                   <TableRow key={row.orderId}>
                     <TableCell align="right"><Checkbox
                       name={row.id}
@@ -213,6 +238,9 @@ export default function Orders() {
             )}
           </Table>
         </TableContainer>
+        {data && data.ordersA && data.ordersA.hasMore && (
+          <Button onClick={loadMore}>Load More</Button>
+        )}
       </Grid>
     </Grid>
   );
