@@ -157,7 +157,7 @@ export default function OrderDetails(props) {
   const [sendVoltageEmailMutation] = useMutation(SEND_VOLTAGE_EMAIL, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
-  const { data, loading, error, refetch } = useOrderAQuery({
+  const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
     },
@@ -184,7 +184,7 @@ export default function OrderDetails(props) {
     const {
       data: { sendPaymentSms },
     }: any = await sendPaymentSmsMutation({
-      variables: {id: data.orderA.id}
+      variables: {id: orderData.orderA.id}
     });
     if(sendPaymentSms)  {
       alert.success(sendPaymentSms.value);
@@ -195,7 +195,7 @@ export default function OrderDetails(props) {
     const {
       data: { editOrder },
     }: any = await editOrderMutation({
-      variables: {id: data.orderA.id, orderItems: [...formData.orderItems]}
+      variables: {id: orderData.orderA.id, orderItems: [...formData.orderItems]}
     });
     if(editOrder)  {
       alert.success(editOrder.id);
@@ -206,7 +206,7 @@ export default function OrderDetails(props) {
     const {
       data: { cancelOrder },
     }: any = await cancelOrderMutation({
-      variables: {id: data.orderA.id, reason: formData.reason}
+      variables: {id: orderData.orderA.id, reason: formData.reason}
     });
     if(cancelOrder)  {
       alert.success(cancelOrder.id);
@@ -223,7 +223,7 @@ export default function OrderDetails(props) {
     const {
       data: { sendProductLevelEmail },
     }: any = await sendVoltageEmailMutation({
-      variables: {orderId: data.orderA.id, orderItems: checkedId, template: 'VOLTAGE'}
+      variables: {orderId: orderData.orderA.id, orderItems: checkedId, template: 'VOLTAGE'}
     });
     if(sendProductLevelEmail)  {
       alert.success(sendProductLevelEmail.value);
@@ -265,7 +265,7 @@ export default function OrderDetails(props) {
 
   return (
     <Grid fluid={true}>
-      <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={data.orderA.orderItems} />
+      <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.orderItems} />
       <CancelOrderDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} />
       <Row>
         <Col lg={2} sm={6} xs={12} className='mb-30'>
@@ -274,25 +274,25 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.reference} ${data.orderA.id}`}
+                  primary={`${orderData.orderA.reference} ${orderData.orderA.id}`}
                   secondary= 'Order'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.customer.firstname} ${data.orderA.customer.lastname} / ${data.orderA.customer.id}`}
+                  primary={`${orderData.orderA.customer.firstname} ${orderData.orderA.customer.lastname} / ${orderData.orderA.customer.id}`}
                   secondary= 'Customer'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.createdDate} ${data.orderA.orderState}`}
+                  primary={`${orderData.orderA.createdDate} ${orderData.orderA.orderState}`}
                   secondary= 'Status'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.customer.email}`}
+                  primary={`${orderData.orderA.customer.email}`}
                   secondary= 'Email'
                   />
               </ListItem>
@@ -305,25 +305,25 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.deliveryAddress.firstName} ${data.orderA.deliveryAddress.lastName}`}
+                  primary={`${orderData.orderA.deliveryAddress.firstName} ${orderData.orderA.deliveryAddress.lastName}`}
                   secondary= 'Name'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${data.orderA.deliveryAddress.line1} ${data.orderA.deliveryAddress.line2}`}
+                  primary={`${orderData.orderA.deliveryAddress.line1} ${orderData.orderA.deliveryAddress.line2}`}
                   secondary= 'Address'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={data.orderA.deliveryAddress.city}
+                  primary={orderData.orderA.deliveryAddress.city}
                   secondary= 'City'
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={data.orderA.deliveryAddress.mobile}
+                  primary={orderData.orderA.deliveryAddress.mobile}
                   secondary= 'Phone'
                 />
               </ListItem>
@@ -340,24 +340,24 @@ export default function OrderDetails(props) {
                   </TableCell>
                   <TableCell align="left">Subtotal</TableCell>
                   <TableCell align="left"></TableCell>
-                  <TableCell align="left">OMR {data.orderA.subtotal}</TableCell>
+                  <TableCell align="left">OMR {orderData.orderA.subtotal}</TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell component="th" scope="row">
                   </TableCell>
                   <TableCell align="left">Delivery</TableCell>
-                  <TableCell align="left">{data.orderA.carrier}</TableCell>
-                  <TableCell align="left">OMR {data.orderA.deliveryTotal}</TableCell>
+                  <TableCell align="left">{orderData.orderA.carrier}</TableCell>
+                  <TableCell align="left">OMR {orderData.orderA.deliveryTotal}</TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>
-                {data.orderA.discountsTotal &&
+                {orderData.orderA.discountsTotal &&
                 <TableRow>
                   <TableCell component="th" scope="row">
                   </TableCell>
                   <TableCell align="left">Discount</TableCell>
                   <TableCell align="left"></TableCell>
-                  <TableCell align="left">OMR {data.orderA.discountsTotal}</TableCell>
+                  <TableCell align="left">OMR {orderData.orderA.discountsTotal}</TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>}
                 <TableRow>
@@ -365,7 +365,7 @@ export default function OrderDetails(props) {
                   </TableCell>
                   <TableCell align="left">Total</TableCell>
                   <TableCell align="left"></TableCell>
-                  <TableCell align="left">OMR {data.orderA.total}</TableCell>
+                  <TableCell align="left">OMR {orderData.orderA.total}</TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>
               </TableHead>
@@ -373,7 +373,7 @@ export default function OrderDetails(props) {
           </OrderInfoPaper>
         </Col>
         <Col lg={4} sm={3} xs={12} className='mb-30'>
-          <Payment order={data.orderA} refetch={refetch}/>
+          <Payment order={orderData.orderA} refetch={refetch}/>
         </Col>
       </Row>
       <Row>
@@ -408,9 +408,9 @@ export default function OrderDetails(props) {
                   <TableCell align="center">id</TableCell>
                 </TableRow>
               </TableHead>
-              {data && data.orderA.orderItems && (
+              {orderData && orderData.orderA.orderItems && (
                 <TableBody>
-                  {data.orderA.orderItems.map(row => (
+                  {orderData.orderA.orderItems.map(row => (
                     <TableRow key={row.sequence}>
                       <TableCell align="right">
                         <Checkbox
