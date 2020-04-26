@@ -230,12 +230,12 @@ export default function OrderDetails(props) {
       await refetch();
     }
   }
-  const onSendOrderCreateEmail = async data => {
+  const onSendOrderCreateEmail = async () => {
     setB2(false);
     const {
       data: { sendOrderLevelEmail },
     }: any = await sendOrderLevelEmailMutation({
-      variables: {id: data.orderA.id, template: "NEW_ORDER"}
+      variables: {id: orderData.orderA.id, template: "NEW_ORDER"}
     });
     if(sendOrderLevelEmail)  {
       alert.success("Payment added");
