@@ -236,6 +236,7 @@ export default function Shipments() {
             Prepare
           </Button>
           <Link to="inventory">Inventory</Link>
+          <Link to="ship-queue">ShipQ</Link>
         </Grid>
 
         <Grid item xs={12}>

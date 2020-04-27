@@ -18,6 +18,7 @@ export const PURCHASEDETAILS = '/purchase-details/:slug';
 export const SHIPMENTS = '/shipments';
 export const SHIPMENTDETAILS = '/shipment-details/:slug';
 export const INVENTORY = '/inventory';
+export const SHIPQ = '/ship-queue';
 export const CART = '/cart';
 export const SIGNUP = '/signup';
 // **************** ROUTE CONSTANT END **************************

@@ -75,12 +75,12 @@ export default function Payment({order, refetch}) {
   const alert = useAlert();
 
 
-  const onSubmit = async data => {
+  const onSubmit = async formData => {
     setB1(false);
     const {
       data: { addPayment },
     }: any = await addPaymentMutation({
-      variables: {id: order.id, ...data}
+      variables: {id: order.id, ...formData}
     });
     if(addPayment)  {
       handleClose();
@@ -88,12 +88,13 @@ export default function Payment({order, refetch}) {
       refetch();
     }
   }
-  const onRefundSubmit = async data => {
+  const onRefundSubmit = async formData => {
     setB1(false);
+    //console.log(formData);
     const {
       data: { addRefund },
     }: any = await addRefundMutation({
-      variables: {id: order.id, ...data}
+      variables: {id: order.id, ...formData}
     });
     if(addRefund)  {
       handleClose();
