@@ -51,6 +51,7 @@ query purchaseQueue {
     cost
     orderId
     productId
+    attributes
   }
 }
 `;
@@ -346,7 +347,7 @@ export default function PurchaseForm({purchase}) {
                   <TableRow key={q.orderItemId}>
                     <TableCell align="right">{q.sequence}</TableCell>
                     <TableCell component="th" scope="row">
-                      <TextField  size="small" variant="filled" className={classes.titleField} placeholder="Description" name="Description" value={q.description} onChange={(e) => handleChangeDescription(q, e.target.value)}/>
+                      <TextField  size="small" style={{width:'600px'}} variant="filled" className={classes.titleField} placeholder="Description" name="Description" value={q.description} onChange={(e) => handleChangeDescription(q, e.target.value)}/>
                     </TableCell>
                     <TableCell align="right"><TextField size="small" variant="filled" placeholder="Amount" name="Amount" value={q.quantity} onChange={(e) => handleChangeQuantity(q, e.target.value)}/></TableCell>
                     <TableCell align="right"><TextField size="small" variant="filled" placeholder="Price" name="Price" value={q.price} onChange={(e) => handleChangePrice(q, e.target.value)}/></TableCell>
@@ -403,10 +404,10 @@ export default function PurchaseForm({purchase}) {
                     {q.sku ?
                         <TableCell component="th" scope="row">
                           <a href={`http://www.amazon.com/dp/${q.sku}`} target="_blank">
-                            {q.productName}
+                            {q.productName} <small>{q.attributes}</small>
                           </a>
                         </TableCell> : <TableCell component="th" scope="row">
-                          {q.productName}
+                          {q.productName}<small>{q.attributes}</small>
                         </TableCell>
                     }
                     <TableCell align="right">{q.quantity}</TableCell>
