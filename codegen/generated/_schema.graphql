@@ -16,8 +16,8 @@ input AddProductInput {
   weight: BigDecimal
   shopIds: [Long]
   browseNode: String
-
-  """slug"""
+  browseNode_ar: String
+  slug: String
   type: String
   unit: String
   availability: Int
@@ -66,6 +66,7 @@ type CartItem {
   salePrice: String
   slug: String
   unit: String
+  variationAttributes: [String]
 }
 
 input CartItemInput {
@@ -190,8 +191,6 @@ type MerchantProduct {
   features_ar: String
   cost: BigDecimal
   weight: BigDecimal
-
-  """slug"""
   type: String
   unit: String
   availability: Int
@@ -200,6 +199,8 @@ type MerchantProduct {
   discountInPercent: Int
   shopIds: [Long]
   gallery: [String]
+  browseNode: String
+  browseNode_ar: String
 }
 
 type MerchantProductResponse {
@@ -308,6 +309,7 @@ type OrderItem {
   productUrl: String
   productSku: String
   productId: Long
+  purchaseItems: [PurchaseItem]
 }
 
 input OrderItemInput {
@@ -315,6 +317,12 @@ input OrderItemInput {
   sequence: Int
   quantity: Int
   price: BigDecimal
+}
+
+type OrderResponse {
+  items: [Order!]!
+  total: Int!
+  hasMore: Boolean!
 }
 
 enum OrderState {
@@ -546,6 +554,7 @@ type PurchaseQueue {
   sku: String
   productId: Long
   orderId: Long
+  attributes: String
 }
 
 type Query {
@@ -559,7 +568,7 @@ type Query {
   """getOrders(): [Orders]"""
   orderConfirmation(ref: String, key: String): Order
   orders(limit: Int = 10): [Order]
-  ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
+  ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
   orderA(id: ID): Order
   purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
   purchase(id: ID): Purchase
@@ -576,6 +585,8 @@ type Query {
   getProductBySku(sku: String, isParent: Boolean = false): Product
   pricingRequests: [PricingRequest]
   parentOf(sku: String): String
+  mws(sku: String): Product
+  ebay(id: String): Product
 }
 
 type Variation {

@@ -41,7 +41,8 @@ export type AddProductInput = {
   weight: Maybe<Scalars['BigDecimal']>;
   shopIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   browseNode: Maybe<Scalars['String']>;
-  /** slug */
+  browseNode_ar: Maybe<Scalars['String']>;
+  slug: Maybe<Scalars['String']>;
   type: Maybe<Scalars['String']>;
   unit: Maybe<Scalars['String']>;
   availability: Maybe<Scalars['Int']>;
@@ -91,6 +92,7 @@ export type CartItem = {
   salePrice: Maybe<Scalars['String']>;
   slug: Maybe<Scalars['String']>;
   unit: Maybe<Scalars['String']>;
+  variationAttributes: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type CartItemInput = {
@@ -215,7 +217,6 @@ export type MerchantProduct = {
   features_ar: Maybe<Scalars['String']>;
   cost: Maybe<Scalars['BigDecimal']>;
   weight: Maybe<Scalars['BigDecimal']>;
-  /** slug */
   type: Maybe<Scalars['String']>;
   unit: Maybe<Scalars['String']>;
   availability: Maybe<Scalars['Int']>;
@@ -224,6 +225,8 @@ export type MerchantProduct = {
   discountInPercent: Maybe<Scalars['Int']>;
   shopIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   gallery: Maybe<Array<Maybe<Scalars['String']>>>;
+  browseNode: Maybe<Scalars['String']>;
+  browseNode_ar: Maybe<Scalars['String']>;
 };
 
 export type MerchantProductResponse = {
@@ -535,6 +538,7 @@ export type OrderItem = {
   productUrl: Maybe<Scalars['String']>;
   productSku: Maybe<Scalars['String']>;
   productId: Maybe<Scalars['Long']>;
+  purchaseItems: Maybe<Array<Maybe<PurchaseItem>>>;
 };
 
 export type OrderItemInput = {
@@ -542,6 +546,13 @@ export type OrderItemInput = {
   sequence: Maybe<Scalars['Int']>;
   quantity: Maybe<Scalars['Int']>;
   price: Maybe<Scalars['BigDecimal']>;
+};
+
+export type OrderResponse = {
+   __typename?: 'OrderResponse';
+  items: Array<Order>;
+  total: Scalars['Int'];
+  hasMore: Scalars['Boolean'];
 };
 
 export enum OrderState {
@@ -778,6 +789,7 @@ export type PurchaseQueue = {
   sku: Maybe<Scalars['String']>;
   productId: Maybe<Scalars['Long']>;
   orderId: Maybe<Scalars['Long']>;
+  attributes: Maybe<Scalars['String']>;
 };
 
 export type Query = {
@@ -790,7 +802,7 @@ export type Query = {
   /** getOrders(): [Orders] */
   orderConfirmation: Maybe<Order>;
   orders: Maybe<Array<Maybe<Order>>>;
-  ordersA: Maybe<Array<Maybe<Order>>>;
+  ordersA: Maybe<OrderResponse>;
   orderA: Maybe<Order>;
   purchases: Maybe<Array<Maybe<Purchase>>>;
   purchase: Maybe<Purchase>;
@@ -807,6 +819,8 @@ export type Query = {
   getProductBySku: Maybe<Product>;
   pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
   parentOf: Maybe<Scalars['String']>;
+  mws: Maybe<Product>;
+  ebay: Maybe<Product>;
 };
 
 
@@ -838,6 +852,7 @@ export type QueryOrdersArgs = {
 
 export type QueryOrdersAArgs = {
   state: Maybe<Array<Maybe<OrderState>>>;
+  offset: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
   searchText: Maybe<Scalars['String']>;
 };
@@ -917,6 +932,16 @@ export type QueryParentOfArgs = {
   sku: Maybe<Scalars['String']>;
 };
 
+
+export type QueryMwsArgs = {
+  sku: Maybe<Scalars['String']>;
+};
+
+
+export type QueryEbayArgs = {
+  id: Maybe<Scalars['String']>;
+};
+
 export type Variation = {
    __typename?: 'Variation';
   ref: Scalars['ID'];
@@ -947,7 +972,7 @@ export type MerchantProductsQuery = (
     & Pick<MerchantProductResponse, 'total' | 'hasMore'>
     & { items: Maybe<Array<Maybe<(
       { __typename?: 'MerchantProduct' }
-      & Pick<MerchantProduct, 'id' | 'ref' | 'name' | 'brand' | 'description' | 'features' | 'name_ar' | 'brand_ar' | 'description_ar' | 'features_ar' | 'image' | 'price' | 'unit' | 'sku' | 'salePrice' | 'discountInPercent' | 'upc' | 'availability' | 'weight' | 'cost' | 'quantity'>
+      & Pick<MerchantProduct, 'id' | 'ref' | 'name' | 'brand' | 'description' | 'features' | 'name_ar' | 'brand_ar' | 'description_ar' | 'features_ar' | 'image' | 'price' | 'unit' | 'sku' | 'salePrice' | 'discountInPercent' | 'upc' | 'availability' | 'weight' | 'cost' | 'quantity' | 'shopIds' | 'browseNode' | 'browseNode_ar'>
     )>>> }
   )> }
 );
@@ -1004,6 +1029,9 @@ export const MerchantProductsDocument = gql`
       weight
       cost
       quantity
+      shopIds
+      browseNode
+      browseNode_ar
     }
     total
     hasMore

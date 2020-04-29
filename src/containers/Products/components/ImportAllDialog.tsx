@@ -27,8 +27,8 @@ export const ImportAllDialog = ({open, onSubmit, onClose}) =>{
 
   const onLocalSubmit = (data) => {
     console.log(data);
-    const shopIds = arrayToObject([data.option],'id');
-    const browseNode = arrayToObject([data.type],'value')[0];
+    const shopIds = [];//arrayToObject([data.option],'id');
+    const browseNode = "";//arrayToObject([data.type],'value')[0];
     onSubmit(shopIds, browseNode);
   }
 
@@ -37,7 +37,7 @@ export const ImportAllDialog = ({open, onSubmit, onClose}) =>{
     <form onSubmit={handleSubmit(onLocalSubmit)}>
       <DialogTitle id="form-dialog-title">Import Search Result</DialogTitle>
       <DialogContent style={{height: "250px", width: "250px"}}>
-        <div><Controller as={<Select
+{/*        <div><Controller as={<Select
           options={OPTIONS}
           getOptionLabel={(option: any) => option.name}
           getOptionValue={(option: any) => option.id}
@@ -61,7 +61,7 @@ export const ImportAllDialog = ({open, onSubmit, onClose}) =>{
                          control={control}
                          label="Browse Node"
                          defaultValue=""
-        /></div>
+        /></div>*/}
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="secondary" onClick={onClose}>Cancel</Button>

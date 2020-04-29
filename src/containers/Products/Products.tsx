@@ -139,7 +139,7 @@ export default function Products() {
 
     let value = event.target.value;
     console.log('handleCheckbox',value)
-    if(checkedId.length >= 10) {
+    if(checkedId.length >= 20) {
       alert.error("Cannot update more than 10 products at one time");
       return false;
     }

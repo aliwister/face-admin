@@ -36,6 +36,9 @@
         weight
         cost
         quantity
+        shopIds
+        browseNode
+        browseNode_ar
       }
       total
       hasMore
