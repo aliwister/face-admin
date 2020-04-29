@@ -39,6 +39,7 @@
         shopIds
         browseNode
         browseNode_ar
+        slug
       }
       total
       hasMore
