@@ -972,7 +972,7 @@ export type MerchantProductsQuery = (
     & Pick<MerchantProductResponse, 'total' | 'hasMore'>
     & { items: Maybe<Array<Maybe<(
       { __typename?: 'MerchantProduct' }
-      & Pick<MerchantProduct, 'id' | 'ref' | 'name' | 'brand' | 'description' | 'features' | 'name_ar' | 'brand_ar' | 'description_ar' | 'features_ar' | 'image' | 'price' | 'unit' | 'sku' | 'salePrice' | 'discountInPercent' | 'upc' | 'availability' | 'weight' | 'cost' | 'quantity' | 'shopIds' | 'browseNode' | 'browseNode_ar'>
+      & Pick<MerchantProduct, 'id' | 'ref' | 'name' | 'brand' | 'description' | 'features' | 'name_ar' | 'brand_ar' | 'description_ar' | 'features_ar' | 'image' | 'price' | 'unit' | 'sku' | 'salePrice' | 'discountInPercent' | 'upc' | 'availability' | 'weight' | 'cost' | 'quantity' | 'shopIds' | 'browseNode' | 'browseNode_ar' | 'slug'>
     )>>> }
   )> }
 );
@@ -1032,6 +1032,7 @@ export const MerchantProductsDocument = gql`
       shopIds
       browseNode
       browseNode_ar
+      slug
     }
     total
     hasMore
