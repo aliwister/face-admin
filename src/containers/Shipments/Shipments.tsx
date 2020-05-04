@@ -51,9 +51,6 @@ const SHIPMENTS = gql`
         customerFirstName
         customerLastName
         merchantName
-        progressTotal
-        progressDone
-        progressTodo
       }
 
   }
@@ -260,7 +257,7 @@ export default function Shipments() {
                   <TableCell align="center">Ref</TableCell>
                   <TableCell align="center">To</TableCell>
                   <TableCell align="center">Shipment Method</TableCell>
-                  <TableCell align="center">Progress</TableCell>
+                  <TableCell align="center">Tracking Num</TableCell>
                 </TableRow>
               </TableHead>
               {data && data.shipments.length && (
@@ -289,7 +286,7 @@ export default function Shipments() {
                       <TableCell align="center">{row.reference}</TableCell>
                       <TableCell align="right">{row.city}</TableCell>
                       <TableCell align="right">{row.shipmentMethod}</TableCell>
-                      <TableCell align="right">{Math.round(100*row.progressTodo/((row.progressTotal+0) - (row.progressDone+0)))} %</TableCell>
+                      <TableCell align="right">{row.trackingNum}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

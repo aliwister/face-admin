@@ -93,6 +93,8 @@ const AddProduct: React.FC<Props> = props => {
       setButtonlabel("Update Product");
     }
     if(updateData && updateData.shopIds) {
+      console.log(updateData.shopIds);
+      return;
       updateData.shopIds.each(i =>
         handleMultiChange(OPTIONS[i+1])
       );

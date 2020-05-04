@@ -117,6 +117,9 @@ export const IMPORT_PRODUCTS = gql`
         weight
         cost
         quantity
+        browseNode
+        browseNode_ar
+        shopIds
       }
       total
       hasMore
