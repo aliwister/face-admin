@@ -200,7 +200,7 @@ export default function PurchaseForm({purchase}) {
   //console.log(state);
   // console.log(merchants);
   useEffect(()=>{
-    setSubtotal(calcSubtotal());
+    setSubtotal(Math.round(100*calcSubtotal())/100);
     setTotal(calcSubtotal() + Number(state.deliveryTotal) + Number(state.taxesTotal) - Number(state.discountTotal));
   },[state]);
 
@@ -361,7 +361,7 @@ export default function PurchaseForm({purchase}) {
                       >
                       </Button>
                     </TableCell>
-
+                    <TableCell align="right"><Link to={`/order-details/${q.orderId}`}>{q.orderItemId}</Link></TableCell>
                   </TableRow>
               ))}
             </TableBody>
@@ -391,7 +391,7 @@ export default function PurchaseForm({purchase}) {
                 <TableCell></TableCell>
                 <TableCell align="right">Description</TableCell>
                 <TableCell align="right">Quantity</TableCell>
-                <TableCell align="right">Price</TableCell>
+                <TableCell align="right">Price (OMR/USD)</TableCell>
                 <TableCell align="right">Link</TableCell>
                 <TableCell align="right">Order</TableCell>
               </TableRow>
@@ -411,7 +411,7 @@ export default function PurchaseForm({purchase}) {
                         </TableCell>
                     }
                     <TableCell align="right">{q.quantity}</TableCell>
-                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">{q.price} / {Math.round(q.price * 260)/100}</TableCell>
                     <TableCell align="right">
                       <Button
                           variant="contained"
