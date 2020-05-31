@@ -27,5 +27,6 @@ export const SHIPMENT_TYPES = [
 ]
 export const DRIVERS = [
   {value: 'Shabib', label: 'Shabib'},
+  {value: 'Salah', label: 'Salah'},
   {value: 'Pickup', label: 'Pickup'},
 ]
