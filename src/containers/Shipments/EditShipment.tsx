@@ -97,6 +97,12 @@ function reducer(state, action) {
         item: action.payload,
         addItemDialog: true
       }
+    case 'SELECT_ADD_ITEM_END':
+      return {
+        ...state,
+        item: null,
+        addItemDialog: false
+      }
 /*    case 'ACCEPT_ITEM_START':
       return {
         ...state,

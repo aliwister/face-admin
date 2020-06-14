@@ -17,6 +17,7 @@ import { IssueItemDialog } from "../components/IssueItemDialog";
 import {Dialog, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import ReactToPrint from "react-to-print";
+import {AddItemDialog} from "../components/AddItemDialog";
 
 const ACCEPT_ITEM = gql`
   mutation acceptItem($shipmentId: Long, $pkgId: Long, $purchaseItemId: Long, $productId: Long, $merchantId: Long, $description: String, $quantity: BigDecimal, $accepted: BigDecimal, $rejected: BigDecimal) {
@@ -74,23 +75,24 @@ export default function EditPackage({state, dispatch}) {
   const classes = useStyles();
   const labelRef = useRef();
 
-  const handleAddItem = async (data) => {
-    console.log('handlin accept',data);
+  const handleAddItem = async (formData) => {
+    console.log('handlin accept',formData);
     let dto = {
-      ...data,
+      ...formData,
       shipmentId: state.shipment.id,
-      pkgId: state.pkg.id,
+      //pkgId: state.pkg.id,
       purchaseItemId: state.item.id,
       description: state.item.description,
-      quantity: Number(state.item.accepted) + Number(state.item.rejected),
+      quantity: state.item.quantity
     }
     const {
-      data: { acceptItem },
+      data: { addItem },
     }: any = await addItemMutation({
       variables: { ...dto },
     });
-    if(acceptItem)  {
-      alert.success(acceptItem.value);
+    if(addItem)  {
+      alert.success(addItem.value);
+      dispatch({type:'SELECT_ADD_ITEM_END'});
       refetch();
     }
   }
@@ -132,25 +134,23 @@ export default function EditPackage({state, dispatch}) {
           action={
             <form onSubmit={hs3(handleRefetch)}>
               <TextField name="keyword" inputRef={r3({required: true})}/>
-              <Button variant="contained" color="secondary" size="small" type="submit" disabled={!state.pkg}>
+              <Button variant="contained" color="secondary" size="small" type="submit" >{/*disabled={!state.pkg}>*/}
                 Search
               </Button>
             </form>
           }
         />
-        {state.shipment.shipmentType === 'PURCHASE' || state.shipment.shipmentType === 'TRANSIT' &&
+        {(state.shipment.shipmentType === 'PURCHASE' || state.shipment.shipmentType === 'TRANSIT') &&
         <SortQueue
             data={data}
             classes={classes}
             handleProcess={handleProcess}
         />}
       </SectionCard>
-      {state.acceptItemDialog &&
-      <AcceptItemDialog item={state.item} open={state.acceptItemDialog} onClose={handleAcceptClose} onSubmit={handleAddItem}/>
+      {state.addItemDialog &&
+      <AddItemDialog item={state.item} open={state.addItemDialog} onClose={handleAcceptClose} onSubmit={handleAddItem}/>
       }
-      {state.issueItemDialog &&
-      <IssueItemDialog item={state.item} open={state.issueItemDialog} onClose={handleIssueClose} onSubmit={handleRemoveItem} productId={state.item.productId} />
-      }
+
     </>
   );
 }

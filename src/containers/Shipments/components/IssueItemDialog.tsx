@@ -17,6 +17,11 @@ export const IssueItemDialog = ({item, open, onClose, onSubmit, productId}) => {
 
   const onSubmitDialog = (data) => {
     console.log(data);
+    if(!data['quantity']) {
+      alert("Must enter quantity");
+      return;
+    }
+
     let allocatable = Number(data['quantity']) - Number(item.preallocated);
     if ( allocatable > Number(data['quantity']) || data['quantity'] == 0) {
       alert("Max Allocatable = " + allocatable );

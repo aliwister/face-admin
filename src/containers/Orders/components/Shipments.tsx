@@ -46,7 +46,7 @@ export const Shipments = ({shipments}) =>{
       {shipments.shipmentsByRef && shipments.shipmentsByRef.map(s => (
       <ExpansionPanel>
         <ExpansionPanelSummary>
-          {s.id} {s.shipmentStatus} {s.progressTotal} {s.progressDone} {s.progressTodo}
+          {s.id} {s.shipmentStatus}
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <TableContainer component={Paper}>

@@ -123,9 +123,6 @@ query shipmentsByRef($ref: String) {
         productId
         image
       }
-      progressTotal
-      progressDone
-      progressTodo
   }
 }
 `;

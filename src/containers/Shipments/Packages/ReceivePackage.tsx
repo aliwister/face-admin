@@ -62,6 +62,7 @@ query prepQueue($shipmentId: Long, $keyword: String ="") {
     unpacked
     productId
     orderItemId
+    orderId
   }
 }
 `;
