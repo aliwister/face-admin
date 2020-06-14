@@ -201,7 +201,7 @@ export default function ShipQueue() {
         columns: [
           {
             Header: 'ID',
-            accessor: (row) => (<Link to={`shipment-details/${row.id}`}>{row.id}</Link>)
+            accessor: (row) => (<Link to={`shipment-details/${row.id}/PREP`}>{row.id}</Link>)
           },
           {
             Header: 'Ref',

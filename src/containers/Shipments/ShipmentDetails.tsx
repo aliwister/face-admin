@@ -78,9 +78,6 @@ query shipment($id: ID) {
         productId
         image
       }
-      progressTotal
-      progressDone
-      progressTodo
   }
 }
 `;
@@ -97,7 +94,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ShipmentDetails(props) {
-  let { slug } = useParams();
+  let { slug, action } = useParams();
+  console.log(action);
   const { data:dp, loading:lp, error:ep, refetch:rp } = useQuery(SHIPMENT, {variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS,{fetchPolicy: "network-only", context: { clientName: "shopLink" }});
 
@@ -107,14 +105,7 @@ export default function ShipmentDetails(props) {
   if (lp || merhcnatsLoading)
     return <div>Loading</div>
 
-  console.log(dp);
-
-  function sendToDetrack() {
-
-  }
-
   return (
-
     <Grid container xs={12} spacing={1}>
       <Grid item md={6}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small"/>} aria-label="breadcrumb" className={classes.bread}>
@@ -127,9 +118,9 @@ export default function ShipmentDetails(props) {
 
       </Grid>
       <Grid item xs={12}>
-        <EditShipment shipment={dp.shipment} merchants={merchants} refreshShipment={rp}/>
+
+        <EditShipment shipment={dp.shipment} merchants={merchants} refreshShipment={rp} action={action}/>
       </Grid>
     </Grid>
-
   );
 }

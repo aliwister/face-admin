@@ -9,13 +9,13 @@ import { useAlert } from "react-alert";
 import TextField from "@material-ui/core/TextField";
 import {useForm} from "react-hook-form";
 
-import {SortQueue} from "./components/SortQueue";
-import {SectionCard} from "./Shipment.style";
+import {SortQueue} from "../components/SortQueue";
+import {SectionCard} from "../Shipment.style";
 import CardHeader from "@material-ui/core/CardHeader";
-import { AcceptItemDialog } from "./components/AcceptItemDialog";
-import { IssueItemDialog } from "./components/IssueItemDialog";
-import {PrepQueue} from "./components/PrepQueue";
-import {PreptemDialog} from "./components/PrepItemDialog";
+import { AcceptItemDialog } from "../components/AcceptItemDialog";
+import { IssueItemDialog } from "../components/IssueItemDialog";
+import {PrepQueue} from "../components/PrepQueue";
+import {PreptemDialog} from "../components/PrepItemDialog";
 const PREP_ITEM = gql`
   mutation prepItem($dto: PackagingContentInput) {
     prepItem(dto: $dto) {
@@ -40,6 +40,19 @@ query sortQueue($keyword: String) {
   }
 }
 `;
+
+const PREP_QUEUE = gql`
+query prepQueue($shipmentId: Long) {
+  prepQueue(shipmentId: $shipmentId) {
+    id
+    description
+    quantity
+    image
+    unpacked
+    productId
+  }
+}
+`;
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -53,8 +66,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EditOutPackage({state, dispatch, refreshShipment}) {
+export default function PrepPackage({state, dispatch, refreshShipment}) {
   const [prepItemMutation] = useMutation(PREP_ITEM,{ context: { clientName: "adminLink" }});
+  const { data, loading, error, refetch } = useQuery(PREP_QUEUE, {variables: {shipmentId: state.shipment.id}, context: { clientName: "adminLink" }});
 
   const alert = useAlert();
   const classes = useStyles();
@@ -72,6 +86,7 @@ export default function EditOutPackage({state, dispatch, refreshShipment}) {
     if(prepItem)  {
       alert.success(prepItem.value);
       refreshShipment();
+      refetch();
       dispatch({type: 'PREP_ITEM_END'})
     }
   }
@@ -87,11 +102,11 @@ export default function EditOutPackage({state, dispatch, refreshShipment}) {
         <CardHeader
           subheader="Prepare"
         />
-        <PrepQueue
-          queue={state.shipment.shipmentItems}
+        {data && <PrepQueue
+          queue={data.prepQueue}
           classes={classes}
           handleProcess={handleProcess}
-        />
+        />}
       </SectionCard>
       {state.prepItemDialog && state.pkg &&
       <PreptemDialog item={state.item} open={state.prepItemDialog} onClose={handlePrepClose} onSubmit={handlePrepItem} pkg={state.pkg}/>

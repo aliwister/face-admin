@@ -5,30 +5,34 @@ import Button from "@material-ui/core/Button";
 import React from "react";
 import {useForm} from "react-hook-form";
 
-export const PreptemDialog = ({item, open, onClose, onSubmit, pkg}) => {
+export const AddItemDialog = ({item, open, onClose, onSubmit}) => {
   const { register, handleSubmit, errors } = useForm({
     defaultValues: {
-      pkgId: pkg.id,
-      shipmentItemId: item.id,
-      quantity: item.quantity
+      productId: (item)?item.productId:null,
+      quantity: (item)?item.quantity:null,
     }
   });
 
   const onSubmitDialog = (data) => {
+    console.log(data);
+    if (Number(data['quantity']) > item.quantity) {
+      alert("Cannot add more than quantity");
+      return;
+    }
     onSubmit(data);
   }
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
       <form onSubmit={handleSubmit(onSubmitDialog)}>
-        <DialogTitle id="form-dialog-title">Prep Item</DialogTitle>
+        <DialogTitle id="form-dialog-title">Add Item</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Item to Pkg Info
+            Package Info
           </DialogContentText>
-          <TextField fullWidth type="number" placeholder="Pkg ID" name="pkgId" inputRef={register({required: true})} />
-          <TextField fullWidth type="number" placeholder="Shipment Item ID" name="shipmentItemId" inputRef={register({required: true})} />
-          <TextField fullWidth type="number" inputProps={{step: 0.1}} placeholder="Quantity" name="quantity" inputRef={register} />
+          <TextField fullWidth type="number" placeholder="Product ID" name="productId" inputRef={register({required: true})}  />
+        {/*  <TextField fullWidth type="number" placeholder="Merchant ID" name="merchantId" inputRef={register({required: true})} />*/}
+          <TextField fullWidth type="number" placeholder="Quantity" name="quantity" inputRef={register({required: true})} />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

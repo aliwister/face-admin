@@ -16,9 +16,10 @@ export const SITE_SETTINGS = '/site-settings';
 export const PURCHASES = '/purchases';
 export const PURCHASEDETAILS = '/purchase-details/:slug';
 export const SHIPMENTS = '/shipments';
-export const SHIPMENTDETAILS = '/shipment-details/:slug';
+export const SHIPMENTDETAILS = '/shipment-details/:slug/:action';
 export const INVENTORY = '/inventory';
 export const SHIPQ = '/ship-queue';
+export const IMPORTQ = '/import-queue';
 export const CART = '/cart';
 export const SIGNUP = '/signup';
 // **************** ROUTE CONSTANT END **************************

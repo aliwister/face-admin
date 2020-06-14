@@ -9,11 +9,11 @@ import { useAlert } from "react-alert";
 import TextField from "@material-ui/core/TextField";
 import {useForm} from "react-hook-form";
 
-import {SortQueue} from "./components/SortQueue";
-import {SectionCard} from "./Shipment.style";
+import {SortQueue} from "../components/SortQueue";
+import {SectionCard} from "../Shipment.style";
 import CardHeader from "@material-ui/core/CardHeader";
-import { AcceptItemDialog } from "./components/AcceptItemDialog";
-import { IssueItemDialog } from "./components/IssueItemDialog";
+import { AcceptItemDialog } from "../components/AcceptItemDialog";
+import { IssueItemDialog } from "../components/IssueItemDialog";
 import {Dialog, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import ReactToPrint from "react-to-print";
@@ -25,11 +25,10 @@ const ACCEPT_ITEM = gql`
     }
   }
 `;
-const ISSUE_ITEM = gql`
-  mutation issueItem($orderItemId : Long, $productId : Long, $description : String, $quantity : BigDecimal) {
-    issueItem(orderItemId: $orderItemId, productId: $productId, description: $description, quantity: $quantity) {
-      id
-      shipmentId
+const ADD_ITEM = gql`
+  mutation addItem($shipmentId : Long, $productId : Long, $purchaseItemId: Long, $description : String, $quantity : BigDecimal) {
+    addItem(shipmentId: $shipmentId, productId: $productId, purchaseItemId: $purchaseItemId, description: $description, quantity: $quantity) {
+      value
     }
   }
 `;
@@ -47,6 +46,8 @@ query sortQueue($keyword: String) {
     productId
     merchantId
     orderItemId
+    orderId
+    preallocated
   }
 }
 `;
@@ -63,9 +64,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EditInPackage({state, dispatch}) {
-  const [acceptItemMutation] = useMutation(ACCEPT_ITEM,{ context: { clientName: "adminLink" }});
-  const [issueItemMutation] = useMutation(ISSUE_ITEM,{ context: { clientName: "adminLink" }});
+export default function EditPackage({state, dispatch}) {
+  const [addItemMutation] = useMutation(ADD_ITEM,{ context: { clientName: "adminLink" }});
+  const [removeItemMutation] = useMutation(ADD_ITEM,{ context: { clientName: "adminLink" }});
   const { data, loading, error, refetch } = useQuery(SORT_QUEUE, { context: { clientName: "adminLink" }});
   const { register:r3, handleSubmit:hs3, errors:e3 } = useForm();
 
@@ -73,7 +74,7 @@ export default function EditInPackage({state, dispatch}) {
   const classes = useStyles();
   const labelRef = useRef();
 
-  const handleAcceptItem = async (data) => {
+  const handleAddItem = async (data) => {
     console.log('handlin accept',data);
     let dto = {
       ...data,
@@ -85,37 +86,21 @@ export default function EditInPackage({state, dispatch}) {
     }
     const {
       data: { acceptItem },
-    }: any = await acceptItemMutation({
+    }: any = await addItemMutation({
       variables: { ...dto },
     });
     if(acceptItem)  {
       alert.success(acceptItem.value);
       refetch();
-      dispatch({type:'ISSUE_ITEM_START'});
     }
   }
 
-  const handleIssueItem = async (data) => {
-    console.log('handling issue',data);
-    let dto = {
-      ...data,
-      productId: state.item.productId,
-      description: state.item.description
-    }
-    const {
-      data: { issueItem },
-    }: any = await issueItemMutation({
-      variables: { ...dto },
-    });
-    if(issueItem)  {
-      alert.success(issueItem.id);
-      //dispatch({type:'ISSUE_ITEM_END'});
-      dispatch({type:'PRINT_LABEL_START', payload:issueItem});
-    }
+  const handleRemoveItem = async (data) => {
+
   }
 
   const handleProcess = (item) => {
-    dispatch({type: 'SELECT_ACCEPT_ITEM_START', payload:item})
+    dispatch({type: 'SELECT_ADD_ITEM_START', payload:item})
   };
 
   const handleRefetch = async x => {
@@ -153,17 +138,18 @@ export default function EditInPackage({state, dispatch}) {
             </form>
           }
         />
+        {state.shipment.shipmentType === 'PURCHASE' || state.shipment.shipmentType === 'TRANSIT' &&
         <SortQueue
             data={data}
             classes={classes}
             handleProcess={handleProcess}
-        />
+        />}
       </SectionCard>
       {state.acceptItemDialog &&
-      <AcceptItemDialog item={state.item} open={state.acceptItemDialog} onClose={handleAcceptClose} onSubmit={handleAcceptItem}/>
+      <AcceptItemDialog item={state.item} open={state.acceptItemDialog} onClose={handleAcceptClose} onSubmit={handleAddItem}/>
       }
       {state.issueItemDialog &&
-      <IssueItemDialog item={state.item} open={state.issueItemDialog} onClose={handleIssueClose} onSubmit={handleIssueItem} productId={state.item.productId} />
+      <IssueItemDialog item={state.item} open={state.issueItemDialog} onClose={handleIssueClose} onSubmit={handleRemoveItem} productId={state.item.productId} />
       }
     </>
   );

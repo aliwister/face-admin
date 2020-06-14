@@ -23,7 +23,7 @@ export const PACKAGE_TYPES = [
 export const SHIPMENT_TYPES = [
   {value: 'PURCHASE', label: 'PURCHASE'},
   {value: 'RETURN', label: 'RETURN'},
-  {value: 'TRANSFER', label: 'TRANSFER'},
+  {value: 'TRANSIT', label: 'TRANSIT'},
 ]
 export const DRIVERS = [
   {value: 'Shabib', label: 'Shabib'},

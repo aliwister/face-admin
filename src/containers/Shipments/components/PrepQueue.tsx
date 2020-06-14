@@ -8,6 +8,8 @@ export const PrepQueue = ({queue, classes, handleProcess }) => {
   if(!queue)
     return <div></div>;
 
+  console.log(queue);
+
   return(
     <>
       <TableContainer component={Paper}>
@@ -18,7 +20,6 @@ export const PrepQueue = ({queue, classes, handleProcess }) => {
                 <TableCell></TableCell>
                 <TableCell align="left">Description</TableCell>
                 <TableCell align="right">Qty</TableCell>
-                <TableCell align="right">Price</TableCell>
                 <TableCell align="left">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -38,8 +39,7 @@ export const PrepQueue = ({queue, classes, handleProcess }) => {
                             {q.description}
                         </TableCell>
                     }
-                    <TableCell align="right">{q.quantity}</TableCell>
-                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">{q.unpacked}</TableCell>
                     <TableCell align="right">
                         <Button
                             variant="contained"

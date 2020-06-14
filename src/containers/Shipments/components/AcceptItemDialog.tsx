@@ -9,11 +9,17 @@ export const AcceptItemDialog = ({item, open, onClose, onSubmit}) => {
   const { register, handleSubmit, errors } = useForm({
     defaultValues: {
       productId: (item)?item.productId:null,
-      merchantId: (item)?item.merchantId:null
+      merchantId: (item)?item.merchantId:null,
+      quantity: (item)?item.quantity:null,
     }
   });
 
   const onSubmitDialog = (data) => {
+    console.log(data);
+    if ((Number(data['accepted']) + Number(data['rejected'])) != Number(data['quantity']) || (Number(data['accepted']) + Number(data['rejected']))  == 0) {
+      alert("Accepted + Rejected NOT Equal Quantity");
+      return;
+    }
     onSubmit(data);
   }
 
@@ -26,7 +32,8 @@ export const AcceptItemDialog = ({item, open, onClose, onSubmit}) => {
             Package Info
           </DialogContentText>
           <TextField fullWidth type="number" placeholder="Product ID" name="productId" inputRef={register({required: true})}  />
-          <TextField fullWidth type="number" placeholder="Merchant ID" name="merchantId" inputRef={register({required: true})} />
+        {/*  <TextField fullWidth type="number" placeholder="Merchant ID" name="merchantId" inputRef={register({required: true})} />*/}
+          <TextField fullWidth type="number" placeholder="Quantity" name="quantity" inputRef={register({required: true})} />
           <TextField fullWidth type="number" placeholder="Accepted" name="accepted" inputRef={register({required: true})} />
           <TextField fullWidth type="number" placeholder="Rejected" name="rejected" inputRef={register({required: true})} />
         </DialogContent>

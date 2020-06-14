@@ -32,6 +32,7 @@ import useTheme from "@material-ui/core/styles/useTheme";
 
 import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {StatusMultiSelect} from "./components/StatusMultiSelect";
+import {AcceptShipmentDialog} from "./components/AcceptShipmentDialog";
 
 const SHIPMENTS = gql`
   query shipments($status: [ShipmentStatus], $type: ShipmentType) {
@@ -64,8 +65,16 @@ query merchants {
 }
 `;
 const ACCEPT_SHIPMENT = gql`
-  mutation acceptShipment($shipment: ShipmentInput) {
-    acceptShipment(shipment: $shipment) {
+  mutation acceptShipment($trackingNum: String) {
+    acceptShipment(trackingNum: $trackingNum) {
+      id
+    }
+  }
+`;
+
+const CREATE_SHIPMENT = gql`
+  mutation createShipment($shipment: ShipmentInput) {
+    createShipment(shipment: $shipment) {
       id
     }
   }
@@ -100,7 +109,8 @@ export default function Shipments() {
   const [search, setSearch] = useState([]);
   const [open, setOpen] = React.useState(false);
   const [tab, setTab] = React.useState(0);
-  const [acceptnewdialog, setAcceptnewdialog] = React.useState(false);
+  const [acceptdialog, setAcceptdialog] = React.useState(false);
+  const [createdialog, setCreatedialog] = React.useState(false);
   const [merchant, setMerchant] = React.useState({id:0});
   const alert = useAlert();
   const classes = useStyles();
@@ -109,6 +119,7 @@ export default function Shipments() {
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
   const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT,{context: { clientName: "adminLink" }});
+  const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{context: { clientName: "adminLink" }});
 
 
   const { data, error, refetch } = useQuery(SHIPMENTS, {
@@ -157,7 +168,8 @@ export default function Shipments() {
 
 
   const handleClose = () => {
-    setAcceptnewdialog(false);
+    setAcceptdialog(false);
+    setCreatedialog(false);
   };
 
   if(merhcnatsLoading) {
@@ -178,18 +190,36 @@ export default function Shipments() {
     console.log(dto);
     delete dto['merchant'];
     const {
-      data: { acceptShipment },
-    }: any = await acceptShipmentMutation({
+      data: { createShipment },
+    }: any = await createShipmentMutation({
       variables: { shipment: dto },
     });
-    if(acceptShipment)  {
-      alert.success(acceptShipment.id);
-      history.push('/shipment-details/'+acceptShipment.id);
+    if(createShipment)  {
+      alert.success(createShipment.id);
+      history.push('/shipment-details/'+createShipment.id+'/EDIT');
     }
   }
 
-  function handleAcceptNewButton() {
-    setAcceptnewdialog(true);
+  const handleAcceptShipment = async data => {
+    console.log( data.trackingNum);
+    // @ts-ignore
+    const {
+      data: { acceptShipment },
+    }: any = await acceptShipmentMutation({
+      variables: {...data},
+    });
+    if(acceptShipment)  {
+      alert.success(acceptShipment.id);
+      history.push('/shipment-details/'+acceptShipment.id+'/RECEIVE');
+    }
+  }
+
+  function handleAcceptButton() {
+    setAcceptdialog(true);
+  }
+
+  function handleCreateButton() {
+    setCreatedialog(true);
   }
 
   function handlePrepareButton() {
@@ -216,32 +246,49 @@ export default function Shipments() {
 
   return (
     <>
-      <CreateShipmentDialog show={acceptnewdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
+      <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
+      <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} onSubmit={handleAcceptShipment} merchants={merchants} />
       <Grid container spacing={1}>
         <Grid item  md={3} >
           <StatusMultiSelect handleStatus={handleStatus} status={status} />
         </Grid>
         <Grid item  md={2} >
         </Grid>
-        <Grid  item  md={4} >
+        <Grid  item  md={2} >
         </Grid>
-        <Grid item  md={3} style={{textAlign: 'right'}}>
-          <Button variant="contained" color="primary" onClick={handleAcceptNewButton} >
-            Accept New
+        <Grid item  md={5} style={{textAlign: 'right'}}>
+          <Button variant="contained" color="primary" onClick={handleCreateButton} >
+            Create
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleAcceptButton} >
+            Accept
           </Button>
           <Button variant="contained" color="primary" onClick={handlePrepareButton} >
             Prepare
           </Button>
-          <Link to="inventory">Inventory</Link>
-          <Link to="ship-queue">ShipQ</Link>
+
+          <Link to="import-queue">
+            <Button variant="contained" color="secondary">
+              Import
+            </Button>
+          </Link>
+          <Link to="inventory">
+            <Button variant="contained" color="secondary">
+              Inventory
+            </Button></Link>
+          <Link to="ship-queue">
+            <Button variant="contained" color="primary">
+              ShipQ
+            </Button></Link>
         </Grid>
 
         <Grid item xs={12}>
           <AppBar position="static">
             <Tabs value={tab} onChange={handleChange}>
-              <Tab label="Customer Shipments"  />
-              <Tab label="Purchase Shipments"  />
-              <Tab label="Other"  />
+              <Tab label="Customer"  />
+              <Tab label="Purchase"  />
+              <Tab label="Transit"  />
+              <Tab label="Return"  />
             </Tabs>
           </AppBar>
 
@@ -253,7 +300,7 @@ export default function Shipments() {
                   <TableCell>ID</TableCell>
                   <TableCell align="left">Name</TableCell>
                   <TableCell align="left">Type</TableCell>
-                  <TableCell align="right">Status</TableCell>
+                  <TableCell align="left">Status</TableCell>
                   <TableCell align="center">Ref</TableCell>
                   <TableCell align="center">To</TableCell>
                   <TableCell align="center">Shipment Method</TableCell>
@@ -284,9 +331,9 @@ export default function Shipments() {
                       <TableCell align="left">{row.shipmentType}</TableCell>
                       <TableCell align="right">{row.shipmentStatus}</TableCell>
                       <TableCell align="center">{row.reference}</TableCell>
-                      <TableCell align="right">{row.city}</TableCell>
-                      <TableCell align="right">{row.shipmentMethod}</TableCell>
-                      <TableCell align="right">{row.trackingNum}</TableCell>
+                      <TableCell align="center">{row.city}</TableCell>
+                      <TableCell align="center">{row.shipmentMethod}</TableCell>
+                      <TableCell align="center">{row.trackingNum}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

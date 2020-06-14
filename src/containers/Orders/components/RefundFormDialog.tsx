@@ -27,6 +27,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment}) =>{
   const classes = useStyles();
   //console.log(payment)
   const formSubmit = async (data) => {
+    console.log(data);
     let refund = {...data, amount : -1*data.amount};
     refund.ref = payment.id;
     onSubmit(refund);

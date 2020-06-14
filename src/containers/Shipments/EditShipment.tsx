@@ -6,7 +6,7 @@ import gql from 'graphql-tag';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { useAlert } from "react-alert";
 import TextField from "@material-ui/core/TextField";
-import EditInPackage from "./EditInPackage";
+import ReceivePackage from "./Packages/ReceivePackage";
 import CardHeader from "@material-ui/core/CardHeader";
 import { SectionCard } from './Shipment.style';
 import { ShipmentItems } from "./components/ShipmentItems";
@@ -14,12 +14,13 @@ import { ShipmentItems } from "./components/ShipmentItems";
 import {CreatePkgDialog} from "./components/CreatePkgDialog";
 import {PurchaseShipmentDetailsForm} from "./components/PurchaseShipmentDetailsForm";
 import {CustomerShipmentDetailsForm} from "./components/CustomerShipmentDetailsForm";
-import EditOutPackage from "./EditOutPackage";
+import PrepPackage from "./Packages/PrepPackage";
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import {ListItem} from "@material-ui/core";
 import ListItemText from "@material-ui/core/ListItemText";
 import {SendToDetrackDialog} from "./components/SendToDetrackDialog";
+import EditPackage from "./Packages/EditPackage";
 const ACCEPT_PACKAGE = gql`
   mutation acceptPackage($pkg: PackageInput) {
     acceptPackage(pkg: $pkg) {
@@ -89,6 +90,12 @@ function reducer(state, action) {
         ...state,
         item: action.payload,
         acceptItemDialog: true
+      }
+    case 'SELECT_ADD_ITEM_START':
+      return {
+        ...state,
+        item: action.payload,
+        addItemDialog: true
       }
 /*    case 'ACCEPT_ITEM_START':
       return {
@@ -163,7 +170,7 @@ function reducer(state, action) {
   }
 }
 
-export default function EditShipment({shipment, merchants, refreshShipment}) {
+export default function EditShipment({shipment, merchants, refreshShipment, action}) {
   const [acceptPackageMutation] = useMutation(ACCEPT_PACKAGE,{ context: { clientName: "adminLink" }});
   const [saveShipmentMutation] = useMutation(SAVE_SHIPMENT,{ context: { clientName: "adminLink" }});
   const [sendDetrackMutation]  = useMutation(SEND_TO_DETRACK,{ context: { clientName: "adminLink" }});
@@ -293,11 +300,15 @@ export default function EditShipment({shipment, merchants, refreshShipment}) {
         {state.pkg &&
         <ShipmentItems state={state.pkg} dispatch={dispatch} label={"Package Items"}/>
         }
-        {(shipment.shipmentType === 'PURCHASE') &&
-          <EditInPackage state={state} dispatch={dispatch}/>
+        {/*shipment.shipmentType === 'PURCHASE'*/}
+        {(action == 'RECEIVE' ) &&
+          <ReceivePackage state={state} dispatch={dispatch}/>
         }
-        {(shipment.shipmentType === 'CUSTOMER') &&
-          <EditOutPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
+        {(action == 'PREP' ) &&
+          <PrepPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
+        }
+        {(action == 'EDIT' ) &&
+          <EditPackage state={state} dispatch={dispatch} />
         }
       </Grid>
       <CreatePkgDialog onSubmit={handleAcceptPackage} handleClose={handleClose} open={state.pkgDialog} />
