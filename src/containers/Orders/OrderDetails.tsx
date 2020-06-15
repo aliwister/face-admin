@@ -402,7 +402,7 @@ export default function OrderDetails(props) {
                   <TableCell align="left">Quantity</TableCell>
                   <TableCell align="right">Price</TableCell>
                   <TableCell align="center">Line Total</TableCell>
-                  <TableCell align="center">id</TableCell>
+                  <TableCell align="center">PO</TableCell>
                 </TableRow>
               </TableHead>
               {orderData && orderData.orderA.orderItems && (
@@ -440,6 +440,9 @@ export default function OrderDetails(props) {
                       <TableCell align="center">{row.price}</TableCell>
                       <TableCell align="right">OMR {row.lineTotal}</TableCell>
                       <TableCell align="right">
+                        {row.po &&
+                        <Link to={`/purchase-details/${row.po}`}>{row.po}</Link>
+                        }
 
                       </TableCell>
                     </TableRow>

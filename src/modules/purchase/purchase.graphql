@@ -1,0 +1,27 @@
+query purchase($id: ID) {
+  purchase(id: $id) {
+    id
+    deliveryTotal
+    currency
+    invoiceDate
+    subtotal
+    taxesTotal
+    discountTotal
+    total
+    merchantObj {
+      id
+      name
+    }
+    purchaseItems {
+      id
+      sequence
+      price
+      quantity
+      description
+      orderItems {
+        id
+        orderId
+      }
+    }
+  }
+}

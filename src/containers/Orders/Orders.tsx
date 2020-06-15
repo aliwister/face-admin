@@ -53,6 +53,7 @@ const GET_ORDERS = gql`
         quantity
         image
         lineTotal
+        po
       }
     }
     }

@@ -66,7 +66,6 @@ type CartItem {
   salePrice: String
   slug: String
   unit: String
-  variationAttributes: [String]
 }
 
 input CartItemInput {
@@ -266,7 +265,7 @@ type Mutation {
   addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   pasLookup(sku: String): Product
   addToPricingQ(sku: String): Message
-  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): Product
+  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
   completePricingRequest(id: Long): Message
   completePricingRequestAndEmail(id: Long): Message
   addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
@@ -297,6 +296,7 @@ type Order {
 
 type OrderItem {
   id: ID
+  orderId: Long
   sequence: Int
   productName: String
   quantity: Int
@@ -309,7 +309,7 @@ type OrderItem {
   productUrl: String
   productSku: String
   productId: Long
-  purchaseItems: [PurchaseItem]
+  po: Long
 }
 
 input OrderItemInput {
@@ -368,6 +368,8 @@ type PricingRequest {
   ref: String
   email: String
   parent: String
+  merchantId: Int
+  merchantName: String
 }
 
 type Product {
@@ -410,6 +412,7 @@ type Product {
   hours: Int
   availability: String
   features: [String]
+  browseNode: String
 }
 
 enum ProductGroup {
@@ -528,8 +531,7 @@ type PurchaseItem {
   price: BigDecimal
   quantity: BigDecimal
   description: String
-  orderItemId: Long
-  orderId: Long
+  orderItems: [OrderItem]
 }
 
 input PurchaseItemInput {
@@ -538,7 +540,7 @@ input PurchaseItemInput {
   price: Float
   quantity: Float
   description: String
-  orderItemId: Int
+  orderItemId: [Int]
   productId: Long
 }
 
@@ -586,6 +588,7 @@ type Query {
   pricingRequests: [PricingRequest]
   parentOf(sku: String): String
   mws(sku: String): Product
+  pas(sku: String): Product
   ebay(id: String): Product
 }
 

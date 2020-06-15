@@ -140,8 +140,8 @@ function reducer(state, action) {
       }
 
     case 'REMOVE_ITEM':
-      const orderIdToRemove = action.payload;
-      const remId = _.findIndex(state.purchaseItems, ['orderItemId', orderIdToRemove])
+      const removeSequence = action.payload;
+      const remId = _.findIndex(state.purchaseItems, ['sequence', removeSequence])
       return  {
         ...state,
         purchaseItems: [...state.purchaseItems.slice(0, remId), ...state.purchaseItems.slice(remId + 1)]
@@ -150,12 +150,12 @@ function reducer(state, action) {
     case 'UPDATE_PRICE':
     case 'UPDATE_QUANTITY':
     case 'UPDATE_DESCRIPTION':
-      let orderIdToUpdate = action.payload.oid;
+      let updateSequence = action.payload.oid;
       let newItems;
-      if(_.findIndex(state.purchaseItems, ['orderItemId', orderIdToUpdate]) > -1) {
+      if(_.findIndex(state.purchaseItems, ['sequence', updateSequence]) > -1) {
         //console.log(action.payload.description);
         newItems = Object.assign([], state.purchaseItems.map(item => {
-          if (item.orderItemId === orderIdToUpdate) {
+          if (item.orderItemId === updateSequence) {
             //console.log('here');
             if(action.type==='UPDATE_PRICE') item.price = action.payload.price;
             if(action.type==='UPDATE_QUANTITY') item.quantity = action.payload.quantity;
@@ -217,9 +217,9 @@ export default function PurchaseForm({purchase}) {
     delete dto.merchantObj;
     delete dto.__typename;
 
-    const purchaseItems = state.purchaseItems.map(({id, orderItemId, price, quantity, description, sequence, productId}) => ({
+    const purchaseItems = state.purchaseItems.map(({id, orderItems, price, quantity, description, sequence, productId}) => ({
       id,
-      orderItemId,
+      orderItems,
       price,
       quantity,
       description,
@@ -251,15 +251,15 @@ export default function PurchaseForm({purchase}) {
   }
 
   function handleChangeQuantity(q: any, newValue) {
-    dispatch({type: 'UPDATE_QUANTITY', payload: {oid: q.orderItemId, quantity: newValue }})
+    dispatch({type: 'UPDATE_QUANTITY', payload: {oid: q.sequence, quantity: newValue }})
   }
 
   function handleChangePrice(q: any, newValue) {
-    dispatch({type: 'UPDATE_PRICE', payload: {oid: q.orderItemId, price: newValue }})
+    dispatch({type: 'UPDATE_PRICE', payload: {oid: q.sequence, price: newValue }})
   }
 
   function handleChangeDescription(q: any, newValue) {
-    dispatch({type: 'UPDATE_DESCRIPTION', payload: {oid: q.orderItemId, description: newValue }})
+    dispatch({type: 'UPDATE_DESCRIPTION', payload: {oid: q.sequence, description: newValue }})
   }
 
   function handleAdd(q) {
@@ -269,7 +269,7 @@ export default function PurchaseForm({purchase}) {
         price: q.cost,
         quantity: q.quantity,
         description: q.productName,
-        orderItemId: q.id,
+        orderItems: [{id: q.id}],
         productId: q.productId
       }});
   }
@@ -277,7 +277,7 @@ export default function PurchaseForm({purchase}) {
   const onClose = () => setNewpurchasedialog(false);
 
   function handleRemove(q) {
-    dispatch({type: 'REMOVE_ITEM', payload: q.orderItemId});
+    dispatch({type: 'REMOVE_ITEM', payload: q.sequence});
   }
 
   function handleUpdate(type: string, payload: string) {
@@ -361,7 +361,7 @@ export default function PurchaseForm({purchase}) {
                       >
                       </Button>
                     </TableCell>
-                    <TableCell align="right"><Link to={`/order-details/${q.orderId}`}>{q.orderItemId}</Link></TableCell>
+                    <TableCell align="right">{q.orderItems && q.orderItems.length > 0 && <Link to={`/order-details/${q.orderItems[0].orderId}`}>{q.orderItems[0].orderItemId}</Link>}</TableCell>
                   </TableRow>
               ))}
             </TableBody>
@@ -422,7 +422,7 @@ export default function PurchaseForm({purchase}) {
                           onClick={()=>handleAdd(q)}
                       />
                     </TableCell>
-                    <TableCell align="right"><Link to={`/order-details/${q.orderId}`}>{q.orderId}</Link></TableCell>
+                    <TableCell align="right"><Link to={`/order-details/${q.orderId}`} target={"_blank"}>{q.orderId}</Link></TableCell>
                   </TableRow>
               ))}
             </TableBody>}
