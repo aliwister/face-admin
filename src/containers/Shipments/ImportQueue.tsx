@@ -45,8 +45,8 @@ query merchants {
 `;
 
 const CREATE_SHIPMENT = gql`
-  mutation createShipment($shipment : ShipmentInput, $shipmentItems : [ShipmentItemInput]) {
-    createShipment(shipment: $shipment, shipmentItems: $shipmentItems) {
+  mutation createShipment($shipment : ShipmentInput, $shipmentItems : [ShipmentItemInput], $trackingNums: [String]) {
+    createShipment(shipment: $shipment, shipmentItems: $shipmentItems, trackingNums: $trackingNums) {
       id
       reference
     }
@@ -71,7 +71,9 @@ const SHIPMENT_ITEMS_COUNT = gql`
 query shipmentItemsCountByTrackingNums($trackingNums: [String]) {
   shipmentItemsCountByTrackingNums(trackingNums: $trackingNums) {
     trackingNum
-    count
+    total
+    processed
+    status
   }
 }
 `;
@@ -117,6 +119,7 @@ export default function ImportQueue() {
   const [item, setItem] = useState(-1);
   const [selected, setSelected] = useState([]);
   const [checkedId, setCheckedId] = useState([]);
+  const [trackingNums, setTrackingnums] = useState("");
 
   const alert = useAlert();
   const classes = useStyles();
@@ -126,6 +129,7 @@ export default function ImportQueue() {
     console.log('handling issue',formData);
     const s = data.shipmentItemsByTrackingNums.filter(e => ~checkedId.indexOf(e.id)).map(({__typename, id, ...props}) => ({...props, from: id}));
     console.log(s);
+    const trackingNumsSplit = trackingNums.split(/\r?\n/);
     let dto = {
        shipment: {
          reference: formData.reference,
@@ -135,7 +139,8 @@ export default function ImportQueue() {
          shipmentType: formData.shipmentType.value,
          shipmentMethod: formData.shipmentMethod.value
        },
-       shipmentItems: s
+       shipmentItems: s,
+       trackingNums: trackingNumsSplit
       //description: state.item.description
     }
     const {
@@ -179,35 +184,48 @@ export default function ImportQueue() {
  // const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
 
 
-  const onSubmit = data => {
-    console.log(data);
-    const trackingNums =  data["trackingNums"].split(/\r?\n/);
-    console.log(trackingNums);
-    refetch({trackingNums: trackingNums});
-    cntrefetch({trackingNums: trackingNums});
+  const onSubmit = e => {
+    //console.log(data);
+    //const trackingNums =  data["trackingNums"];
+    console.log(trackingNums.split(/\r?\n/));
+    refetch({trackingNums: trackingNums.split(/\r?\n/)});
+    cntrefetch({trackingNums: trackingNums.split(/\r?\n/)});
+    return false;
   }
 
   if(loadingInventory)
     return <></>
 
+  function handleChange(event) {
+    setTrackingnums(event.target.value)
+  }
+
   return (
     <>
       <Grid container xs={12} md={12} spacing={1}>
         <Grid item md={4}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <textarea name="trackingNums" ref={register({required: true, maxLength: 800})} rows={20} cols={40}/>
-            <input type="submit" />
-          </form>
+
+          <textarea name="trackingNums" onChange={handleChange}  value={trackingNums} rows={20} cols={40}/>
+          <button onClick={onSubmit} >Get</button>
+
         </Grid>
         <Grid item md={4}>
           <Table  size="small" aria-label="a dense table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Tracking #</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Total</TableCell>
+                <TableCell>Processed</TableCell>
+              </TableRow>
+            </TableHead>
             <TableBody>
               {cntdata && cntdata.shipmentItemsCountByTrackingNums && cntdata.shipmentItemsCountByTrackingNums.map((item,b) => (
                 <TableRow>
-                  <TableCell>{item.trackingNum}
-
-                  </TableCell>
-                  <TableCell>{item.count}</TableCell>
+                  <TableCell>{item.trackingNum}</TableCell>
+                  <TableCell>{item.status}</TableCell>
+                  <TableCell>{item.total}</TableCell>
+                  <TableCell>{item.processed}</TableCell>
                 </TableRow>
                 ))}
             </TableBody>
