@@ -155,7 +155,7 @@ function reducer(state, action) {
       if(_.findIndex(state.purchaseItems, ['sequence', updateSequence]) > -1) {
         //console.log(action.payload.description);
         newItems = Object.assign([], state.purchaseItems.map(item => {
-          if (item.orderItemId === updateSequence) {
+          if (item.sequence === updateSequence) {
             //console.log('here');
             if(action.type==='UPDATE_PRICE') item.price = action.payload.price;
             if(action.type==='UPDATE_QUANTITY') item.quantity = action.payload.quantity;
