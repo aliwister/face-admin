@@ -33,11 +33,20 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Checkbox from "@material-ui/core/Checkbox";
 import Fade from "react-reveal/Fade";
 import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
+import {AddTrackingDialog} from "./components/AddTrackingDialog";
 
 
 const MERCHANTS = gql`
 query merchants {
   merchants {
+    id
+    name
+  }
+}
+`;
+const TRACKING_EVENTS = gql`
+query trackingEvents {
+  trackingEvents {
     id
     name
   }
@@ -49,6 +58,13 @@ const CREATE_SHIPMENT = gql`
     createShipment(shipment: $shipment, shipmentItems: $shipmentItems, trackingNums: $trackingNums) {
       id
       reference
+    }
+  }
+`;
+const ADD_TRACKING_EVENT = gql`
+  mutation addTrackingEvent($trackingNums: [String], $shipmentStatus: ShipmentStatus, $trackingEvent: Int, $details: String) {
+    addTrackingEvent(trackingNums: $trackingNums, shipmentStatus: $shipmentStatus, trackingEvent: $trackingEvent, details: $details) {
+      value
     }
   }
 `;
@@ -91,6 +107,7 @@ query inventory {
   }
 }
 `;
+
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -106,14 +123,17 @@ const useStyles = makeStyles(theme => ({
 
 export default function ImportQueue() {
   const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{ context: { clientName: "adminLink" }});
+  const [addTrackingEventMutation] = useMutation(ADD_TRACKING_EVENT,{ context: { clientName: "adminLink" }});
   const { data, loading, error, refetch } = useQuery(SHIPMENT_ITEMS, { context: { clientName: "adminLink" }});
   const { data: cntdata, loading: cntloading, error: cnterror, refetch: cntrefetch } = useQuery(SHIPMENT_ITEMS_COUNT, { context: { clientName: "adminLink" }});
   const { data: dataInventory, loading: loadingInventory, error: errorInventory, refetch: refetchInventory } = useQuery(INVENTORY, { context: { clientName: "adminLink" }});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
+  const { data:events, loading:eLoading} = useQuery(TRACKING_EVENTS, {context: { clientName: "adminLink" }});
   const { register, handleSubmit, errors } = useForm();
 
 
   const [createShipmentDialog, setCreate] = useState(false);
+  const [addTrackingDialog, setAdd] = useState(false);
   const [printLabelDialog, setPrintlabeldialog] = useState(false);
   const [label, setLabel] = useState('');
   const [item, setItem] = useState(-1);
@@ -153,6 +173,30 @@ export default function ImportQueue() {
     }
   }
 
+  const addTrackingEvent = async (formData) => {
+    console.log('handling issue',formData);
+    const s = data.shipmentItemsByTrackingNums.filter(e => ~checkedId.indexOf(e.id)).map(({__typename, id, ...props}) => ({...props, from: id}));
+    console.log(s);
+    const trackingNumsSplit = trackingNums.split(/\r?\n/);
+    let dto = {
+       shipmentStatus: formData.shipmentStatus.value,
+       trackingEvent: formData.trackingEvent.id,
+       details: formData.details,
+       trackingNums: trackingNumsSplit
+      //description: state.item.description
+    }
+    const {
+      data: { addTrackingEvent },
+    }: any = await addTrackingEventMutation({
+      variables: { ...dto },
+    });
+    if(addTrackingEvent)  {
+      alert.success(addTrackingEvent.value);
+    }
+  }
+
+
+
   const handleCreate = (item) => {
     setCreate(true);
   };
@@ -179,6 +223,7 @@ export default function ImportQueue() {
   const onClose = () => {
     setCreate(false)
     setPrintlabeldialog(false)
+    setAdd(false)
   }
  // const handleAcceptClose = () => dispatch({type: 'SELECT_ACCEPT_ITEM_CANCEL'})
  // const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
@@ -200,14 +245,20 @@ export default function ImportQueue() {
     setTrackingnums(event.target.value)
   }
 
+  function handleOpenAddTrackingEventDialog() {
+    setAdd(true)
+  }
+
   return (
     <>
       <Grid container xs={12} md={12} spacing={1}>
         <Grid item md={4}>
 
           <textarea name="trackingNums" onChange={handleChange}  value={trackingNums} rows={20} cols={40}/>
-          <button onClick={onSubmit} >Get</button>
-
+          <Button variant="contained" color="secondary" size="small" onClick={onSubmit} >Parse</Button>
+          <Button variant="contained" color="secondary" size="small"  onClick={handleOpenAddTrackingEventDialog}>
+            Add Tracking Event
+          </Button>
         </Grid>
         <Grid item md={4}>
           <Table  size="small" aria-label="a dense table">
@@ -314,7 +365,9 @@ export default function ImportQueue() {
       <Button variant="contained" color="secondary" size="small"  disabled={checkedId.length < 1} onClick={handleCreate}>
         Create Shipment
       </Button>
-      {merchants && <CreateShipmentDialog onSubmit={onCreateShipment} merchants={merchants} show={createShipmentDialog} onClose={onClose} />}
+
+      {merchants && <CreateShipmentDialog onSubmit={onCreateShipment} merchants={merchants} show={createShipmentDialog} onClose={onClose}/>}
+      {events    && <AddTrackingDialog    onSubmit={addTrackingEvent} events={events}       show={addTrackingDialog}    onClose={onClose}/>}
     </>
   );
 }

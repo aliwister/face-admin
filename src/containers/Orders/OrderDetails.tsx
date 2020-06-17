@@ -81,48 +81,27 @@ mutation sendOrderLevelEmail($id:ID, $template:String) {
 }
 `;
 const SHIPMENTS = gql`
-query shipmentsByRef($ref: String) {
-    shipmentsByRef(ref: $ref) {
-       id
-      actualShipCost
-      latestCancelDate
-      handlingInstructions
-      reference
-      trackingNum
-      trackingLink
-      shipmentMethod
-      shipmentType
-      shipmentStatus
-      customerFirstName
-      customerLastName
-      customerId
-      merchantId
-      pkgs {
-        id
-        packageType
-        length
-        width
-        height
-        weight
-        shipmentItems {
-          id
-          sequence
-          quantity
-          description
-          shipmentId
-          productId
-          image
-        }
-      }
-      shipmentItems {
-        id
-        sequence
-        quantity
+query track ($ref: String) {
+  track(ref: $ref) {
+    id
+    shipment {
+    status
+    trackingNum
+    type
+    date
+      content {
         description
-        shipmentId
-        productId
         image
+        quantity
       }
+      progress {
+        shipmentEventId
+        shipmentEventDescription
+        status
+        createdDate
+        details
+      }
+    }
   }
 }
 `;

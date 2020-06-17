@@ -181,7 +181,7 @@ function reducer(state, action) {
 }
 
 
-export default function PurchaseForm({purchase}) {
+export default function PurchaseForm({purchase, purchaseRefetch}) {
   const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE,{ context: { clientName: "shopLink" }});
   const [po, setPO] = useState(0);
   const [items, setItems] = useState([]);
@@ -238,6 +238,7 @@ export default function PurchaseForm({purchase}) {
       alert.success("Purchase saved successfully");
       //setPO(createPurchase.id);
       setCreate(true);
+      purchaseRefetch({slug: updatePurchase.id});
       dispatch(updatePurchase);
       //setItems(updatePurchase.items);
     }

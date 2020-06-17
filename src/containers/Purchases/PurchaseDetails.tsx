@@ -63,7 +63,7 @@ export default function PurchaseDetails(props) {
   return (
     <>
       <Heading>Purchase PO {dp.purchase.id}</Heading>
-      <PurchaseForm purchase={dp.purchase}/>
+      <PurchaseForm purchase={dp.purchase} purchaseRefetch={rp}/>
     </>
   );
 }

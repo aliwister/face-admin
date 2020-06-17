@@ -10,6 +10,15 @@ export const SHIPMENT_METHODS = [
   {value: 'Cargo', label: 'Cargo'},
 ];
 
+export const SHIPMENT_STATUS = [
+  {value: 'PENDING', label: 'PENDING'},
+  {value: 'IN_TRANSIT', label: 'IN_TRANSIT'},
+  {value: 'RECEIVED', label: 'RECEIVED'},
+  {value: 'DELIVERED', label: 'DELIVERED'},
+  {value: 'CANCELED', label: 'CANCELED'},
+  {value: 'FAILED', label: 'FAILED'},
+  {value: 'PROCESSING', label: 'PROCESSING'},
+];
 export const PACKAGE_TYPES = [
   {value: 'BADALS14X18BAG', label: 'BADALS14X18BAG'},
   {value: 'DHLFLYER', label: 'DHLFLYER'},

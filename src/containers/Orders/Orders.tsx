@@ -221,7 +221,7 @@ export default function Orders() {
                       }}
                     /></TableCell>
                     <TableCell component="th" scope="row">
-                      <Link to={`order-details/${row.id}`}>{row.id}</Link>
+                      <Link to={`order-details/${row.reference}`}>{row.id}</Link>
                     </TableCell>
                     <TableCell align="left">{row.reference}</TableCell>
 
