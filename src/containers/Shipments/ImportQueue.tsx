@@ -62,8 +62,8 @@ const CREATE_SHIPMENT = gql`
   }
 `;
 const ADD_TRACKING_EVENT = gql`
-  mutation addTrackingEvent($trackingNums: [String], $shipmentStatus: ShipmentStatus, $trackingEvent: Int, $details: String) {
-    addTrackingEvent(trackingNums: $trackingNums, shipmentStatus: $shipmentStatus, trackingEvent: $trackingEvent, details: $details) {
+  mutation addTrackingEvent($trackingNums: [String], $shipmentStatus: ShipmentStatus, $trackingEvent: Int, $eventDate: LocalDateTime, $details: String) {
+    addTrackingEvent(trackingNums: $trackingNums, shipmentStatus: $shipmentStatus, trackingEvent: $trackingEvent, eventDate: $eventDate, details: $details) {
       value
     }
   }
@@ -182,7 +182,8 @@ export default function ImportQueue() {
        shipmentStatus: formData.shipmentStatus.value,
        trackingEvent: formData.trackingEvent.id,
        details: formData.details,
-       trackingNums: trackingNumsSplit
+       trackingNums: trackingNumsSplit,
+       eventDate: formData.eventDate
       //description: state.item.description
     }
     const {
