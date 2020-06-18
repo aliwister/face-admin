@@ -99,7 +99,7 @@ export const Shipments = ({shipments}) =>{
 
                       <TableRow key={row.sequence}>
                         <TableCell align="left">
-                          {row.createdDate}
+                          {row.eventDate}
                         </TableCell>
                         <TableCell align="center">{row.shipmentEventDescription} {row.details}</TableCell>
                       </TableRow>

@@ -18,6 +18,7 @@ export const SHIPMENT_STATUS = [
   {value: 'CANCELED', label: 'CANCELED'},
   {value: 'FAILED', label: 'FAILED'},
   {value: 'PROCESSING', label: 'PROCESSING'},
+  {value: 'CLOSED', label: 'CLOSED'},
 ];
 export const PACKAGE_TYPES = [
   {value: 'BADALS14X18BAG', label: 'BADALS14X18BAG'},

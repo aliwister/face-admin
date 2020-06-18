@@ -89,6 +89,7 @@ query track ($ref: String) {
     trackingNum
     type
     date
+    
       content {
         description
         image
@@ -99,6 +100,7 @@ query track ($ref: String) {
         shipmentEventDescription
         status
         createdDate
+        eventDate
         details
       }
     }
