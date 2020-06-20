@@ -507,7 +507,7 @@ export type Order = {
   invoiceDate: Maybe<Scalars['LocalDate']>;
   deliveryDate: Maybe<Scalars['LocalDate']>;
   customer: Customer;
-  cart: Maybe<Cart>;
+  cartId: Maybe<Scalars['Long']>;
   currency: Maybe<Scalars['String']>;
   deliveryAddress: Address;
   invoiceAddress: Address;
@@ -544,6 +544,7 @@ export type OrderItem = {
 
 export type OrderItemInput = {
   id: Maybe<Scalars['ID']>;
+  orderId: Maybe<Scalars['Long']>;
   sequence: Maybe<Scalars['Int']>;
   quantity: Maybe<Scalars['Int']>;
   price: Maybe<Scalars['BigDecimal']>;
@@ -775,7 +776,7 @@ export type PurchaseItemInput = {
   price: Maybe<Scalars['Float']>;
   quantity: Maybe<Scalars['Float']>;
   description: Maybe<Scalars['String']>;
-  orderItemId: Maybe<Array<Maybe<Scalars['Int']>>>;
+  orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
   productId: Maybe<Scalars['Long']>;
 };
 
@@ -995,7 +996,7 @@ export type OrderAQuery = (
   { __typename?: 'Query' }
   & { orderA: Maybe<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'currency' | 'balance' | 'carrier'>
+    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'cartId' | 'currency' | 'balance' | 'carrier'>
     & { customer: (
       { __typename?: 'Customer' }
       & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
@@ -1137,6 +1138,7 @@ export const OrderADocument = gql`
     deliveryTotal
     discountsTotal
     deliveryDate
+    cartId
     customer {
       id
       firstname

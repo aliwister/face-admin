@@ -40,6 +40,7 @@ const GET_ORDERS = gql`
       deliveryTotal
       discountsTotal
       deliveryDate
+      cartId
       deliveryAddress {
           firstName
           lastName

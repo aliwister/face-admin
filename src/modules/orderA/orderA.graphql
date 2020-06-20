@@ -12,6 +12,7 @@
       deliveryTotal
       discountsTotal
       deliveryDate
+      cartId
       customer {
         id
         firstname

@@ -87,6 +87,7 @@ query track ($ref: String) {
     shipment {
     status
     trackingNum
+    carrier
     type
     date
     
@@ -252,8 +253,8 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={`${orderData.orderA.reference} ${orderData.orderA.id}`}
-                  secondary= 'Order'
+                  primary={`${orderData.orderA.reference} `}
+                  secondary= {`Order ${orderData.orderA.id} from cart ${orderData.orderA.cartId}`}
                 />
               </ListItem>
               <ListItem>
@@ -390,13 +391,15 @@ export default function OrderDetails(props) {
                 <TableBody>
                   {orderData.orderA.orderItems.map(row => (
                     <TableRow key={row.sequence}>
-                      <TableCell align="right">
+                      <TableCell align="left">
+
                         <Checkbox
                           name={row.id}
                           checked={checkedId.includes(row.id)}
                           onChange={handleCheckbox}
                           value={row.id}
                       />
+                        {row.id}
                       </TableCell>
                       <TableCell component="th" scope="row">
                         {row.sequence}

@@ -1,27 +1,12 @@
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import Button from "@material-ui/core/Button";
-import {OrderInfoPaper} from "../Orders.style";
 import React from "react";
-import {useForm} from "react-hook-form";
+
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  Table, TableBody,
+  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow
 } from "@material-ui/core";
-import DialogActions from "@material-ui/core/DialogActions";
-import Checkbox from "@material-ui/core/Checkbox";
-import Image from "../../../components/Image/Image";
-import LaunchIcon from "@material-ui/icons/Launch";
-import TableFooter from "@material-ui/core/TableFooter";
+
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -29,6 +14,7 @@ import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,7 +42,12 @@ export const Shipments = ({shipments}) =>{
           <Card variant="outlined" style={{width:'100%'}}>
             <CardContent>
               <Typography gutterBottom variant="h5" component="h2">
-                شحنة رقم    {s.id}
+                Shipment-
+                <Link to={`/shipment-details/${s.id}/EDIT`}>{s.id}</Link><br/>
+              </Typography>
+              <Typography className={classes.heading}>
+                <a href={`https://www.trackingmore.com/${s.shipment.carrier}-tracking.html?number=${s.shipment.trackingNum}`} target="_blank">Track {s.shipment.carrier} {s.shipment.trackingNum}</a>
+
               </Typography>
               <Typography variant="h4">
                 {s.shipment.status}

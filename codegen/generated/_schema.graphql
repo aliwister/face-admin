@@ -278,7 +278,7 @@ type Order {
   invoiceDate: LocalDate
   deliveryDate: LocalDate
   customer: Customer!
-  cart: Cart
+  cartId: Long
   currency: String
   deliveryAddress: Address!
   invoiceAddress: Address!
@@ -314,6 +314,7 @@ type OrderItem {
 
 input OrderItemInput {
   id: ID
+  orderId: Long
   sequence: Int
   quantity: Int
   price: BigDecimal
@@ -540,7 +541,7 @@ input PurchaseItemInput {
   price: Float
   quantity: Float
   description: String
-  orderItemId: [Int]
+  orderItems: [OrderItemInput]
   productId: Long
 }
 
