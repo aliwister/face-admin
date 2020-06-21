@@ -52,8 +52,9 @@ export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
         <div><TextField variant="outlined" fullWidth type="text" placeholder="Tracking #" name="trackingNum"
                         inputRef={register({required: true})} /></div>
         <div><TextField variant="outlined" fullWidth type="text" placeholder="Reference" name="reference" inputRef={register({required: true, maxLength: 100})} /></div>
-
-
+        <div><TextField variant="outlined" fullWidth type="number" placeholder="Pkg count" name="pkgCount"
+                        inputRef={register({required: true})} /></div>
+        <div><textarea name="handlingInstructions" ref={register({required: true})}  rows={3} cols={10}/></div>
 
 
       </DialogContent>

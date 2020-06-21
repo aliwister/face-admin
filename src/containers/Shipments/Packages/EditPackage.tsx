@@ -12,20 +12,14 @@ import {useForm} from "react-hook-form";
 import {SortQueue} from "../components/SortQueue";
 import {SectionCard} from "../Shipment.style";
 import CardHeader from "@material-ui/core/CardHeader";
-import { AcceptItemDialog } from "../components/AcceptItemDialog";
-import { IssueItemDialog } from "../components/IssueItemDialog";
+
 import {Dialog, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import ReactToPrint from "react-to-print";
 import {AddItemDialog} from "../components/AddItemDialog";
+import {useSetShipmentStatusMutation} from "../../../codegen/generated/_graphql";
+import ConfirmDialog from "../../../components/ConfirmDialog/ConfirmDialog";
 
-const ACCEPT_ITEM = gql`
-  mutation acceptItem($shipmentId: Long, $pkgId: Long, $purchaseItemId: Long, $productId: Long, $merchantId: Long, $description: String, $quantity: BigDecimal, $accepted: BigDecimal, $rejected: BigDecimal) {
-    acceptItem(shipmentId: $shipmentId,  pkgId: $pkgId,  purchaseItemId: $purchaseItemId,  productId: $productId,  merchantId: $merchantId,  description: $description,  quantity: $quantity,  accepted: $accepted,  rejected: $rejected) {
-      value
-    }
-  }
-`;
 const ADD_ITEM = gql`
   mutation addItem($shipmentId : Long, $productId : Long, $purchaseItemId: Long, $description : String, $quantity : BigDecimal) {
     addItem(shipmentId: $shipmentId, productId: $productId, purchaseItemId: $purchaseItemId, description: $description, quantity: $quantity) {
@@ -71,9 +65,35 @@ export default function EditPackage({state, dispatch}) {
   const { data, loading, error, refetch } = useQuery(SORT_QUEUE, { context: { clientName: "adminLink" }});
   const { register:r3, handleSubmit:hs3, errors:e3 } = useForm();
 
+  const [setStatusMutation] = useSetShipmentStatusMutation({ context: { clientName: "adminLink" }});
+
   const alert = useAlert();
   const classes = useStyles();
   const labelRef = useRef();
+
+  const handleCloseShipment = () => dispatch({type: 'CLOSE_SHIPMENT_START', payload: state.shipment.id});
+  const handleCancelShipment = () => dispatch({type: 'CANCEL_SHIPMENT_START', payload: state.shipment.id});
+
+  const cancelShipment = async => {
+    return setShipmentStatus('CANCELED');
+  }
+
+  const closeShipment = async => {
+    return setShipmentStatus('CLOSED');
+  }
+
+  const setShipmentStatus = async (status) => {
+    const {
+      data: { setShipmentStatus },
+    }: any = await setStatusMutation({
+      variables: { id: state.shipment.id, status: status},
+    });
+    if(setShipmentStatus) {
+      alert.success(setShipmentStatus.value);
+      onCancel()
+    }
+  }
+
 
   const handleAddItem = async (formData) => {
     console.log('handlin accept',formData);
@@ -108,23 +128,25 @@ export default function EditPackage({state, dispatch}) {
   const handleRefetch = async x => {
     refetch({keyword: x.keyword});
   }
+
   const onClose = () => dispatch({type: 'PRINT_LABEL_CANCEL'})
+  const onCancel = () => dispatch({type: 'CLOSE_CANCEL_SHIPMENT_CANCEL'})
   const handleAcceptClose = () => dispatch({type: 'SELECT_ACCEPT_ITEM_CANCEL'})
   const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
 
   return (
     <>
       <Dialog open={state.printLabelDialog} onClose={onClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Prep Item</DialogTitle>
-          <DialogContent>
-            <ReactToPrint
-              trigger={() => <button>Print label!</button>}
-              content={() => labelRef.current}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-          </DialogActions>
+        <DialogTitle id="form-dialog-title">Prep Item</DialogTitle>
+        <DialogContent>
+          <ReactToPrint
+            trigger={() => <button>Print label!</button>}
+            content={() => labelRef.current}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+        </DialogActions>
       </Dialog>
 
       <span ref={labelRef}>{state.label}</span>
@@ -142,14 +164,35 @@ export default function EditPackage({state, dispatch}) {
         />
         {(state.shipment.shipmentType === 'PURCHASE' || state.shipment.shipmentType === 'TRANSIT') &&
         <SortQueue
-            data={data}
-            classes={classes}
-            handleProcess={handleProcess}
+          data={data}
+          classes={classes}
+          handleProcess={handleProcess}
         />}
+      </SectionCard>
+      <SectionCard>
+        <CardHeader
+          subheader="Actions"
+          action={
+            <>
+              <Button variant="contained" color="secondary" onClick = {() => handleCloseShipment()}>Close</Button>
+              <Button variant="contained" color="secondary" onClick = {() => handleCancelShipment()}>Cancel</Button>
+            </>
+          }/>
       </SectionCard>
       {state.addItemDialog &&
       <AddItemDialog item={state.item} open={state.addItemDialog} onClose={handleAcceptClose} onSubmit={handleAddItem}/>
       }
+
+      <div>
+        {state.closeShipmentConfirmDialog &&
+        <ConfirmDialog title="Close Shipment?" open={state.closeShipmentConfirmDialog} cancel={onCancel} onConfirm={closeShipment}>
+          Are you sure you want to close this shipment?
+        </ConfirmDialog>}
+        {state.cancelShipmentConfirmDialog &&
+        <ConfirmDialog title="Cancel Shipment?" open={state.cancelShipmentConfirmDialog} cancel={onCancel} onConfirm={cancelShipment}>
+          Are you sure you want to cancel this shipment?
+        </ConfirmDialog>}
+      </div>
 
     </>
   );

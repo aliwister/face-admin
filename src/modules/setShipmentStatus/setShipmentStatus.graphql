@@ -1,0 +1,5 @@
+mutation setShipmentStatus($id: Long, $status:ShipmentStatus) {
+  setShipmentStatus (id: $id, status: $status) {
+    value
+  }
+}

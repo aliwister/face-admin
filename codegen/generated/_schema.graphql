@@ -137,6 +137,27 @@ type Gallery {
   url: String!
 }
 
+type Inventory {
+  productId: Long
+  title: String
+  sku: String
+  received: BigDecimal
+  issued: BigDecimal
+  quantityOnHand: BigDecimal
+  image: String
+}
+
+type Item {
+  image: String
+  description: String
+  quantity: Long
+}
+
+type ItemIssuance {
+  id: ID
+  shipmentId: Long
+}
+
 type LineItem {
   productId: Int
   sku: String
@@ -161,8 +182,9 @@ input LineItemInput {
   url: String
 }
 
-"""java.time.LocalDate implementation"""
 scalar LocalDate
+
+scalar LocalDateTime
 
 """Long type"""
 scalar Long
@@ -233,42 +255,67 @@ type Meta {
 }
 
 type Mutation {
-  updateCart(secureKey: String, items: [CartItemInput]): Cart
-  setCart(secureKey: String, items: [CartItemInput]): Cart
-  createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
-  resetPassword(email: String): String
-  createMerchantProduct(product: AddProductInput): Message
+  """
+  acceptItem(shipmentId: Long,  pkgId: Long,  purchaseItemId: Long,  productId:
+  Long,  merchantId: Long,  description: String,  quantity: BigDecimal, 
+  accepted: BigDecimal,  rejected: BigDecimal): Message
+  """
+  acceptItem(shipmentItemId: Long, packageId: Long, accepted: BigDecimal, rejected: BigDecimal): Message
+  acceptPackage(pkg: PackageInput): Pkg
+  acceptShipment(trackingNum: String): Shipment
+  addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
+  addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
+  addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+  addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
+  addToPricingQ(sku: String): Message
+  addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
   approveProduct(id: ID): Product
-  getImageUploadUrl(filename: String, contentType: String): PresignedUrl
-  importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
-  createOrder(id: Int): Order
+  cancelOrder(id: ID, reason: String): Order
+  completePricingRequest(id: Long): Message
+  completePricingRequestAndEmail(id: Long): Message
   contact(id: Int): Message
+  createCart(cart: CheckoutCartInput): CheckoutCart
+  createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+  createMerchantProduct(product: AddProductInput): Message
+  createNewProduct(product: ProductInput): Product
+  createOrder(id: Int): Order
+  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
+  createProduct(ref: Int, parent: Int, sku: String, upc: String, releaseDate: LocalDate): Product
 
   """createOrderFromCart(cart: CartInput): Order"""
   createPurchase(dto: PurchaseInput): Purchase
-  updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
-  sendPaymentSms(id: ID, mobile: String): Message
+
+  """
+  printCode(shipmentId: Long): Message
+  savePackage(pkgId: Long, shipmentItems: [Long]): Pkg
+  scheduleShipment(id: Long, deliveryDate: LocalDate, comments: String, assignTo: String): Message
+  unAccept(shipmentAcceptanceId: Long): Message
+  unIssue(itemIssuanceId: Long) : Message
+  """
+  createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   discountOrder(id: ID): Order
-  setOrderState(id: ID, state: OrderState): Order
-  cancelOrder(id: ID, reason: String): Order
-  addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
-  sendOrderLevelEmail(id: ID, template: String): Message
-  sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
-  createCart(cart: CheckoutCartInput): CheckoutCart
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
+  getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+  importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
+  indexProduct(id: Int): Attribute
+  issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
+  pasLookup(sku: String): Product
+  prepItem(dto: PackagingContentInput): Message
+  processAmazonShipments: Message
 
   """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
-  createProduct(ref: Int, parent: Int, sku: String, upc: String, releaseDate: LocalDate): Product
-  createNewProduct(product: ProductInput): Product
-  indexProduct(id: Int): Attribute
-  addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
-  pasLookup(sku: String): Product
-  addToPricingQ(sku: String): Message
-  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
-  completePricingRequest(id: Long): Message
-  completePricingRequestAndEmail(id: Long): Message
-  addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
+  resetPassword(email: String): String
+  saveShipment(shipment: ShipmentInput): Shipment
+  sendOrderLevelEmail(id: ID, template: String): Message
+  sendPaymentSms(id: ID, mobile: String): Message
+  sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
+  sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
+  setCart(secureKey: String, items: [CartItemInput]): Cart
+  setOrderState(id: ID, state: OrderState): Order
+  setShipmentStatus(id: Long, status: ShipmentStatus): Message
+  updateCart(secureKey: String, items: [CartItemInput]): Cart
+  updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
 }
 
 type Order {
@@ -340,6 +387,20 @@ enum OrderState {
   CANCELLED
 }
 
+type OutstandingQueue {
+  id: ID
+  description: String
+  quantity: BigDecimal
+  allocated: BigDecimal
+  price: BigDecimal
+  weight: BigDecimal
+  image: String
+  sku: String
+  orderId: Long
+  orderItemId: Long
+  productId: Long
+}
+
 enum OverrideType {
   COST
   WEIGHT
@@ -349,12 +410,58 @@ enum OverrideType {
   PRICE
 }
 
+input PackageInput {
+  length: BigDecimal
+  width: BigDecimal
+  height: BigDecimal
+  weight: BigDecimal
+  packageType: PackageType
+  shipmentId: Long
+}
+
+enum PackageType {
+  BADALS14X18BAG
+  DHLFLYER
+  DHLFLYERBIG
+  BOX
+  TUBE
+  NONSTANDARD
+}
+
+input PackagingContentInput {
+  shipmentItemId: Long
+  pkgId: Long
+  quantity: BigDecimal
+}
+
 type Payment {
   id: ID
   paymentMethod: String
   orderId: Long
   amount: BigDecimal
   authCode: String
+}
+
+type Pkg {
+  id: ID
+  length: BigDecimal
+  width: BigDecimal
+  height: BigDecimal
+  weight: BigDecimal
+  packageType: PackageType
+  shipmentItems: [ShipmentItem]
+}
+
+type PrepQueue {
+  id: ID
+  description: String
+  quantity: BigDecimal
+  unpacked: BigDecimal
+  image: String
+  shipmentId: Long
+  productId: Long
+  orderItemId: Long
+  orderId: Long
 }
 
 type PresignedUrl {
@@ -560,37 +667,208 @@ type PurchaseQueue {
   attributes: String
 }
 
+type PurchaseShipment {
+  shipmentItemId: Int
+  purchaseItemId: Int
+  quantity: Int
+}
+
+input PurchaseShipmentInput {
+  shipmentItemId: Int
+  purchaseItemId: Int
+  quantity: Int
+}
+
 type Query {
+  categories(type: String!): [Category!]!
+  category(id: Int!): Category!
+  customers: [Customer]
+  ebay(id: String): Product
   getAddresses(customerId: Int): [Address]
+  getProductBySku(sku: String, isParent: Boolean = false): Product
+
+  """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
+  inventory: [Inventory]
 
   """getAddress(addressId: Int): Address"""
   me: Customer
-  customers: [Customer]
   merchantProducts(text: String = "", type: String = "", offset: Int = 0, limit: Int = 10, lang: Int = 1, imported: Boolean = true): MerchantProductResponse
+  merchants: [Merchant]
+  mws(sku: String): Product
+  orderA(id: ID): Order
 
   """getOrders(): [Orders]"""
   orderConfirmation(ref: String, key: String): Order
   orders(limit: Int = 10): [Order]
   ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
-  orderA(id: ID): Order
-  purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+  outstandingQueue(keyword: String): [OutstandingQueue]
+  parentOf(sku: String): String
+  pas(sku: String): Product
+  payments(orderId: ID): [Payment]
+  prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
+  pricingRequests: [PricingRequest]
+  product(slug: String!, cookie: String = ""): Product!
+  productAdmin(id: ID): Product
+  productAny(id: ID): Product
+  products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
   purchase(id: ID): Purchase
   purchaseQueue: [PurchaseQueue]
-  merchants: [Merchant]
-  payments(orderId: ID): [Payment]
-  product(slug: String!, cookie: String = ""): Product!
-  products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
+  purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
   relatedProducts(type: String, slug: String!): [Product!]!
-  categories(type: String!): [Category!]!
-  category(id: Int!): Category!
-  productAny(id: ID): Product
-  productAdmin(id: ID): Product
-  getProductBySku(sku: String, isParent: Boolean = false): Product
-  pricingRequests: [PricingRequest]
-  parentOf(sku: String): String
-  mws(sku: String): Product
-  pas(sku: String): Product
-  ebay(id: String): Product
+  shipQueue: [ShipQueue]
+  shipment(id: ID): Shipment
+  shipmentItemsByTrackingNums(trackingNums: [String]): [ShipmentItem]
+  shipmentItemsCountByTrackingNums(trackingNums: [String]): [ShipmentItemSummary]
+  shipments(status: [ShipmentStatus], type: ShipmentType): [Shipment]
+  shipmentsByRef(ref: String): [Shipment]
+  sortQueue(keyword: String): [SortQueue]
+  track(ref: String): [ShipmentTrackingMap]
+  trackingEvents: [TrackingEvent]
+}
+
+type Shipment {
+  id: ID
+  estimatedShipDate: LocalDate
+  estimatedReadyDate: LocalDate
+  estimatedArrivalDate: LocalDate
+  estimatedShipCost: BigDecimal
+  actualShipCost: BigDecimal
+  latestCancelDate: LocalDate
+  handlingInstructions: String
+  reference: String
+  trackingNum: String
+  trackingLink: String
+  shipmentMethod: String
+  shipmentType: ShipmentType
+  shipmentStatus: ShipmentStatus
+
+  """shipmentItems: [ShipmentItem]"""
+  customerId: Long
+  merchantId: Long
+  pkgs: [Pkg]
+  shipmentItems: [ShipmentItem]
+  customerFirstName: String
+  customerLastName: String
+  merchantName: String
+}
+
+input ShipmentInput {
+  reference: String
+  trackingNum: String
+  shipmentMethod: String
+  shipmentType: ShipmentType
+  shipmentStatus: ShipmentStatus
+  merchantId: Long
+}
+
+type ShipmentItem {
+  id: ID
+  sequence: Int
+  quantity: BigDecimal
+  description: String
+  shipmentId: Long
+  productId: Long
+  image: String
+  purchaseShipments: [PurchaseShipment]
+  from: Long
+}
+
+input ShipmentItemInput {
+  sequence: Int
+  quantity: BigDecimal
+  description: String
+  shipmentId: Long
+  productId: Long
+  image: String
+  purchaseShipments: [PurchaseShipmentInput]
+  from: Long
+}
+
+type ShipmentItemSummary {
+  trackingNum: String
+  total: Long
+  status: String
+  processed: Long
+}
+
+enum ShipmentStatus {
+  PENDING
+  IN_TRANSIT
+  RECEIVED
+  DELIVERED
+  CANCELED
+  FAILED
+  PROCESSING
+  ACCEPTED
+  SCHEDULED
+  CLOSED
+  ARRIVED
+}
+
+type ShipmentTracking {
+  content: [Item]
+  progress: [TrackingEventItem]
+  status: String
+  type: String
+  date: String
+  trackingNum: String
+  carrier: String
+}
+
+type ShipmentTrackingMap {
+  id: Long
+  shipment: ShipmentTracking
+}
+
+enum ShipmentType {
+  PURCHASE
+  CUSTOMER
+  TRANSFER
+  PURCHASERETURN
+  CUSTOMERRETURN
+  TRANSIT
+}
+
+type ShipQueue {
+  id: Long
+  fullName: String
+  reference: String
+  total: BigDecimal
+  done: BigDecimal
+  todo: BigDecimal
+  carrier: String
+}
+
+type SortQueue {
+  id: ID
+  description: String
+  quantity: BigDecimal
+  preallocated: BigDecimal
+  price: BigDecimal
+  cost: BigDecimal
+  weight: BigDecimal
+  image: String
+  url: String
+  sku: String
+  shippingInstructions: String
+  orderId: Long
+  orderItemId: Long
+  merchantId: Long
+  productId: Long
+}
+
+type TrackingEvent {
+  id: Long
+  name: String
+}
+
+type TrackingEventItem {
+  status: String
+  shipmentEventId: Int
+  shipmentEventDescription: String
+  createdDate: String
+  details: String
+  eventDate: LocalDateTime
 }
 
 type Variation {

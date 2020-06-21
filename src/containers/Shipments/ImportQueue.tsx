@@ -157,7 +157,9 @@ export default function ImportQueue() {
          shipmentStatus: 'PROCESSING',
          merchantId: formData.merchant.id,
          shipmentType: formData.shipmentType.value,
-         shipmentMethod: formData.shipmentMethod.value
+         shipmentMethod: formData.shipmentMethod.value,
+         pkgCount: formData.pkgCount,
+         handlingInstructions: formData.handlingInstructions
        },
        shipmentItems: s,
        trackingNums: trackingNumsSplit
@@ -182,6 +184,7 @@ export default function ImportQueue() {
        shipmentStatus: formData.shipmentStatus.value,
        trackingEvent: formData.trackingEvent.id,
        details: formData.details,
+
        trackingNums: trackingNumsSplit,
        eventDate: formData.eventDate
       //description: state.item.description

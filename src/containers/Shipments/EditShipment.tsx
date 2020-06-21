@@ -137,6 +137,7 @@ function reducer(state, action) {
         item: action.payload,
         prepItemDialog: true,
       }
+
     case 'PREP_ITEM_END':
       return {
         ...state,
@@ -170,6 +171,25 @@ function reducer(state, action) {
       return {
         ...state,
         sendDetrackDialog: false,
+      }
+    case 'CLOSE_SHIPMENT_START':
+      return {
+        ...state,
+        item: action.payload,
+        closeShipmentConfirmDialog: true,
+      }
+    case 'CANCEL_SHIPMENT_START':
+      return {
+        ...state,
+        item: action.payload,
+        cancelShipmentConfirmDialog: true,
+      }
+    case 'CLOSE_CANCEL_SHIPMENT_CANCEL':
+      return {
+        ...state,
+        item: action.payload,
+        cancelShipmentConfirmDialog: false,
+        closeShipmentConfirmDialog: false
       }
     default:
       return state;

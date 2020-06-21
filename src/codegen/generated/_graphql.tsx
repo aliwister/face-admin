@@ -13,14 +13,14 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** Built-in java.math.BigDecimal */
-  BigDecimal: any;
   /** Long type */
   Long: any;
-  /** java.time.LocalDate implementation */
   LocalDate: any;
+  /** Built-in java.math.BigDecimal */
+  BigDecimal: any;
   /** java.util.Date implementation */
   Date: any;
+  LocalDateTime: any;
 };
 
 export type AddProductInput = {
@@ -164,6 +164,30 @@ export type Gallery = {
   url: Scalars['String'];
 };
 
+export type Inventory = {
+   __typename?: 'Inventory';
+  productId: Maybe<Scalars['Long']>;
+  title: Maybe<Scalars['String']>;
+  sku: Maybe<Scalars['String']>;
+  received: Maybe<Scalars['BigDecimal']>;
+  issued: Maybe<Scalars['BigDecimal']>;
+  quantityOnHand: Maybe<Scalars['BigDecimal']>;
+  image: Maybe<Scalars['String']>;
+};
+
+export type Item = {
+   __typename?: 'Item';
+  image: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['Long']>;
+};
+
+export type ItemIssuance = {
+   __typename?: 'ItemIssuance';
+  id: Maybe<Scalars['ID']>;
+  shipmentId: Maybe<Scalars['Long']>;
+};
+
 export type LineItem = {
    __typename?: 'LineItem';
   productId: Maybe<Scalars['Int']>;
@@ -188,6 +212,7 @@ export type LineItemInput = {
   subTotal: Maybe<Scalars['Float']>;
   url: Maybe<Scalars['String']>;
 };
+
 
 
 
@@ -264,52 +289,159 @@ export type Meta = {
 
 export type Mutation = {
    __typename?: 'Mutation';
-  updateCart: Maybe<Cart>;
-  setCart: Maybe<Cart>;
-  createCheckoutSession: Maybe<CheckoutSession>;
-  resetPassword: Maybe<Scalars['String']>;
-  createMerchantProduct: Maybe<Message>;
-  approveProduct: Maybe<Product>;
-  getImageUploadUrl: Maybe<PresignedUrl>;
-  importProducts: Maybe<Message>;
-  createOrder: Maybe<Order>;
-  contact: Maybe<Message>;
-  /** createOrderFromCart(cart: CartInput): Order */
-  createPurchase: Maybe<Purchase>;
-  updatePurchase: Maybe<Purchase>;
-  sendPaymentSms: Maybe<Message>;
-  discountOrder: Maybe<Order>;
-  setOrderState: Maybe<Order>;
-  cancelOrder: Maybe<Order>;
-  addPayment: Maybe<Payment>;
-  sendOrderLevelEmail: Maybe<Message>;
-  sendProductLevelEmail: Maybe<Message>;
-  createCart: Maybe<CheckoutCart>;
-  editOrder: Maybe<Order>;
-  /** cancelOrder(id: ID): Order */
-  refundPayment: Maybe<Payment>;
-  createProduct: Maybe<Product>;
-  createNewProduct: Maybe<Product>;
-  indexProduct: Maybe<Attribute>;
+  /**
+   * acceptItem(shipmentId: Long,  pkgId: Long,  purchaseItemId: Long,  productId:
+   * Long,  merchantId: Long,  description: String,  quantity: BigDecimal, 
+   * accepted: BigDecimal,  rejected: BigDecimal): Message
+   */
+  acceptItem: Maybe<Message>;
+  acceptPackage: Maybe<Pkg>;
+  acceptShipment: Maybe<Shipment>;
   addI18n: Maybe<ProductI18n>;
-  pasLookup: Maybe<Product>;
+  addItem: Maybe<Message>;
+  addPayment: Maybe<Payment>;
+  addToElastic: Maybe<Message>;
   addToPricingQ: Maybe<Message>;
-  createOverride: Maybe<Product>;
+  addTrackingEvent: Maybe<Message>;
+  approveProduct: Maybe<Product>;
+  cancelOrder: Maybe<Order>;
   completePricingRequest: Maybe<Message>;
   completePricingRequestAndEmail: Maybe<Message>;
-  addToElastic: Maybe<Message>;
+  contact: Maybe<Message>;
+  createCart: Maybe<CheckoutCart>;
+  createCheckoutSession: Maybe<CheckoutSession>;
+  createMerchantProduct: Maybe<Message>;
+  createNewProduct: Maybe<Product>;
+  createOrder: Maybe<Order>;
+  createOverride: Maybe<Product>;
+  createProduct: Maybe<Product>;
+  /** createOrderFromCart(cart: CartInput): Order */
+  createPurchase: Maybe<Purchase>;
+  /**
+   * printCode(shipmentId: Long): Message
+   * savePackage(pkgId: Long, shipmentItems: [Long]): Pkg
+   * scheduleShipment(id: Long, deliveryDate: LocalDate, comments: String, assignTo: String): Message
+   * unAccept(shipmentAcceptanceId: Long): Message
+   * unIssue(itemIssuanceId: Long) : Message
+   */
+  createShipment: Maybe<Shipment>;
+  discountOrder: Maybe<Order>;
+  editOrder: Maybe<Order>;
+  getImageUploadUrl: Maybe<PresignedUrl>;
+  importProducts: Maybe<Message>;
+  indexProduct: Maybe<Attribute>;
+  issueItem: Maybe<ItemIssuance>;
+  pasLookup: Maybe<Product>;
+  prepItem: Maybe<Message>;
+  processAmazonShipments: Maybe<Message>;
+  /** cancelOrder(id: ID): Order */
+  refundPayment: Maybe<Payment>;
+  resetPassword: Maybe<Scalars['String']>;
+  saveShipment: Maybe<Shipment>;
+  sendOrderLevelEmail: Maybe<Message>;
+  sendPaymentSms: Maybe<Message>;
+  sendProductLevelEmail: Maybe<Message>;
+  sendToDetrack: Maybe<Message>;
+  setCart: Maybe<Cart>;
+  setOrderState: Maybe<Order>;
+  setShipmentStatus: Maybe<Message>;
+  updateCart: Maybe<Cart>;
+  updatePurchase: Maybe<Purchase>;
 };
 
 
-export type MutationUpdateCartArgs = {
-  secureKey: Maybe<Scalars['String']>;
-  items: Maybe<Array<Maybe<CartItemInput>>>;
+export type MutationAcceptItemArgs = {
+  shipmentItemId: Maybe<Scalars['Long']>;
+  packageId: Maybe<Scalars['Long']>;
+  accepted: Maybe<Scalars['BigDecimal']>;
+  rejected: Maybe<Scalars['BigDecimal']>;
 };
 
 
-export type MutationSetCartArgs = {
-  secureKey: Maybe<Scalars['String']>;
-  items: Maybe<Array<Maybe<CartItemInput>>>;
+export type MutationAcceptPackageArgs = {
+  pkg: Maybe<PackageInput>;
+};
+
+
+export type MutationAcceptShipmentArgs = {
+  trackingNum: Maybe<Scalars['String']>;
+};
+
+
+export type MutationAddI18nArgs = {
+  id: Maybe<Scalars['Int']>;
+  i18n: Maybe<ProductI18nInput>;
+};
+
+
+export type MutationAddItemArgs = {
+  shipmentId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  purchaseItemId: Maybe<Scalars['Long']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+};
+
+
+export type MutationAddPaymentArgs = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
+  method: Maybe<Scalars['String']>;
+  authCode: Maybe<Scalars['String']>;
+};
+
+
+export type MutationAddToElasticArgs = {
+  id: Maybe<Scalars['Long']>;
+  sku: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
+  name_ar: Maybe<Scalars['String']>;
+  shops: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type MutationAddToPricingQArgs = {
+  sku: Maybe<Scalars['String']>;
+};
+
+
+export type MutationAddTrackingEventArgs = {
+  trackingNums: Maybe<Array<Maybe<Scalars['String']>>>;
+  shipmentStatus: Maybe<ShipmentStatus>;
+  trackingEvent: Maybe<Scalars['Int']>;
+  eventDate: Maybe<Scalars['LocalDateTime']>;
+  details: Maybe<Scalars['String']>;
+};
+
+
+export type MutationApproveProductArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationCancelOrderArgs = {
+  id: Maybe<Scalars['ID']>;
+  reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCompletePricingRequestArgs = {
+  id: Maybe<Scalars['Long']>;
+};
+
+
+export type MutationCompletePricingRequestAndEmailArgs = {
+  id: Maybe<Scalars['Long']>;
+};
+
+
+export type MutationContactArgs = {
+  id: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationCreateCartArgs = {
+  cart: Maybe<CheckoutCartInput>;
 };
 
 
@@ -319,18 +451,61 @@ export type MutationCreateCheckoutSessionArgs = {
 };
 
 
-export type MutationResetPasswordArgs = {
-  email: Maybe<Scalars['String']>;
-};
-
-
 export type MutationCreateMerchantProductArgs = {
   product: Maybe<AddProductInput>;
 };
 
 
-export type MutationApproveProductArgs = {
+export type MutationCreateNewProductArgs = {
+  product: Maybe<ProductInput>;
+};
+
+
+export type MutationCreateOrderArgs = {
+  id: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationCreateOverrideArgs = {
+  sku: Maybe<Scalars['String']>;
+  type: Maybe<OverrideType>;
+  override: Maybe<Scalars['String']>;
+  active: Maybe<Scalars['Boolean']>;
+  lazy: Maybe<Scalars['Boolean']>;
+  merchantId: Maybe<Scalars['Int']>;
+};
+
+
+export type MutationCreateProductArgs = {
+  ref: Maybe<Scalars['Int']>;
+  parent: Maybe<Scalars['Int']>;
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  releaseDate: Maybe<Scalars['LocalDate']>;
+};
+
+
+export type MutationCreatePurchaseArgs = {
+  dto: Maybe<PurchaseInput>;
+};
+
+
+export type MutationCreateShipmentArgs = {
+  shipment: Maybe<ShipmentInput>;
+  shipmentItems: Maybe<Array<Maybe<ShipmentItemInput>>>;
+  trackingNums?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type MutationDiscountOrderArgs = {
   id: Maybe<Scalars['ID']>;
+};
+
+
+export type MutationEditOrderArgs = {
+  id: Maybe<Scalars['ID']>;
+  orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
+  reason: Maybe<Scalars['String']>;
 };
 
 
@@ -347,80 +522,26 @@ export type MutationImportProductsArgs = {
 };
 
 
-export type MutationCreateOrderArgs = {
+export type MutationIndexProductArgs = {
   id: Maybe<Scalars['Int']>;
 };
 
 
-export type MutationContactArgs = {
-  id: Maybe<Scalars['Int']>;
+export type MutationIssueItemArgs = {
+  orderItemId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
 };
 
 
-export type MutationCreatePurchaseArgs = {
-  dto: Maybe<PurchaseInput>;
+export type MutationPasLookupArgs = {
+  sku: Maybe<Scalars['String']>;
 };
 
 
-export type MutationUpdatePurchaseArgs = {
-  dto: Maybe<PurchaseInput>;
-  items: Maybe<Array<Maybe<PurchaseItemInput>>>;
-};
-
-
-export type MutationSendPaymentSmsArgs = {
-  id: Maybe<Scalars['ID']>;
-  mobile: Maybe<Scalars['String']>;
-};
-
-
-export type MutationDiscountOrderArgs = {
-  id: Maybe<Scalars['ID']>;
-};
-
-
-export type MutationSetOrderStateArgs = {
-  id: Maybe<Scalars['ID']>;
-  state: Maybe<OrderState>;
-};
-
-
-export type MutationCancelOrderArgs = {
-  id: Maybe<Scalars['ID']>;
-  reason: Maybe<Scalars['String']>;
-};
-
-
-export type MutationAddPaymentArgs = {
-  id: Maybe<Scalars['ID']>;
-  amount: Maybe<Scalars['BigDecimal']>;
-  method: Maybe<Scalars['String']>;
-  authCode: Maybe<Scalars['String']>;
-};
-
-
-export type MutationSendOrderLevelEmailArgs = {
-  id: Maybe<Scalars['ID']>;
-  template: Maybe<Scalars['String']>;
-};
-
-
-export type MutationSendProductLevelEmailArgs = {
-  orderId: Maybe<Scalars['ID']>;
-  orderItems: Maybe<Array<Maybe<Scalars['Long']>>>;
-  template: Maybe<Scalars['String']>;
-};
-
-
-export type MutationCreateCartArgs = {
-  cart: Maybe<CheckoutCartInput>;
-};
-
-
-export type MutationEditOrderArgs = {
-  id: Maybe<Scalars['ID']>;
-  orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
-  reason: Maybe<Scalars['String']>;
+export type MutationPrepItemArgs = {
+  dto: Maybe<PackagingContentInput>;
 };
 
 
@@ -436,67 +557,73 @@ export type MutationRefundPaymentArgs = {
 };
 
 
-export type MutationCreateProductArgs = {
-  ref: Maybe<Scalars['Int']>;
-  parent: Maybe<Scalars['Int']>;
-  sku: Maybe<Scalars['String']>;
-  upc: Maybe<Scalars['String']>;
-  releaseDate: Maybe<Scalars['LocalDate']>;
+export type MutationResetPasswordArgs = {
+  email: Maybe<Scalars['String']>;
 };
 
 
-export type MutationCreateNewProductArgs = {
-  product: Maybe<ProductInput>;
+export type MutationSaveShipmentArgs = {
+  shipment: Maybe<ShipmentInput>;
 };
 
 
-export type MutationIndexProductArgs = {
-  id: Maybe<Scalars['Int']>;
+export type MutationSendOrderLevelEmailArgs = {
+  id: Maybe<Scalars['ID']>;
+  template: Maybe<Scalars['String']>;
 };
 
 
-export type MutationAddI18nArgs = {
-  id: Maybe<Scalars['Int']>;
-  i18n: Maybe<ProductI18nInput>;
+export type MutationSendPaymentSmsArgs = {
+  id: Maybe<Scalars['ID']>;
+  mobile: Maybe<Scalars['String']>;
 };
 
 
-export type MutationPasLookupArgs = {
-  sku: Maybe<Scalars['String']>;
+export type MutationSendProductLevelEmailArgs = {
+  orderId: Maybe<Scalars['ID']>;
+  orderItems: Maybe<Array<Maybe<Scalars['Long']>>>;
+  template: Maybe<Scalars['String']>;
 };
 
 
-export type MutationAddToPricingQArgs = {
-  sku: Maybe<Scalars['String']>;
-};
-
-
-export type MutationCreateOverrideArgs = {
-  sku: Maybe<Scalars['String']>;
-  type: Maybe<OverrideType>;
-  override: Maybe<Scalars['String']>;
-  active: Maybe<Scalars['Boolean']>;
-  lazy: Maybe<Scalars['Boolean']>;
-  merchantId: Maybe<Scalars['Int']>;
-};
-
-
-export type MutationCompletePricingRequestArgs = {
-  id: Maybe<Scalars['Long']>;
-};
-
-
-export type MutationCompletePricingRequestAndEmailArgs = {
-  id: Maybe<Scalars['Long']>;
-};
-
-
-export type MutationAddToElasticArgs = {
-  id: Maybe<Scalars['Long']>;
-  sku: Maybe<Scalars['String']>;
+export type MutationSendToDetrackArgs = {
+  shipmentId: Maybe<Scalars['Long']>;
+  orderId: Maybe<Scalars['Long']>;
   name: Maybe<Scalars['String']>;
-  name_ar: Maybe<Scalars['String']>;
-  shops: Maybe<Array<Maybe<Scalars['String']>>>;
+  instructions: Maybe<Scalars['String']>;
+  date: Maybe<Scalars['String']>;
+  time: Maybe<Scalars['String']>;
+  assignTo: Maybe<Scalars['String']>;
+};
+
+
+export type MutationSetCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
+export type MutationSetOrderStateArgs = {
+  id: Maybe<Scalars['ID']>;
+  state: Maybe<OrderState>;
+};
+
+
+export type MutationSetShipmentStatusArgs = {
+  id: Maybe<Scalars['Long']>;
+  status: Maybe<ShipmentStatus>;
+};
+
+
+export type MutationUpdateCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
+export type MutationUpdatePurchaseArgs = {
+  dto: Maybe<PurchaseInput>;
+  items: Maybe<Array<Maybe<PurchaseItemInput>>>;
 };
 
 export type Order = {
@@ -571,6 +698,21 @@ export enum OrderState {
   Cancelled = 'CANCELLED'
 }
 
+export type OutstandingQueue = {
+   __typename?: 'OutstandingQueue';
+  id: Maybe<Scalars['ID']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  allocated: Maybe<Scalars['BigDecimal']>;
+  price: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  image: Maybe<Scalars['String']>;
+  sku: Maybe<Scalars['String']>;
+  orderId: Maybe<Scalars['Long']>;
+  orderItemId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+};
+
 export enum OverrideType {
   Cost = 'COST',
   Weight = 'WEIGHT',
@@ -580,6 +722,30 @@ export enum OverrideType {
   Price = 'PRICE'
 }
 
+export type PackageInput = {
+  length: Maybe<Scalars['BigDecimal']>;
+  width: Maybe<Scalars['BigDecimal']>;
+  height: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  packageType: Maybe<PackageType>;
+  shipmentId: Maybe<Scalars['Long']>;
+};
+
+export enum PackageType {
+  Badals14X18Bag = 'BADALS14X18BAG',
+  Dhlflyer = 'DHLFLYER',
+  Dhlflyerbig = 'DHLFLYERBIG',
+  Box = 'BOX',
+  Tube = 'TUBE',
+  Nonstandard = 'NONSTANDARD'
+}
+
+export type PackagingContentInput = {
+  shipmentItemId: Maybe<Scalars['Long']>;
+  pkgId: Maybe<Scalars['Long']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+};
+
 export type Payment = {
    __typename?: 'Payment';
   id: Maybe<Scalars['ID']>;
@@ -587,6 +753,30 @@ export type Payment = {
   orderId: Maybe<Scalars['Long']>;
   amount: Maybe<Scalars['BigDecimal']>;
   authCode: Maybe<Scalars['String']>;
+};
+
+export type Pkg = {
+   __typename?: 'Pkg';
+  id: Maybe<Scalars['ID']>;
+  length: Maybe<Scalars['BigDecimal']>;
+  width: Maybe<Scalars['BigDecimal']>;
+  height: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  packageType: Maybe<PackageType>;
+  shipmentItems: Maybe<Array<Maybe<ShipmentItem>>>;
+};
+
+export type PrepQueue = {
+   __typename?: 'PrepQueue';
+  id: Maybe<Scalars['ID']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  unpacked: Maybe<Scalars['BigDecimal']>;
+  image: Maybe<Scalars['String']>;
+  shipmentId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  orderItemId: Maybe<Scalars['Long']>;
+  orderId: Maybe<Scalars['Long']>;
 };
 
 export type PresignedUrl = {
@@ -796,41 +986,88 @@ export type PurchaseQueue = {
   attributes: Maybe<Scalars['String']>;
 };
 
+export type PurchaseShipment = {
+   __typename?: 'PurchaseShipment';
+  shipmentItemId: Maybe<Scalars['Int']>;
+  purchaseItemId: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['Int']>;
+};
+
+export type PurchaseShipmentInput = {
+  shipmentItemId: Maybe<Scalars['Int']>;
+  purchaseItemId: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['Int']>;
+};
+
 export type Query = {
    __typename?: 'Query';
+  categories: Array<Category>;
+  category: Category;
+  customers: Maybe<Array<Maybe<Customer>>>;
+  ebay: Maybe<Product>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
+  getProductBySku: Maybe<Product>;
+  /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
+  inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
   me: Maybe<Customer>;
-  customers: Maybe<Array<Maybe<Customer>>>;
   merchantProducts: Maybe<MerchantProductResponse>;
+  merchants: Maybe<Array<Maybe<Merchant>>>;
+  mws: Maybe<Product>;
+  orderA: Maybe<Order>;
   /** getOrders(): [Orders] */
   orderConfirmation: Maybe<Order>;
   orders: Maybe<Array<Maybe<Order>>>;
   ordersA: Maybe<OrderResponse>;
-  orderA: Maybe<Order>;
-  purchases: Maybe<Array<Maybe<Purchase>>>;
+  outstandingQueue: Maybe<Array<Maybe<OutstandingQueue>>>;
+  parentOf: Maybe<Scalars['String']>;
+  pas: Maybe<Product>;
+  payments: Maybe<Array<Maybe<Payment>>>;
+  prepQueue: Maybe<Array<Maybe<PrepQueue>>>;
+  pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
+  product: Product;
+  productAdmin: Maybe<Product>;
+  productAny: Maybe<Product>;
+  products: ProductResponse;
   purchase: Maybe<Purchase>;
   purchaseQueue: Maybe<Array<Maybe<PurchaseQueue>>>;
-  merchants: Maybe<Array<Maybe<Merchant>>>;
-  payments: Maybe<Array<Maybe<Payment>>>;
-  product: Product;
-  products: ProductResponse;
+  purchases: Maybe<Array<Maybe<Purchase>>>;
   relatedProducts: Array<Product>;
-  categories: Array<Category>;
-  category: Category;
-  productAny: Maybe<Product>;
-  productAdmin: Maybe<Product>;
-  getProductBySku: Maybe<Product>;
-  pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
-  parentOf: Maybe<Scalars['String']>;
-  mws: Maybe<Product>;
-  pas: Maybe<Product>;
-  ebay: Maybe<Product>;
+  shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
+  shipment: Maybe<Shipment>;
+  shipmentItemsByTrackingNums: Maybe<Array<Maybe<ShipmentItem>>>;
+  shipmentItemsCountByTrackingNums: Maybe<Array<Maybe<ShipmentItemSummary>>>;
+  shipments: Maybe<Array<Maybe<Shipment>>>;
+  shipmentsByRef: Maybe<Array<Maybe<Shipment>>>;
+  sortQueue: Maybe<Array<Maybe<SortQueue>>>;
+  track: Maybe<Array<Maybe<ShipmentTrackingMap>>>;
+  trackingEvents: Maybe<Array<Maybe<TrackingEvent>>>;
+};
+
+
+export type QueryCategoriesArgs = {
+  type: Scalars['String'];
+};
+
+
+export type QueryCategoryArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryEbayArgs = {
+  id: Maybe<Scalars['String']>;
 };
 
 
 export type QueryGetAddressesArgs = {
   customerId: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetProductBySkuArgs = {
+  sku: Maybe<Scalars['String']>;
+  isParent?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -841,6 +1078,16 @@ export type QueryMerchantProductsArgs = {
   limit?: Maybe<Scalars['Int']>;
   lang?: Maybe<Scalars['Int']>;
   imported?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryMwsArgs = {
+  sku: Maybe<Scalars['String']>;
+};
+
+
+export type QueryOrderAArgs = {
+  id: Maybe<Scalars['ID']>;
 };
 
 
@@ -863,20 +1110,18 @@ export type QueryOrdersAArgs = {
 };
 
 
-export type QueryOrderAArgs = {
-  id: Maybe<Scalars['ID']>;
+export type QueryOutstandingQueueArgs = {
+  keyword: Maybe<Scalars['String']>;
 };
 
 
-export type QueryPurchasesArgs = {
-  state: Maybe<Array<Maybe<OrderState>>>;
-  limit: Maybe<Scalars['Int']>;
-  searchText: Maybe<Scalars['String']>;
+export type QueryParentOfArgs = {
+  sku: Maybe<Scalars['String']>;
 };
 
 
-export type QueryPurchaseArgs = {
-  id: Maybe<Scalars['ID']>;
+export type QueryPasArgs = {
+  sku: Maybe<Scalars['String']>;
 };
 
 
@@ -885,9 +1130,25 @@ export type QueryPaymentsArgs = {
 };
 
 
+export type QueryPrepQueueArgs = {
+  shipmentId: Maybe<Scalars['Long']>;
+  keyword?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryProductArgs = {
   slug: Scalars['String'];
   cookie?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryProductAdminArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryProductAnyArgs = {
+  id: Maybe<Scalars['ID']>;
 };
 
 
@@ -901,55 +1162,210 @@ export type QueryProductsArgs = {
 };
 
 
+export type QueryPurchaseArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryPurchasesArgs = {
+  state: Maybe<Array<Maybe<OrderState>>>;
+  limit: Maybe<Scalars['Int']>;
+  searchText: Maybe<Scalars['String']>;
+};
+
+
 export type QueryRelatedProductsArgs = {
   type: Maybe<Scalars['String']>;
   slug: Scalars['String'];
 };
 
 
-export type QueryCategoriesArgs = {
-  type: Scalars['String'];
-};
-
-
-export type QueryCategoryArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type QueryProductAnyArgs = {
+export type QueryShipmentArgs = {
   id: Maybe<Scalars['ID']>;
 };
 
 
-export type QueryProductAdminArgs = {
+export type QueryShipmentItemsByTrackingNumsArgs = {
+  trackingNums: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type QueryShipmentItemsCountByTrackingNumsArgs = {
+  trackingNums: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type QueryShipmentsArgs = {
+  status: Maybe<Array<Maybe<ShipmentStatus>>>;
+  type: Maybe<ShipmentType>;
+};
+
+
+export type QueryShipmentsByRefArgs = {
+  ref: Maybe<Scalars['String']>;
+};
+
+
+export type QuerySortQueueArgs = {
+  keyword: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTrackArgs = {
+  ref: Maybe<Scalars['String']>;
+};
+
+export type Shipment = {
+   __typename?: 'Shipment';
   id: Maybe<Scalars['ID']>;
+  estimatedShipDate: Maybe<Scalars['LocalDate']>;
+  estimatedReadyDate: Maybe<Scalars['LocalDate']>;
+  estimatedArrivalDate: Maybe<Scalars['LocalDate']>;
+  estimatedShipCost: Maybe<Scalars['BigDecimal']>;
+  actualShipCost: Maybe<Scalars['BigDecimal']>;
+  latestCancelDate: Maybe<Scalars['LocalDate']>;
+  handlingInstructions: Maybe<Scalars['String']>;
+  reference: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  trackingLink: Maybe<Scalars['String']>;
+  shipmentMethod: Maybe<Scalars['String']>;
+  shipmentType: Maybe<ShipmentType>;
+  shipmentStatus: Maybe<ShipmentStatus>;
+  /** shipmentItems: [ShipmentItem] */
+  customerId: Maybe<Scalars['Long']>;
+  merchantId: Maybe<Scalars['Long']>;
+  pkgs: Maybe<Array<Maybe<Pkg>>>;
+  shipmentItems: Maybe<Array<Maybe<ShipmentItem>>>;
+  customerFirstName: Maybe<Scalars['String']>;
+  customerLastName: Maybe<Scalars['String']>;
+  merchantName: Maybe<Scalars['String']>;
 };
 
+export type ShipmentInput = {
+  reference: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  shipmentMethod: Maybe<Scalars['String']>;
+  shipmentType: Maybe<ShipmentType>;
+  shipmentStatus: Maybe<ShipmentStatus>;
+  merchantId: Maybe<Scalars['Long']>;
+};
 
-export type QueryGetProductBySkuArgs = {
+export type ShipmentItem = {
+   __typename?: 'ShipmentItem';
+  id: Maybe<Scalars['ID']>;
+  sequence: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  description: Maybe<Scalars['String']>;
+  shipmentId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  image: Maybe<Scalars['String']>;
+  purchaseShipments: Maybe<Array<Maybe<PurchaseShipment>>>;
+  from: Maybe<Scalars['Long']>;
+};
+
+export type ShipmentItemInput = {
+  sequence: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  description: Maybe<Scalars['String']>;
+  shipmentId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  image: Maybe<Scalars['String']>;
+  purchaseShipments: Maybe<Array<Maybe<PurchaseShipmentInput>>>;
+  from: Maybe<Scalars['Long']>;
+};
+
+export type ShipmentItemSummary = {
+   __typename?: 'ShipmentItemSummary';
+  trackingNum: Maybe<Scalars['String']>;
+  total: Maybe<Scalars['Long']>;
+  status: Maybe<Scalars['String']>;
+  processed: Maybe<Scalars['Long']>;
+};
+
+export enum ShipmentStatus {
+  Pending = 'PENDING',
+  InTransit = 'IN_TRANSIT',
+  Received = 'RECEIVED',
+  Delivered = 'DELIVERED',
+  Canceled = 'CANCELED',
+  Failed = 'FAILED',
+  Processing = 'PROCESSING',
+  Accepted = 'ACCEPTED',
+  Scheduled = 'SCHEDULED',
+  Closed = 'CLOSED',
+  Arrived = 'ARRIVED'
+}
+
+export type ShipmentTracking = {
+   __typename?: 'ShipmentTracking';
+  content: Maybe<Array<Maybe<Item>>>;
+  progress: Maybe<Array<Maybe<TrackingEventItem>>>;
+  status: Maybe<Scalars['String']>;
+  type: Maybe<Scalars['String']>;
+  date: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  carrier: Maybe<Scalars['String']>;
+};
+
+export type ShipmentTrackingMap = {
+   __typename?: 'ShipmentTrackingMap';
+  id: Maybe<Scalars['Long']>;
+  shipment: Maybe<ShipmentTracking>;
+};
+
+export enum ShipmentType {
+  Purchase = 'PURCHASE',
+  Customer = 'CUSTOMER',
+  Transfer = 'TRANSFER',
+  Purchasereturn = 'PURCHASERETURN',
+  Customerreturn = 'CUSTOMERRETURN',
+  Transit = 'TRANSIT'
+}
+
+export type ShipQueue = {
+   __typename?: 'ShipQueue';
+  id: Maybe<Scalars['Long']>;
+  fullName: Maybe<Scalars['String']>;
+  reference: Maybe<Scalars['String']>;
+  total: Maybe<Scalars['BigDecimal']>;
+  done: Maybe<Scalars['BigDecimal']>;
+  todo: Maybe<Scalars['BigDecimal']>;
+  carrier: Maybe<Scalars['String']>;
+};
+
+export type SortQueue = {
+   __typename?: 'SortQueue';
+  id: Maybe<Scalars['ID']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  preallocated: Maybe<Scalars['BigDecimal']>;
+  price: Maybe<Scalars['BigDecimal']>;
+  cost: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  image: Maybe<Scalars['String']>;
+  url: Maybe<Scalars['String']>;
   sku: Maybe<Scalars['String']>;
-  isParent?: Maybe<Scalars['Boolean']>;
+  shippingInstructions: Maybe<Scalars['String']>;
+  orderId: Maybe<Scalars['Long']>;
+  orderItemId: Maybe<Scalars['Long']>;
+  merchantId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
 };
 
-
-export type QueryParentOfArgs = {
-  sku: Maybe<Scalars['String']>;
+export type TrackingEvent = {
+   __typename?: 'TrackingEvent';
+  id: Maybe<Scalars['Long']>;
+  name: Maybe<Scalars['String']>;
 };
 
-
-export type QueryMwsArgs = {
-  sku: Maybe<Scalars['String']>;
-};
-
-
-export type QueryPasArgs = {
-  sku: Maybe<Scalars['String']>;
-};
-
-
-export type QueryEbayArgs = {
-  id: Maybe<Scalars['String']>;
+export type TrackingEventItem = {
+   __typename?: 'TrackingEventItem';
+  status: Maybe<Scalars['String']>;
+  shipmentEventId: Maybe<Scalars['Int']>;
+  shipmentEventDescription: Maybe<Scalars['String']>;
+  createdDate: Maybe<Scalars['String']>;
+  details: Maybe<Scalars['String']>;
+  eventDate: Maybe<Scalars['LocalDateTime']>;
 };
 
 export type Variation = {
@@ -964,6 +1380,17 @@ export type VariationOption = {
   name: Maybe<Scalars['String']>;
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
+
+export type MerchantsQueryVariables = {};
+
+
+export type MerchantsQuery = (
+  { __typename?: 'Query' }
+  & { merchants: Maybe<Array<Maybe<(
+    { __typename?: 'Merchant' }
+    & Pick<Merchant, 'id' | 'name'>
+  )>>> }
+);
 
 export type MerchantProductsQueryVariables = {
   type: Maybe<Scalars['String']>;
@@ -1037,7 +1464,73 @@ export type PurchaseQuery = (
   )> }
 );
 
+export type SetShipmentStatusMutationVariables = {
+  id: Maybe<Scalars['Long']>;
+  status: Maybe<ShipmentStatus>;
+};
 
+
+export type SetShipmentStatusMutation = (
+  { __typename?: 'Mutation' }
+  & { setShipmentStatus: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+
+export const MerchantsDocument = gql`
+    query merchants {
+  merchants {
+    id
+    name
+  }
+}
+    `;
+export type MerchantsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<MerchantsQuery, MerchantsQueryVariables>, 'query'>;
+
+    export const MerchantsComponent = (props: MerchantsComponentProps) => (
+      <ApolloReactComponents.Query<MerchantsQuery, MerchantsQueryVariables> query={MerchantsDocument} {...props} />
+    );
+    
+export type MerchantsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<MerchantsQuery, MerchantsQueryVariables>
+    } & TChildProps;
+export function withMerchants<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  MerchantsQuery,
+  MerchantsQueryVariables,
+  MerchantsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, MerchantsQuery, MerchantsQueryVariables, MerchantsProps<TChildProps, TDataName>>(MerchantsDocument, {
+      alias: 'merchants',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useMerchantsQuery__
+ *
+ * To run a query within a React component, call `useMerchantsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMerchantsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMerchantsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useMerchantsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<MerchantsQuery, MerchantsQueryVariables>) {
+        return ApolloReactHooks.useQuery<MerchantsQuery, MerchantsQueryVariables>(MerchantsDocument, baseOptions);
+      }
+export function useMerchantsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<MerchantsQuery, MerchantsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<MerchantsQuery, MerchantsQueryVariables>(MerchantsDocument, baseOptions);
+        }
+export type MerchantsQueryHookResult = ReturnType<typeof useMerchantsQuery>;
+export type MerchantsLazyQueryHookResult = ReturnType<typeof useMerchantsLazyQuery>;
+export type MerchantsQueryResult = ApolloReactCommon.QueryResult<MerchantsQuery, MerchantsQueryVariables>;
 export const MerchantProductsDocument = gql`
     query merchantProducts($type: String, $limit: Int = 12, $text: String, $offset: Int = 0, $lang: Int, $imported: Boolean = true) {
   merchantProducts(type: $type, limit: $limit, text: $text, offset: $offset, lang: $lang, imported: $imported) {
@@ -1298,3 +1791,55 @@ export function usePurchaseLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHoo
 export type PurchaseQueryHookResult = ReturnType<typeof usePurchaseQuery>;
 export type PurchaseLazyQueryHookResult = ReturnType<typeof usePurchaseLazyQuery>;
 export type PurchaseQueryResult = ApolloReactCommon.QueryResult<PurchaseQuery, PurchaseQueryVariables>;
+export const SetShipmentStatusDocument = gql`
+    mutation setShipmentStatus($id: Long, $status: ShipmentStatus) {
+  setShipmentStatus(id: $id, status: $status) {
+    value
+  }
+}
+    `;
+export type SetShipmentStatusMutationFn = ApolloReactCommon.MutationFunction<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
+export type SetShipmentStatusComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>, 'mutation'>;
+
+    export const SetShipmentStatusComponent = (props: SetShipmentStatusComponentProps) => (
+      <ApolloReactComponents.Mutation<SetShipmentStatusMutation, SetShipmentStatusMutationVariables> mutation={SetShipmentStatusDocument} {...props} />
+    );
+    
+export type SetShipmentStatusProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>
+    } & TChildProps;
+export function withSetShipmentStatus<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SetShipmentStatusMutation,
+  SetShipmentStatusMutationVariables,
+  SetShipmentStatusProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SetShipmentStatusMutation, SetShipmentStatusMutationVariables, SetShipmentStatusProps<TChildProps, TDataName>>(SetShipmentStatusDocument, {
+      alias: 'setShipmentStatus',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSetShipmentStatusMutation__
+ *
+ * To run a mutation, you first call `useSetShipmentStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetShipmentStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setShipmentStatusMutation, { data, loading, error }] = useSetShipmentStatusMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useSetShipmentStatusMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>(SetShipmentStatusDocument, baseOptions);
+      }
+export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipmentStatusMutation>;
+export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
+export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;

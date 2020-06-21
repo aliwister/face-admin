@@ -1,0 +1,6 @@
+query merchants {
+  merchants {
+    id
+    name
+  }
+}
