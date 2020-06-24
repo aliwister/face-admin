@@ -32,7 +32,7 @@ export const AddItemDialog = ({item, open, onClose, onSubmit}) => {
           </DialogContentText>
           <TextField fullWidth type="number" placeholder="Product ID" name="productId" inputRef={register({required: true})}  />
         {/*  <TextField fullWidth type="number" placeholder="Merchant ID" name="merchantId" inputRef={register({required: true})} />*/}
-          <TextField fullWidth type="number" placeholder="Quantity" name="quantity" inputRef={register({required: true})} />
+          <TextField fullWidth type="number" inputProps={{step: 0.1}}  placeholder="Quantity" name="quantity" inputRef={register({required: true})} />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

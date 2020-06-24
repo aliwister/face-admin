@@ -103,7 +103,7 @@ export default function EditPackage({state, dispatch}) {
       //pkgId: state.pkg.id,
       purchaseItemId: state.item.id,
       description: state.item.description,
-      quantity: state.item.quantity
+      quantity: formData.quantity
     }
     const {
       data: { addItem },

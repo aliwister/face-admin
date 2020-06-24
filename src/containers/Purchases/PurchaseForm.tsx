@@ -25,13 +25,7 @@ import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import {Link} from "react-router-dom";
 import NewPurchaseDialog from "./components/NewPurchaseDialog";
-const CREATE_PURCHASE = gql`
-  mutation createPurchase($dto: PurchaseInput) {
-    createPurchase(dto: $dto) {
-      id
-    }
-  }
-`;
+
 const UPDATE_PURCHASE = gql`
   mutation updatePurchase($dto: PurchaseInput, $items: [PurchaseItemInput]) {
     updatePurchase(dto: $dto, items: $items) {
@@ -60,21 +54,6 @@ query merchants {
   merchants {
     id
     name
-  }
-}
-`;
-const PURCHASE = gql`
-query purchase($id: Long) {
-  purchase(id: $id) {
-    id
-    items {
-      id
-      sequence
-      price
-      quantity
-      description
-      orderItemId
-    }
   }
 }
 `;
@@ -201,7 +180,7 @@ export default function PurchaseForm({purchase, purchaseRefetch}) {
   // console.log(merchants);
   useEffect(()=>{
     setSubtotal(Math.round(100*calcSubtotal())/100);
-    setTotal(calcSubtotal() + Number(state.deliveryTotal) + Number(state.taxesTotal) - Number(state.discountTotal));
+    setTotal(calcSubtotal() + Math.round( 100*(Number(state.deliveryTotal) + Number(state.taxesTotal) - Number(state.discountTotal))/100));
   },[state]);
 
   const alert = useAlert();
@@ -238,8 +217,9 @@ export default function PurchaseForm({purchase, purchaseRefetch}) {
       alert.success("Purchase saved successfully");
       //setPO(createPurchase.id);
       setCreate(true);
-      purchaseRefetch({slug: updatePurchase.id});
-      dispatch(updatePurchase);
+
+      purchaseRefetch({networkOnly: true});
+
       //setItems(updatePurchase.items);
     }
   }
@@ -347,6 +327,8 @@ export default function PurchaseForm({purchase, purchaseRefetch}) {
               {state.purchaseItems && state.purchaseItems.map(q => (
                   <TableRow key={q.orderItemId}>
                     <TableCell align="right">{q.sequence}</TableCell>
+                    <TableCell align="right">{q.id}</TableCell>
+
                     <TableCell component="th" scope="row">
                       <TextField  size="small" style={{width:'600px'}} variant="filled" className={classes.titleField} placeholder="Description" name="Description" value={q.description} onChange={(e) => handleChangeDescription(q, e.target.value)}/>
                     </TableCell>

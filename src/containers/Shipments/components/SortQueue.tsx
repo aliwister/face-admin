@@ -3,6 +3,7 @@ import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, Tab
 import Image from "../../../components/Image/Image";
 import SaveIcon from "@material-ui/icons/Save";
 import React from "react";
+import {Link} from "react-router-dom";
 
 export const SortQueue = ({data, classes, handleProcess }) => {
   if(!data)
@@ -26,7 +27,7 @@ export const SortQueue = ({data, classes, handleProcess }) => {
           <TableBody>
             {data.sortQueue.map(q => (
                 <TableRow key={q.id}>
-                    <TableCell align="right">{q.id}</TableCell>
+                    <TableCell align="right"><Link to={`/purchase-details/${q.po}`}>{q.po}</Link></TableCell>
                     <TableCell align="right"><Image url={q.image} className="product-image"
                                                     style={{maxWidth: '70px'}}/></TableCell>
                     {q.sku ?
