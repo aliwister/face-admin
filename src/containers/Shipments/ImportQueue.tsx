@@ -80,6 +80,7 @@ query shipmentItemsByTrackingNums($trackingNums: [String]) {
       quantity
     }
     productId
+    price
   }
 }
 `;
@@ -332,6 +333,7 @@ export default function ImportQueue() {
               <TableCell >
                 Product
               </TableCell>
+              <TableCell align="right">Price</TableCell>
               <TableCell align="right">PId</TableCell>
             </TableRow>
           </TableHead>
@@ -346,7 +348,7 @@ export default function ImportQueue() {
                     value={item.id}
                   />
                 </TableCell>
-                <TableCell>{item.id}</TableCell>
+                <TableCell><img src={item.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
                 <TableCell>{item.sequence}</TableCell>
                 <TableCell>{item.description}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
@@ -356,6 +358,7 @@ export default function ImportQueue() {
                   </a>:
                   <span>{item.productId}</span>
                 }</TableCell>
+                <TableCell>{item.price}</TableCell>
                 <TableCell>
                   {item.purchaseShipments && item.purchaseShipments.map((p) => (
                     <div> {p.purchaseItemId} </div>

@@ -4,6 +4,7 @@ export const SHIPMENT_METHODS = [
   {value: 'DHL', label: 'DHL'},
   {value: 'Fedex', label: 'Fedex'},
   {value: 'UPS', label: 'UPS'},
+  {value: 'USPS', label: 'USPS'},
   {value: 'Falcon', label: 'Falcon'},
   {value: 'Aramex', label: 'Aramex'},
   {value: 'Oman Post', label: 'Oman Post'},
