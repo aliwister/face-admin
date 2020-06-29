@@ -33,6 +33,21 @@ import useTheme from "@material-ui/core/styles/useTheme";
 import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {StatusMultiSelect} from "./components/StatusMultiSelect";
 import {AcceptShipmentDialog} from "./components/AcceptShipmentDialog";
+import {IncomingShipments} from "./queues/IncomingShipments";
+
+const INCOMING_SHIPMENT_QUEUE = gql`
+  query incomingShipmentQueue {
+    incomingShipmentQueue {
+      id
+      createdDate
+      trackingNum
+      shipmentMethod
+      pkgCount
+      arrivedPkgs
+      status
+    }
+  }
+`;
 
 const SHIPMENTS = gql`
   query shipments($status: [ShipmentStatus], $type: ShipmentType) {
@@ -122,12 +137,20 @@ export default function Shipments() {
   const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{context: { clientName: "adminLink" }});
 
 
-  const { data, error, refetch } = useQuery(SHIPMENTS, {
+/*  const { data, error, refetch } = useQuery(SHIPMENTS, {
     variables: {
       status: status,
       type: 'CUSTOMER'
     },
     fetchPolicy: "network-only",
+    context: { clientName: "adminLink" }
+  });  */
+
+  const { data, error, refetch } = useQuery(INCOMING_SHIPMENT_QUEUE, {
+/*    variables: {
+      status: status,
+      type: 'CUSTOMER'
+    },*/
     context: { clientName: "adminLink" }
   });
 
@@ -293,52 +316,7 @@ export default function Shipments() {
           </AppBar>
 
           <TableContainer component={Paper}>
-            <Table className={classes.table} size="small" aria-label="a dense table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>#</TableCell>
-                  <TableCell>ID</TableCell>
-                  <TableCell align="left">Name</TableCell>
-                  <TableCell align="left">Type</TableCell>
-                  <TableCell align="left">Status</TableCell>
-                  <TableCell align="center">Ref</TableCell>
-                  <TableCell align="center">To</TableCell>
-                  <TableCell align="center">Shipment Method</TableCell>
-                  <TableCell align="center">Tracking Num</TableCell>
-                </TableRow>
-              </TableHead>
-              {data && data.shipments.length && (
-                <TableBody>
-                  {data.shipments.map(row => (
-                    <TableRow key={row.orderId}>
-                      <TableCell align="right">
-                        <Checkbox
-                          name={row.id}
-                          checked={checkedId.includes(row.id)}
-                          onChange={handleCheckbox}
-                          overrides={{
-                            Checkmark: {
-                              style: {
-                                borderWidth: '2px',
-                                borderRadius: '4px',
-                              },
-                            },
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell component="th" scope="row"><Link to={`shipment-details/${row.id}`}>{row.id}</Link></TableCell>
-                      <TableCell align="left">{row.customerFirstName} {row.customerLastName}</TableCell>
-                      <TableCell align="left">{row.shipmentType}</TableCell>
-                      <TableCell align="right">{row.shipmentStatus}</TableCell>
-                      <TableCell align="center">{row.reference}</TableCell>
-                      <TableCell align="center">{row.city}</TableCell>
-                      <TableCell align="center">{row.shipmentMethod}</TableCell>
-                      <TableCell align="center">{row.trackingNum}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              )}
-            </Table>
+            {data && <IncomingShipments data={data}/>}
           </TableContainer>
         </Grid>
       </Grid>
