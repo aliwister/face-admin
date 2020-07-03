@@ -30,7 +30,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment}) =>{
     console.log(data);
     let refund = {...data, amount : -1*data.amount};
     refund.ref = payment.id;
-    onSubmit(refund);
+    return onSubmit(refund);
   }
 
 
