@@ -25,6 +25,7 @@ input AddProductInput {
   quantity: BigDecimal
   ref: String
   discountInPercent: Int
+  merchantId: Int
 }
 
 type Address {
@@ -135,6 +136,16 @@ scalar Date
 
 type Gallery {
   url: String!
+}
+
+type IncomingShipmentQueue {
+  id: Long
+  createdDate: String
+  shipmentMethod: String
+  trackingNum: String
+  pkgCount: Int
+  arrivedPkgs: Int
+  status: String
 }
 
 type Inventory {
@@ -640,6 +651,7 @@ type PurchaseItem {
   quantity: BigDecimal
   description: String
   orderItems: [OrderItem]
+  productId: Long
 }
 
 input PurchaseItemInput {
@@ -670,13 +682,13 @@ type PurchaseQueue {
 type PurchaseShipment {
   shipmentItemId: Int
   purchaseItemId: Int
-  quantity: Int
+  quantity: BigDecimal
 }
 
 input PurchaseShipmentInput {
   shipmentItemId: Int
   purchaseItemId: Int
-  quantity: Int
+  quantity: BigDecimal
 }
 
 type Query {
@@ -686,6 +698,7 @@ type Query {
   ebay(id: String): Product
   getAddresses(customerId: Int): [Address]
   getProductBySku(sku: String, isParent: Boolean = false): Product
+  incomingShipmentQueue: [IncomingShipmentQueue]
 
   """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
   inventory: [Inventory]
@@ -759,6 +772,8 @@ input ShipmentInput {
   shipmentType: ShipmentType
   shipmentStatus: ShipmentStatus
   merchantId: Long
+  pkgCount: Int
+  handlingInstructions: String
 }
 
 type ShipmentItem {
@@ -771,6 +786,7 @@ type ShipmentItem {
   image: String
   purchaseShipments: [PurchaseShipment]
   from: Long
+  price: BigDecimal
 }
 
 input ShipmentItemInput {
@@ -782,6 +798,7 @@ input ShipmentItemInput {
   image: String
   purchaseShipments: [PurchaseShipmentInput]
   from: Long
+  price: BigDecimal
 }
 
 type ShipmentItemSummary {

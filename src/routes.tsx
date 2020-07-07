@@ -12,6 +12,7 @@ import {
   STUFF_MEMBERS,
   SITE_SETTINGS,
   ORDERDETAILS,
+  ORDER_NEW,
   PURCHASES,
   PURCHASEDETAILS,
   CART,
@@ -40,6 +41,7 @@ const Dashboard = lazy(() => import("./containers/Dashboard/Dashboard"));
 const Category = lazy(() => import("./containers/Category/Category"));
 const Orders = lazy(() => import("./containers/Orders/Orders"));
 const OrderDetails = lazy(() => import("./containers/Orders/OrderDetails"));
+const OrderForm = lazy(() => import("./containers/OrderForm/OrderForm"));
 const Settings = lazy(() => import("./containers/Settings/Settings"));
 const SiteSettingForm = lazy(() =>
   import("./containers/SiteSettingForm/SiteSettingForm")
@@ -159,6 +161,13 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
+          <PrivateRoute path={ORDER_NEW}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <OrderForm />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
           <EmployeeRoute path={ORDERS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
@@ -173,6 +182,7 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </PrivateRoute>
+
           <EmployeeRoute path={PURCHASES}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>

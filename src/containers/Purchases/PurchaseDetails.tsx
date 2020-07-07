@@ -5,8 +5,18 @@ import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import { useAlert } from "react-alert";
 
 import {useParams} from "react-router-dom";
-import PurchaseForm from "./PurchaseForm";
+import PurchaseForm from "./components/PurchaseForm";
 import {usePurchaseQuery} from "../../codegen/generated/_graphql";
+import {useMutation} from "@apollo/react-hooks";
+import {gql} from "apollo-boost";
+
+const UPDATE_PURCHASE = gql`
+  mutation updatePurchase($dto: PurchaseInput, $items: [PurchaseItemInput]) {
+    updatePurchase(dto: $dto, items: $items) {
+      id
+    }
+  }
+`;
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -35,9 +45,8 @@ function reducer(state, action) {
 }
 export default function PurchaseDetails(props) {
   let { slug } = useParams();
-
-  const [po, setPO] = useState(0);
-  const [items, setItems] = useState([]);
+  const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE,{ context: { clientName: "shopLink" }});
+  const [merchant, setMerchant] = useState({});
   const [create, setCreate] = useState(true);
   const [update, setUpdate] = useState(false);
   const [pqButton, setPQButton] = useState([]);
@@ -46,24 +55,59 @@ export default function PurchaseDetails(props) {
   const alert = useAlert();
   const classes = useStyles();
 
-  const addToPurchase = ({id,price,quantity, productName}) => {
-    setItems([
-        ...items,
-      {
-        sequence:items.length+1,
-        price: price,
-        quantity: quantity,
-        description: productName,
-        orderItems: [{id: id}]
-      }]);
+  const savePurchase = async (form) => {
+    console.log(form);
+    console.log(merchant);
+
+    console.log(merchant['id']);
+    //return;
+
+    const dto = {
+      id: slug,
+      deliveryTotal: form.deliveryTotal,
+      taxesTotal: form.taxesTotal,
+      discountTotal: form.discountTotal,
+      merchantId: merchant['id'],
+      //ref: form.ref
+    }
+
+    const purchaseItems = form.items.map(({pid, productId, description, price, quantity, ref}) => ({
+      id: pid===""?null:pid,
+      orderItems: [{id: ref}],
+      price,
+      quantity,
+      description,
+      productId
+    }));
+    //console.log(dto);
+    //console.log(purchaseItems);
+
+    const {
+      data: { updatePurchase },
+    }: any = await updatePurchaseMutation({
+      variables: { dto, items: purchaseItems },
+    });
+    if(updatePurchase)  {
+      alert.success("Purchase saved successfully");
+      //setPO(createPurchase.id);
+      setCreate(true);
+
+      rp();
+      //setItems(updatePurchase.items);
+    }
   }
+
+
+
   if (lp)
     return <div>Loading</div>
 
+
   return (
     <>
-      <Heading>Purchase PO {dp.purchase.id}</Heading>
-      <PurchaseForm purchase={dp.purchase} purchaseRefetch={rp}/>
+      <h1>Purchase </h1>
+      <Heading>PO {dp.purchase.id}</Heading>
+      <PurchaseForm purchase={dp.purchase} savePurchase={savePurchase} setMerchant={setMerchant}/>
     </>
   );
 }

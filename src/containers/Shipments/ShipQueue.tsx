@@ -13,7 +13,7 @@ import Grid from "@material-ui/core/Grid";
 
 import {Link} from "react-router-dom";
 import styled from 'styled-components'
-import {Tablelate} from "./components/Tabelate";
+import {Tablelate} from "components/Table/Tabelate";
 const SHIP_Q = gql`
 query shipQueue {
   shipQueue {

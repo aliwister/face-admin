@@ -50,6 +50,7 @@ export type AddProductInput = {
   quantity: Maybe<Scalars['BigDecimal']>;
   ref: Maybe<Scalars['String']>;
   discountInPercent: Maybe<Scalars['Int']>;
+  merchantId: Maybe<Scalars['Int']>;
 };
 
 export type Address = {
@@ -162,6 +163,17 @@ export type Customer = {
 export type Gallery = {
    __typename?: 'Gallery';
   url: Scalars['String'];
+};
+
+export type IncomingShipmentQueue = {
+   __typename?: 'IncomingShipmentQueue';
+  id: Maybe<Scalars['Long']>;
+  createdDate: Maybe<Scalars['String']>;
+  shipmentMethod: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  pkgCount: Maybe<Scalars['Int']>;
+  arrivedPkgs: Maybe<Scalars['Int']>;
+  status: Maybe<Scalars['String']>;
 };
 
 export type Inventory = {
@@ -958,6 +970,7 @@ export type PurchaseItem = {
   quantity: Maybe<Scalars['BigDecimal']>;
   description: Maybe<Scalars['String']>;
   orderItems: Maybe<Array<Maybe<OrderItem>>>;
+  productId: Maybe<Scalars['Long']>;
 };
 
 export type PurchaseItemInput = {
@@ -990,13 +1003,13 @@ export type PurchaseShipment = {
    __typename?: 'PurchaseShipment';
   shipmentItemId: Maybe<Scalars['Int']>;
   purchaseItemId: Maybe<Scalars['Int']>;
-  quantity: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
 };
 
 export type PurchaseShipmentInput = {
   shipmentItemId: Maybe<Scalars['Int']>;
   purchaseItemId: Maybe<Scalars['Int']>;
-  quantity: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
 };
 
 export type Query = {
@@ -1007,6 +1020,7 @@ export type Query = {
   ebay: Maybe<Product>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
   getProductBySku: Maybe<Product>;
+  incomingShipmentQueue: Maybe<Array<Maybe<IncomingShipmentQueue>>>;
   /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
@@ -1248,6 +1262,8 @@ export type ShipmentInput = {
   shipmentType: Maybe<ShipmentType>;
   shipmentStatus: Maybe<ShipmentStatus>;
   merchantId: Maybe<Scalars['Long']>;
+  pkgCount: Maybe<Scalars['Int']>;
+  handlingInstructions: Maybe<Scalars['String']>;
 };
 
 export type ShipmentItem = {
@@ -1261,6 +1277,7 @@ export type ShipmentItem = {
   image: Maybe<Scalars['String']>;
   purchaseShipments: Maybe<Array<Maybe<PurchaseShipment>>>;
   from: Maybe<Scalars['Long']>;
+  price: Maybe<Scalars['BigDecimal']>;
 };
 
 export type ShipmentItemInput = {
@@ -1272,6 +1289,7 @@ export type ShipmentItemInput = {
   image: Maybe<Scalars['String']>;
   purchaseShipments: Maybe<Array<Maybe<PurchaseShipmentInput>>>;
   from: Maybe<Scalars['Long']>;
+  price: Maybe<Scalars['BigDecimal']>;
 };
 
 export type ShipmentItemSummary = {
@@ -1455,7 +1473,7 @@ export type PurchaseQuery = (
       & Pick<Merchant, 'id' | 'name'>
     )>, purchaseItems: Maybe<Array<Maybe<(
       { __typename?: 'PurchaseItem' }
-      & Pick<PurchaseItem, 'id' | 'sequence' | 'price' | 'quantity' | 'description'>
+      & Pick<PurchaseItem, 'id' | 'productId' | 'sequence' | 'price' | 'quantity' | 'description'>
       & { orderItems: Maybe<Array<Maybe<(
         { __typename?: 'OrderItem' }
         & Pick<OrderItem, 'id' | 'orderId'>
@@ -1734,6 +1752,7 @@ export const PurchaseDocument = gql`
     }
     purchaseItems {
       id
+      productId
       sequence
       price
       quantity

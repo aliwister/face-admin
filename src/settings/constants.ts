@@ -7,6 +7,7 @@ export const CATEGORY = '/category';
 export const LOGIN = '/login';
 export const LOGOUT = '/logout';
 export const ORDERS = '/orders';
+export const ORDER_NEW = '/orders/new';
 export const ORDERDETAILS = '/order-details/:slug';
 export const CUSTOMERS = '/customers';
 export const COUPONS = '/coupons';

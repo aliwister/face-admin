@@ -6,6 +6,7 @@ import { useDrawerState, useDrawerDispatch } from '../../context/DrawerContext';
 
 /** Drawer Components */
 import ProductForm from '../ProductForm/ProductForm';
+import ProductStubForm from '../ProductForm/ProductStubForm';
 import ProductUpdateForm from '../ProductForm/ProductUpdateForm';
 import CampaingForm from '../CampaingForm/CampaingForm';
 import CategoryForm from '../CategoryForm/CategoryForm';
@@ -14,8 +15,8 @@ import Sidebar from '../Layout/Sidebar/Sidebar';
 
 /** Components Name Constants */
 const DRAWER_COMPONENTS = {
-  PRODUCT_FORM: ProductForm,
-  PRODUCT_UPDATE_FORM: ProductForm,
+  PRODUCT_FORM: ProductStubForm,
+  PRODUCT_UPDATE_FORM: ProductStubForm,
   CAMPAING_FORM: CampaingForm,
   CATEGORY_FORM: CategoryForm,
   STAFF_MEMBER_FORM: StaffMemberForm,

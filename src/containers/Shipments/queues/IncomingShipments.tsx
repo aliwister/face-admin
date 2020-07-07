@@ -2,7 +2,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
 import {Paper, TableContainer} from "@material-ui/core";
-import {Tablelate} from "../components/Tabelate";
+import {Tablelate} from "components/Table/Tabelate";
 import {Styles} from "../ShipQueue";
 
 export function IncomingShipments({data}) {
