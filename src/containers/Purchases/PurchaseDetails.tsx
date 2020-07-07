@@ -9,6 +9,7 @@ import PurchaseForm from "./components/PurchaseForm";
 import {usePurchaseQuery} from "../../codegen/generated/_graphql";
 import {useMutation} from "@apollo/react-hooks";
 import {gql} from "apollo-boost";
+import Button from "@material-ui/core/Button";
 
 const UPDATE_PURCHASE = gql`
   mutation updatePurchase($dto: PurchaseInput, $items: [PurchaseItemInput]) {
@@ -51,7 +52,7 @@ export default function PurchaseDetails(props) {
   const [update, setUpdate] = useState(false);
   const [pqButton, setPQButton] = useState([]);
 
-  const { data:dp, loading:lp, error:ep, refetch:rp } = usePurchaseQuery({variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "shopLink" }});
+  const { data, loading, error, refetch } = usePurchaseQuery({variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "shopLink" }});
   const alert = useAlert();
   const classes = useStyles();
 
@@ -92,22 +93,24 @@ export default function PurchaseDetails(props) {
       //setPO(createPurchase.id);
       setCreate(true);
 
-      rp();
       //setItems(updatePurchase.items);
     }
   }
 
 
 
-  if (lp)
+  if (loading)
     return <div>Loading</div>
 
 
   return (
     <>
-      <h1>Purchase </h1>
-      <Heading>PO {dp.purchase.id}</Heading>
-      <PurchaseForm purchase={dp.purchase} savePurchase={savePurchase} setMerchant={setMerchant}/>
+      <h1>Purchase <Button variant="contained" color="secondary" onClick={()=>{refetch({id: slug})}}>
+        Refresh
+      </Button> </h1>
+      <Heading>PO {data.purchase.id}</Heading>
+      <PurchaseForm purchase={data.purchase} savePurchase={savePurchase} setMerchant={setMerchant}/>
+
     </>
   );
 }

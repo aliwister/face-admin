@@ -46,20 +46,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-export default function TableForm({register, fields, onSubmit, remove }) {
+export default function TableForm({register, fields, onSubmit, remove, watch, order }) {
 
-
-  //const onSubmit = data => console.log("data", data);
-
-  function handleAdd(q) {
-
-  }
-
-  //const onClose = () => setNewpurchasedialog(false);
-
-  const merchantsx =  [{name:"ali", id:1},{name:"mas",id:2}];
-  // @ts-ignore
-  // @ts-ignore
+  const [total, setTotal] = useState(getTotal(order));
+  const [subtotal, setSubtotal] = useState(getSubtotal(order));
 
   const headCells = [
     { id: 'id', numeric: true, disablePadding: false, label: 'Seq/ID' },
@@ -70,13 +60,23 @@ export default function TableForm({register, fields, onSubmit, remove }) {
     { id: 'lineTotal', numeric: true, disablePadding: false, label: 'Line Total' },
   ];
 
-  function subtotal() {
-    return fields.length+"";
+  const watchTotals= watch(["deliveryTotal","taxesTotal","discountTotal","items"]);
+  function handleUpdate(a,b) {
+    console.log('handle update');
+    setSubtotal(getSubtotal(watchTotals));
+    setTotal(getTotal(watchTotals));
+    //setTotal(getSubtotal() + Math.round( 100*( watchTotals.deliveryTotal + watchTotals.taxesTotal - watchTotals.discountTotal)/100));
   }
 
+  function getSubtotal(order) {
+    const f = order.items?order.items:order.purchaseItems;
+    return Math.round(100* f.reduce((sum,p) => sum + p.quantity * p.price, 0))/100;
+  }
+  function getTotal(order) {
+    return getSubtotal(order) + Math.round( 100*( order.deliveryTotal*1 + order.taxesTotal*1 - order.discountTotal*1)/100);
+  }
 
   return (
-
       <Grid item xs={12} md={12}>
         <form onSubmit={onSubmit}>
           <TableContainer component={Paper}>
@@ -84,11 +84,12 @@ export default function TableForm({register, fields, onSubmit, remove }) {
             <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
-              <TableCell>Name</TableCell>
+              <TableCell>Product Id</TableCell>
+              <TableCell>Description</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Price</TableCell>
-              <TableCell>Ref</TableCell>
               <TableCell>Line Total</TableCell>
+              <TableCell>Ref</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
             </TableHead>
@@ -123,6 +124,7 @@ export default function TableForm({register, fields, onSubmit, remove }) {
                     name={`items[${index}].quantity`}
                     defaultValue={`${item.quantity}`}
                     ref={register({})}
+                    onChange={(e) => handleUpdate('delivery', e.target.value)}
                   />
                   </TableCell>
                   <TableCell style={{width:100}}>
@@ -130,12 +132,13 @@ export default function TableForm({register, fields, onSubmit, remove }) {
                     name={`items[${index}].price`}
                     defaultValue={`${item.price}`}
                     ref={register({})}
+                    onChange={(e) => handleUpdate('delivery', e.target.value)}
                   />
 
                   </TableCell>
 
                   <TableCell>
-                    {Math.round(100* item.quantity * item.price)/100}
+                    {Math.round(100* watchTotals.items[index].quantity * watchTotals.items[index].price)/100}
                   </TableCell>
                   <TableCell>
                     {item.orderId &&
@@ -160,11 +163,11 @@ export default function TableForm({register, fields, onSubmit, remove }) {
           </TableContainer>
           <section>
             <ul>
-              <li><label>Subtotal:</label> <input name="subtotal" disabled value={subtotal()}/></li>
-              <li>Delivery: <input name="deliveryTotal" ref={register({})}/></li>
-              <li>Taxes: <input  name="taxesTotal" ref={register({})}/></li>
-              <li>Discount: <input name="discountTotal" ref={register({})}/></li>
-              <li>Total: <input  name="total" disabled/></li>
+              <li><label>Subtotal:</label> <input name="subtotal" disabled value={subtotal}/></li>
+              <li>Delivery: <input name="deliveryTotal" ref={register({})}  onChange={(e) => handleUpdate('delivery', e.target.value)}/></li>
+              <li>Taxes: <input  name="taxesTotal" ref={register({})} onChange={(e) => handleUpdate('taxes', e.target.value)}/></li>
+              <li>Discount: <input name="discountTotal" ref={register({})} onChange={(e) => handleUpdate('discount', e.target.value)}/></li>
+              <li>Total: <input  name="total" disabled value={total}/></li>
             </ul>
           </section>
           <Button type="submit" variant="contained" color="primary" size="large">

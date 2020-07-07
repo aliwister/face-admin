@@ -20,11 +20,9 @@ const CREATE_PURCHASE = gql`
   }
 `;
 export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
-  const [total, setTotal] = useState(purchase.total);
-  const [subtotal, setSubtotal] = useState(purchase.subtotal);
   const [newPurchaseDialog, setNewpurchasedialog] = useState(purchase.subtotal);
 
-  const { register, control, handleSubmit } = useForm({
+  const { register, control, handleSubmit, watch } = useForm({
     defaultValues: {
       items: purchase.purchaseItems.map(({id, orderItems, price, quantity, description, sequence, productId}) => ({
         id: id,
@@ -37,9 +35,9 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
         sequence,
         productId
       })),
-      deliveryTotal: 3,
-      taxesTotal: 3,
-      discountTotal: 3,
+      deliveryTotal: purchase.deliveryTotal,
+      taxesTotal: purchase.taxesTotal,
+      discountTotal: purchase.discountTotal,
     }});
   const { fields, append, remove} = useFieldArray(
     {
@@ -76,7 +74,7 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
 
   return (
     <Grid container xs={12} md={12}>
-    {/*  <NewPurchaseDialog open={newPurchaseDialog} onClose={onClose} merchants={merchants} />*/}
+     {/* <NewPurchaseDialog open={newPurchaseDialog} onClose={onClose} merchants={merchants} />*/}
       <Grid item md={4}>
         <MerchantLookup setMerchant={setMerchant} selected={purchase.merchantObj}/>
       </Grid>
@@ -87,12 +85,11 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
         <TextField size="small" id="outlined-basic" label="Ref" variant="outlined" value={purchase.id} />
       </Grid>
       <Grid item md={3} style={{textAlign:'right'}}>
-
-        <Button variant="contained" color="primary" size="large" onClick={()=> setNewpurchasedialog(true)}>
-          New Purchase
-        </Button>
+      <Button variant="contained" color="primary" size="large" onClick={()=> setNewpurchasedialog(true)}>
+        New Purchase
+      </Button>
       </Grid>
-    <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} />
+    <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={purchase}/>
     <PurchaseQueue handleAdd={addToPurchase}/>
     </Grid>
   );
