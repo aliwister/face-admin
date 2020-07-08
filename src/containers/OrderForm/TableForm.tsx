@@ -138,7 +138,10 @@ export default function TableForm({register, fields, onSubmit, remove, watch, or
                   </TableCell>
 
                   <TableCell>
-                    {Math.round(100* watchTotals.items[index].quantity * watchTotals.items[index].price)/100}
+                    {watchTotals.items && watchTotals.items[index] ?
+                      Math.round(100* watchTotals.items[index].quantity * watchTotals.items[index].price)/100:
+                      Math.round(100* item.quantity * item.price)/100
+                    }
                   </TableCell>
                   <TableCell>
                     {item.orderId &&
