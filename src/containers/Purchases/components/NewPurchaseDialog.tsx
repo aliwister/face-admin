@@ -7,6 +7,7 @@ import React from "react";
 import {useMutation} from "@apollo/react-hooks";
 import gql from 'graphql-tag';
 import {useHistory} from "react-router-dom";
+import {MerchantLookup} from "../../../components/Merchant/MerchantsLookup";
 const CREATE_PURCHASE = gql`
   mutation createPurchase($dto: PurchaseInput) {
     createPurchase(dto: $dto) {
@@ -14,7 +15,7 @@ const CREATE_PURCHASE = gql`
     }
   }
 `;
-export default function NewPurchaseDialog({merchants, onClose, open}) {
+export default function NewPurchaseDialog({onClose, open}) {
   const [createPurchaseMutation] = useMutation(CREATE_PURCHASE,{context: { clientName: "shopLink" }});
   const alert = useAlert();
   const [merchant, setMerchant] = React.useState(false);
@@ -41,14 +42,7 @@ export default function NewPurchaseDialog({merchants, onClose, open}) {
         <DialogContentText>
           Select Merchant
         </DialogContentText>
-        <Autocomplete
-          id="combo-box-demo"
-          options={merchants.merchants}
-          getOptionLabel={(option: any) => option.name}
-          style={{width: 300}}
-          onChange={(event, value) => setMerchant(value)}
-          renderInput={params => <TextField {...params} label="Merchant Name" variant="outlined"/>}
-        />
+        <MerchantLookup setMerchant={setMerchant} selected={{}}/>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">

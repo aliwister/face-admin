@@ -7,8 +7,9 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Button from "@material-ui/core/Button";
 
-export const ShipmentItems = ({state, dispatch, label}) => {
+export const ShipmentItems = ({state, dispatch, label, handleDeleteItem}) => {
   return (
     <ExpansionPanel>
       <ExpansionPanelSummary
@@ -48,6 +49,7 @@ Product
                   </a>:
                   <span>{a.productId}</span>
                 }</TableCell>
+                <TableCell><Button variant="contained" color="secondary" onClick = {() => handleDeleteItem(a.id)}>X</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>

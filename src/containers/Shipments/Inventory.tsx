@@ -22,6 +22,7 @@ import {InventoryList} from "./components/InventoryList";
 import {OutstandingQueue} from "./components/OutstandingQueue";
 
 
+
 const ISSUE_ITEM = gql`
   mutation issueItem($orderItemId : Long, $productId : Long, $description : String, $quantity : BigDecimal) {
     issueItem(orderItemId: $orderItemId, productId: $productId, description: $description, quantity: $quantity) {
@@ -72,7 +73,10 @@ const useStyles = makeStyles(theme => ({
 
 export default function Inventory() {
   const [issueItemMutation] = useMutation(ISSUE_ITEM,{ context: { clientName: "adminLink" }});
-  const { data, loading, error, refetch } = useQuery(OUTSTANDING_Q, { context: { clientName: "adminLink" }});
+  const [skip, setSkip] = useState(true);
+
+
+  const { data, loading, error, refetch } = useQuery(OUTSTANDING_Q, { context: { clientName: "adminLink" }, skip: skip});
   const { data: dataInventory, loading: loadingInventory, error: errorInventory, refetch: refetchInventory } = useQuery(INVENTORY, { context: { clientName: "adminLink" }});
   const { register:r3, handleSubmit:hs3, errors:e3 } = useForm();
 
@@ -81,6 +85,7 @@ export default function Inventory() {
   const [label, setLabel] = useState('');
   const [item, setItem] = useState(-1);
   const [selected, setSelected] = useState([]);
+  const [description, setDescription] = useState("");
 
 
   const alert = useAlert();
@@ -131,12 +136,22 @@ export default function Inventory() {
         selected.slice(selectedIndex + 1),
       );
     }
+    console.log(newSelected);
+    let description = dataInventory.inventory.find(x => x.productId === newSelected[0]);
+    console.log(description);
+
+    if(description)
+      console.log(description.title)
+
 
     setSelected(newSelected);
+
+    setDescription(description?description.title:"")
   };
 
   const handleRefetch = async x => {
     refetch({keyword: x.keyword});
+    setSkip(false);
   }
   const onClose = () => {
     setIssueitemdialog(false)
@@ -147,6 +162,7 @@ export default function Inventory() {
 
   if(loadingInventory)
     return <></>
+
 
   return (
     <>
@@ -209,7 +225,7 @@ export default function Inventory() {
           handleProcess={handleProcess}
         />}
       </SectionCard>
-      <IssueItemDialog item={item} open={issueItemDialog} onClose={onClose} onSubmit={handleIssueItem} productId={selected[0]} />
+      <IssueItemDialog item={item} open={issueItemDialog} onClose={onClose} onSubmit={handleIssueItem} productId={selected[0]} description={description} />
     </>
   );
 }

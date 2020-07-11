@@ -12,8 +12,6 @@ import {useForm} from "react-hook-form";
 import {SortQueue} from "../components/SortQueue";
 import {SectionCard} from "../Shipment.style";
 import CardHeader from "@material-ui/core/CardHeader";
-import { AcceptItemDialog } from "../components/AcceptItemDialog";
-import { IssueItemDialog } from "../components/IssueItemDialog";
 import {PrepQueue} from "../components/PrepQueue";
 import {PreptemDialog} from "../components/PrepItemDialog";
 const PREP_ITEM = gql`

@@ -27,6 +27,23 @@ const ADD_ITEM = gql`
     }
   }
 `;
+
+const REMOVE_ITEM = gql`
+  mutation removeItem($shipmentItemId : Long) {
+    removeItem(shipmentItemId: $shipmentItemId) {
+      value
+    }
+  }
+`;
+
+const UNPACK_ITEM = gql`
+  mutation unpackItem($shipmentItemId : Long) {
+    unpackItem(shipmentItemId: $shipmentItemId) {
+      value
+    }
+  }
+`;
+
 const SORT_QUEUE = gql`
 query sortQueue($keyword: String) {
   sortQueue(keyword: $keyword) {
@@ -59,9 +76,10 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function EditPackage({state, dispatch}) {
+export default function EditPackage({state, dispatch, refreshShipment}) {
   const [addItemMutation] = useMutation(ADD_ITEM,{ context: { clientName: "adminLink" }});
-  const [removeItemMutation] = useMutation(ADD_ITEM,{ context: { clientName: "adminLink" }});
+  const [removeItemMutation] = useMutation(REMOVE_ITEM,{ context: { clientName: "adminLink" }});
+  const [unpackItemMutation] = useMutation(UNPACK_ITEM,{ context: { clientName: "adminLink" }});
   const { data, loading, error, refetch } = useQuery(SORT_QUEUE, { context: { clientName: "adminLink" }});
   const { register:r3, handleSubmit:hs3, errors:e3 } = useForm();
 
@@ -118,7 +136,36 @@ export default function EditPackage({state, dispatch}) {
   }
 
   const handleRemoveItem = async (data) => {
-
+    if (state.context === 'PKG')
+      return handleUnpackItem(data);
+    let dto = {
+      shipmentItemId: state.item
+    }
+    const {
+      data: { removeItem },
+    }: any = await removeItemMutation({
+      variables: { ...dto },
+    });
+    if(removeItem)  {
+      alert.success(removeItem.value);
+      refreshShipment({id: state.shipment.id});
+      dispatch({type:'REMOVE_ITEM_END'});
+    }
+  }
+  const handleUnpackItem = async (data) => {
+    let dto = {
+      shipmentItemId: state.item
+    }
+    const {
+      data: { unpackItem },
+    }: any = await unpackItemMutation({
+      variables: { ...dto },
+    });
+    if(unpackItem)  {
+      alert.success(unpackItem.value);
+      dispatch({type:'REMOVE_ITEM_END'});
+      refetch();
+    }
   }
 
   const handleProcess = (item) => {
@@ -191,6 +238,10 @@ export default function EditPackage({state, dispatch}) {
         {state.cancelShipmentConfirmDialog &&
         <ConfirmDialog title="Cancel Shipment?" open={state.cancelShipmentConfirmDialog} cancel={onCancel} onConfirm={cancelShipment}>
           Are you sure you want to cancel this shipment?
+        </ConfirmDialog>}
+        {state.removeItemConfirmDialog &&
+        <ConfirmDialog title="Remove Item?" open={state.removeItemConfirmDialog} cancel={onCancel} onConfirm={handleRemoveItem}>
+          Are you sure you want to remove this item? (Note: if issued, will be unissued)
         </ConfirmDialog>}
       </div>
 

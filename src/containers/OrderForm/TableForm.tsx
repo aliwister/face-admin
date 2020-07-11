@@ -73,7 +73,7 @@ export default function TableForm({register, fields, onSubmit, remove, watch, or
     return Math.round(100* f.reduce((sum,p) => sum + p.quantity * p.price, 0))/100;
   }
   function getTotal(order) {
-    return getSubtotal(order) + Math.round( 100*( order.deliveryTotal*1 + order.taxesTotal*1 - order.discountTotal*1)/100);
+    return Math.round( 100*( getSubtotal(order) + order.deliveryTotal*1.0 + order.taxesTotal*1.0 - order.discountTotal*1.0))/100.0;
   }
 
   return (

@@ -4,7 +4,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import React, {useState} from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-import {useMutation} from "@apollo/react-hooks";
+import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from 'graphql-tag';
 import {useHistory} from "react-router-dom";
 import OrderForm from "../../OrderForm/OrderForm";
@@ -51,12 +51,12 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
     console.log("data", data);
     return savePurchase(data);
   }
-  const addToPurchase = ({id,price,quantity, productName,productId, orderId}) => {
+  const addToPurchase = ({id,cost,quantity, productName,productId, orderId}) => {
     append(
       {
         pid: "",
         productId: productId,
-        price: price,
+        price: cost,
         quantity: quantity,
         description: productName,
         orderId: orderId,
@@ -71,10 +71,13 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
     remove(index);
   }
 
+  function onClose() {
+    setNewpurchasedialog(false);
+  }
 
   return (
     <Grid container xs={12} md={12}>
-     {/* <NewPurchaseDialog open={newPurchaseDialog} onClose={onClose} merchants={merchants} />*/}
+      <NewPurchaseDialog open={newPurchaseDialog} onClose={onClose} />
       <Grid item md={4}>
         <MerchantLookup setMerchant={setMerchant} selected={purchase.merchantObj}/>
       </Grid>

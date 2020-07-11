@@ -184,12 +184,36 @@ function reducer(state, action) {
         item: action.payload,
         cancelShipmentConfirmDialog: true,
       }
+    case 'REMOVE_ITEM_FROM_SHIPMENT_START':
+      console.log('here');
+      return {
+        ...state,
+        item: action.payload,
+        removeItemConfirmDialog: true,
+        context: 'SHIPMENT'
+      }
+    case 'REMOVE_ITEM_FROM_PKG_START':
+      console.log('here');
+      return {
+        ...state,
+        item: action.payload,
+        removeItemConfirmDialog: true,
+        context: 'PKG'
+      }
+    case 'REMOVE_ITEM_END':
+      console.log('here');
+      return {
+        ...state,
+        removeItemConfirmDialog: false,
+      }
     case 'CLOSE_CANCEL_SHIPMENT_CANCEL':
+
       return {
         ...state,
         item: action.payload,
         cancelShipmentConfirmDialog: false,
-        closeShipmentConfirmDialog: false
+        closeShipmentConfirmDialog: false,
+        removeItemConfirmDialog: false,
       }
     default:
       return state;
@@ -288,7 +312,8 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   const handleDetrackStart = () => dispatch({type:'SEND_TO_DETRACK_START'});
   const handleDetrackCancel = () => dispatch({type:'SEND_TO_DETRACK_CANCEL'});
 
-
+  const handleRemoveFromShipment = (itemId) => dispatch({type: 'REMOVE_ITEM_FROM_SHIPMENT_START', payload: itemId})
+  const handleRemoveFromPkg = (itemId) => dispatch({type: 'REMOVE_ITEM_FROM_PKG_START', payload: itemId})
 
   return (
 	  <Grid container xs={12} md={12} spacing={1}>
@@ -322,9 +347,9 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
         </SectionCard>
       </Grid>
       <Grid item md={8}>
-        <ShipmentItems state={state.shipment} dispatch={dispatch} label={"Shipment Items"}/>
+        <ShipmentItems state={state.shipment} dispatch={dispatch} label={"Shipment Items"} handleDeleteItem={handleRemoveFromShipment}/>
         {state.pkg &&
-        <ShipmentItems state={state.pkg} dispatch={dispatch} label={"Package Items"}/>
+        <ShipmentItems state={state.pkg} dispatch={dispatch} label={"Package Items"} handleDeleteItem={handleRemoveFromPkg}/>
         }
         {/*shipment.shipmentType === 'PURCHASE'*/}
         {(action == 'RECEIVE' ) &&
@@ -334,7 +359,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
           <PrepPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
         }
         {(action == 'EDIT' ) &&
-          <EditPackage state={state} dispatch={dispatch} />
+          <EditPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
         }
       </Grid>
       <CreatePkgDialog onSubmit={handleAcceptPackage} handleClose={handleClose} open={state.pkgDialog} />

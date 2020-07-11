@@ -133,7 +133,7 @@ export default function Purchases() {
   const alert = useAlert();
   const classes = useStyles();
   const history = useHistory();
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
+  //const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
 
   const [useCss, theme] = themedUseStyletron();
   const sent = useCss({
@@ -235,12 +235,12 @@ export default function Purchases() {
     setOpen(false);
   };
 
-  if(merhcnatsLoading) {
+/*  if(merhcnatsLoading) {
     return <div>Loading</div>
-  }
+  }*/
   return (
       <>
-      <NewPurchaseDialog open={open} onClose={handleClose} merchants={merchants} />
+      <NewPurchaseDialog open={open} onClose={handleClose}  />
       <Grid container spacing={1}>
 
             <Grid item  md={3} >
