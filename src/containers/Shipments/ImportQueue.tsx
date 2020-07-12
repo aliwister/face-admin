@@ -34,6 +34,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import Fade from "react-reveal/Fade";
 import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {AddTrackingDialog} from "./components/AddTrackingDialog";
+import {Link} from "react-router-dom";
 
 
 const MERCHANTS = gql`
@@ -77,6 +78,7 @@ query shipmentItemsByTrackingNums($trackingNums: [String]) {
     description
     purchaseShipments {
       purchaseItemId
+      purchaseId
       quantity
     }
     productId
@@ -87,6 +89,7 @@ query shipmentItemsByTrackingNums($trackingNums: [String]) {
 const SHIPMENT_ITEMS_COUNT = gql`
 query shipmentItemsCountByTrackingNums($trackingNums: [String]) {
   shipmentItemsCountByTrackingNums(trackingNums: $trackingNums) {
+    id
     trackingNum
     total
     processed
@@ -269,6 +272,7 @@ export default function ImportQueue() {
           <Table  size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>Tracking #</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Total</TableCell>
@@ -278,6 +282,7 @@ export default function ImportQueue() {
             <TableBody>
               {cntdata && cntdata.shipmentItemsCountByTrackingNums && cntdata.shipmentItemsCountByTrackingNums.map((item,b) => (
                 <TableRow>
+                  <TableCell><Link to={`shipment-details/${item.id}/EDIT`} target="new">{item.id}</Link></TableCell>
                   <TableCell>{item.trackingNum}</TableCell>
                   <TableCell>{item.status}</TableCell>
                   <TableCell>{item.total}</TableCell>
@@ -333,8 +338,8 @@ export default function ImportQueue() {
               <TableCell >
                 Product
               </TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">PId</TableCell>
+              <TableCell >Price</TableCell>
+              <TableCell align="right">pId (po)</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -359,9 +364,9 @@ export default function ImportQueue() {
                   <span>{item.productId}</span>
                 }</TableCell>
                 <TableCell>{item.price}</TableCell>
-                <TableCell>
+                <TableCell  align="right">
                   {item.purchaseShipments && item.purchaseShipments.map((p) => (
-                    <div> {p.purchaseItemId} </div>
+                    <div> {p.purchaseItemId} <Link to={`/purchase-details/${p.purchaseId}`} target="_blank">{p.purchaseId}</Link> </div>
                   ))}
                 </TableCell>
               </TableRow>

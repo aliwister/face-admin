@@ -40,7 +40,7 @@ export const IssueItemDialog = ({item, open, onClose, onSubmit, productId, descr
           </DialogContentText>
           <div>Item Qty = {item.quantity} Preallocated = {item.preallocated}  <Link to={`/order-details/${item.orderId}`} target="_blank">{item.orderId}</Link></div>
           <TextField fullWidth type="number" placeholder="Product ID" name="productId" value={productId} inputRef={register({required: true})} />
-          <TextField fullWidth type="text" placeholder="Description" name="description" value={description} inputRef={register({required: true})} />
+          <TextField fullWidth type="text" placeholder="Description" name="description" value={description} inputRef={register({})} />
 
           <TextField fullWidth type="number" placeholder="Quantity" name="quantity"  inputProps={{step: 0.1}} inputRef={register({required: true})} />
           <TextField fullWidth type="number" placeholder="Order Item Id" name="orderItemId" value={item.orderItemId} inputRef={register} />
