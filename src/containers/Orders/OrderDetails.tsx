@@ -253,7 +253,7 @@ export default function OrderDetails(props) {
             <List>
               <ListItem>
                 <ListItemText
-                  primary={`${orderData.orderA.reference} `}
+                  primary={<Link to={`${orderData.orderA.reference}`}> {orderData.orderA.reference} </Link>}
                   secondary= {`Order ${orderData.orderA.id} from cart ${orderData.orderA.cartId}`}
                 />
               </ListItem>

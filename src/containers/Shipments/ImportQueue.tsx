@@ -94,6 +94,7 @@ query shipmentItemsCountByTrackingNums($trackingNums: [String]) {
     total
     processed
     status
+    reference
   }
 }
 `;
@@ -287,6 +288,7 @@ export default function ImportQueue() {
                   <TableCell>{item.status}</TableCell>
                   <TableCell>{item.total}</TableCell>
                   <TableCell>{item.processed}</TableCell>
+                  <TableCell>{item.reference}</TableCell>
                 </TableRow>
                 ))}
             </TableBody>
