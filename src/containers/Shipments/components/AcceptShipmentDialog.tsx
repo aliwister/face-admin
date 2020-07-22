@@ -110,7 +110,7 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
         height={720}
         ref={webcamRef}
         screenshotFormat="image/jpeg"
-        width={1280}
+        width={500}
         videoConstraints={videoConstraints}
         />
         <button onClick={capture}>Capture photo</button>
