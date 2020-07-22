@@ -9,6 +9,8 @@ export const SHIPMENT_METHODS = [
   {value: 'Aramex', label: 'Aramex'},
   {value: 'Oman Post', label: 'Oman Post'},
   {value: 'Cargo', label: 'Cargo'},
+  {value: 'Pickup', label: 'Pickup'},
+  {value: 'Badals Express', label: 'Badals Express'},
 ];
 
 export const SHIPMENT_STATUS = [
@@ -35,9 +37,14 @@ export const SHIPMENT_TYPES = [
   {value: 'PURCHASE', label: 'PURCHASE'},
   {value: 'RETURN', label: 'RETURN'},
   {value: 'TRANSIT', label: 'TRANSIT'},
+  {value: 'CUSTOMER', label: 'CUSTOMER'},
 ]
 export const DRIVERS = [
   {value: 'Shabib', label: 'Shabib'},
   {value: 'Salah', label: 'Salah'},
   {value: 'Pickup', label: 'Pickup'},
+]
+export const USERS = [
+  {value: '8782', label: 'Shabib'},
+  {value: '1', label: 'Ali'},
 ]

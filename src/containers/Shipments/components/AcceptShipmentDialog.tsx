@@ -5,14 +5,86 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import Button from "@material-ui/core/Button";
 import React from "react";
 import {Controller, useForm} from "react-hook-form";
-import {PACKAGE_TYPES, SHIPMENT_METHODS, SHIPMENT_TYPES} from "./Constants";
-import Select from "react-select";
+import Webcam from "react-webcam";
 
-export const AcceptShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
+import Uploader from "../../../components/Uploader/Uploader";
+import {useMutation} from "@apollo/react-hooks";
+import {useGetUploadUrlMutation} from "codegen/generated/_graphql";
+import Select from "react-select";
+import {handleUpload} from "../../Image/Uploader";
+import {useHistory} from "react-router-dom";
+import { useAlert } from "react-alert";
+import {gql} from "apollo-boost";
+import {DRIVERS, USERS} from "./Constants";
+const videoConstraints = {
+  width: 1280,
+  height: 720,
+  facingMode: "user"
+};
+
+const ACCEPT_SHIPMENT = gql`
+  mutation acceptShipment($trackingNum: String, $payment: PaymentInput, $invoiceLink: String ) {
+    acceptShipment(trackingNum: $trackingNum, payment: $payment, invoiceLink: $invoiceLink) {
+      id
+    }
+  }
+`;
+
+export const AcceptShipmentDialog = ({show, onClose}) => {
   const { register, handleSubmit, errors, control } = useForm();
+  const [getUploadUrlMutation] = useGetUploadUrlMutation({ context: { clientName: "shopLink" }});
+  const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT,{context: { clientName: "adminLink" }});
+  const history = useHistory();
+  const alert = useAlert();
+  const webcamRef = React.useRef(null);
+
+
+  const handleAcceptShipment = async formData => {
+    console.log( formData.trackingNum);
+    const filename = 'shipment-receipts/'+formData.trackingNum + '.jpg';
+    // @ts-ignore
+    const {
+      data: { acceptShipment },
+    }: any = await acceptShipmentMutation({
+      variables: {
+        trackingNum: formData.trackingNum,
+        payment: {
+          price: {
+            amount: formData.amount,
+            currency: "omr"
+          },
+          invoiceNum: formData.invoiceNum,
+          userId: formData.user.id
+        },
+        invoiceLink: filename
+      },
+    });
+
+    const imageSrc = webcamRef.current.getScreenshot();
+
+    // @ts-ignore
+    const imgData = new Buffer.from(imageSrc.split(',')[1], 'base64');
+    let {data: { getUploadUrl }} = await getUploadUrlMutation({variables: {filename: filename}});
+
+    let xyz = await handleUpload(imgData , getUploadUrl, "image/jpeg");
+    console.log(xyz);
+
+    if(acceptShipment)  {
+      alert.success(acceptShipment.id);
+      history.push('/shipment-details/'+acceptShipment.id+'/RECEIVE');
+    }
+  }
+
+  const capture = React.useCallback(
+    () => {
+      const imageSrc = webcamRef.current.getScreenshot();
+    },
+    [webcamRef]
+  );
+
   return (
   <Dialog open={show} onClose={onClose} aria-labelledby="form-dialog-title">
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleAcceptShipment)}>
       <DialogTitle id="form-dialog-title">Accept Shipment</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -20,6 +92,29 @@ export const AcceptShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
         </DialogContentText>
         <div><TextField variant="outlined" fullWidth type="text" placeholder="Tracking #" name="trackingNum"
                         inputRef={register({required: true})} /></div>
+       {/* <Uploader onChange={handleUploader} handleUpload={handleUpload } />*/}
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="Invoice #" name="invoiceNum"
+                        inputRef={register({required: true})} /></div>
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="Amount" name="amount"
+                        inputRef={register({required: true})} /></div>
+        <div>          <Controller
+          as={<Select options={USERS}/>}
+          rules={{ required: true }}
+          name="user"
+          register={register}
+          control={control}
+          defaultValue=""
+        /></div>
+        <Webcam
+        audio={false}
+        height={720}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        width={1280}
+        videoConstraints={videoConstraints}
+        />
+        <button onClick={capture}>Capture photo</button>
+
 
       </DialogContent>
       <DialogActions>

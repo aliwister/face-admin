@@ -79,13 +79,7 @@ query merchants {
   }
 }
 `;
-const ACCEPT_SHIPMENT = gql`
-  mutation acceptShipment($trackingNum: String) {
-    acceptShipment(trackingNum: $trackingNum) {
-      id
-    }
-  }
-`;
+
 
 const CREATE_SHIPMENT = gql`
   mutation createShipment($shipment: ShipmentInput) {
@@ -133,7 +127,7 @@ export default function Shipments() {
 
   const history = useHistory();
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
-  const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT,{context: { clientName: "adminLink" }});
+
   const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{context: { clientName: "adminLink" }});
 
 
@@ -223,19 +217,7 @@ export default function Shipments() {
     }
   }
 
-  const handleAcceptShipment = async data => {
-    console.log( data.trackingNum);
-    // @ts-ignore
-    const {
-      data: { acceptShipment },
-    }: any = await acceptShipmentMutation({
-      variables: {...data},
-    });
-    if(acceptShipment)  {
-      alert.success(acceptShipment.id);
-      history.push('/shipment-details/'+acceptShipment.id+'/RECEIVE');
-    }
-  }
+
 
   function handleAcceptButton() {
     setAcceptdialog(true);
@@ -267,10 +249,17 @@ export default function Shipments() {
 
   };
 
+  function handleUploader() {
+
+  }
+  function handleUpload() {
+
+  }
+
   return (
     <>
       <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
-      <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} onSubmit={handleAcceptShipment} merchants={merchants} />
+      <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} />
       <Grid container spacing={1}>
         <Grid item  md={3} >
           <StatusMultiSelect handleStatus={handleStatus} status={status} />

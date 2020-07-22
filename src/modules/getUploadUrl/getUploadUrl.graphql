@@ -1,0 +1,7 @@
+mutation getUploadUrl($filename: String) {
+  getUploadUrl(filename: $filename) {
+    uploadUrl
+    imageUrl
+    status
+  }
+}

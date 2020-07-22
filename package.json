@@ -47,6 +47,7 @@
     "react-select": "^3.1.0",
     "react-table": "^7.0.4",
     "react-to-print": "^2.6.3",
+    "react-webcam": "^5.2.0",
     "styled-components": "^5.0.1",
     "styletron-engine-atomic": "^1.4.6",
     "styletron-react": "^5.2.7",

@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
-import * as React from 'react';
 import * as ApolloReactCommon from '@apollo/react-common';
+import * as React from 'react';
 import * as ApolloReactComponents from '@apollo/react-components';
 import * as ApolloReactHoc from '@apollo/react-hoc';
 import * as ApolloReactHooks from '@apollo/react-hooks';
@@ -340,6 +340,7 @@ export type Mutation = {
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
   getImageUploadUrl: Maybe<PresignedUrl>;
+  getUploadUrl: Maybe<PresignedUrl>;
   importProducts: Maybe<Message>;
   indexProduct: Maybe<Attribute>;
   issueItem: Maybe<ItemIssuance>;
@@ -348,6 +349,7 @@ export type Mutation = {
   processAmazonShipments: Maybe<Message>;
   /** cancelOrder(id: ID): Order */
   refundPayment: Maybe<Payment>;
+  removeItem: Maybe<Message>;
   resetPassword: Maybe<Scalars['String']>;
   saveShipment: Maybe<Shipment>;
   sendOrderLevelEmail: Maybe<Message>;
@@ -357,6 +359,7 @@ export type Mutation = {
   setCart: Maybe<Cart>;
   setOrderState: Maybe<Order>;
   setShipmentStatus: Maybe<Message>;
+  unpackItem: Maybe<Message>;
   updateCart: Maybe<Cart>;
   updatePurchase: Maybe<Purchase>;
 };
@@ -377,6 +380,8 @@ export type MutationAcceptPackageArgs = {
 
 export type MutationAcceptShipmentArgs = {
   trackingNum: Maybe<Scalars['String']>;
+  payment: Maybe<PaymentInput>;
+  invoiceLink: Maybe<Scalars['String']>;
 };
 
 
@@ -527,6 +532,12 @@ export type MutationGetImageUploadUrlArgs = {
 };
 
 
+export type MutationGetUploadUrlArgs = {
+  filename: Maybe<Scalars['String']>;
+  contentType: Maybe<Scalars['String']>;
+};
+
+
 export type MutationImportProductsArgs = {
   products: Maybe<Array<Maybe<AddProductInput>>>;
   shopIds: Maybe<Array<Maybe<Scalars['Long']>>>;
@@ -566,6 +577,11 @@ export type MutationRefundPaymentArgs = {
   bankOwnerName: Maybe<Scalars['String']>;
   ref: Maybe<Scalars['Long']>;
   paymentMethod: Maybe<Scalars['String']>;
+};
+
+
+export type MutationRemoveItemArgs = {
+  shipmentItemId: Maybe<Scalars['Long']>;
 };
 
 
@@ -624,6 +640,11 @@ export type MutationSetOrderStateArgs = {
 export type MutationSetShipmentStatusArgs = {
   id: Maybe<Scalars['Long']>;
   status: Maybe<ShipmentStatus>;
+};
+
+
+export type MutationUnpackItemArgs = {
+  shipmentItemId: Maybe<Scalars['Long']>;
 };
 
 
@@ -767,6 +788,12 @@ export type Payment = {
   authCode: Maybe<Scalars['String']>;
 };
 
+export type PaymentInput = {
+  price: Maybe<PriceInput>;
+  invoiceNum: Maybe<Scalars['String']>;
+  userId: Maybe<Scalars['Long']>;
+};
+
 export type Pkg = {
    __typename?: 'Pkg';
   id: Maybe<Scalars['ID']>;
@@ -796,6 +823,11 @@ export type PresignedUrl = {
   uploadUrl: Maybe<Scalars['String']>;
   imageUrl: Maybe<Scalars['String']>;
   status: Maybe<Scalars['String']>;
+};
+
+export type PriceInput = {
+  amount: Maybe<Scalars['BigDecimal']>;
+  currency: Maybe<Scalars['String']>;
 };
 
 export type PricingRequest = {
@@ -1003,6 +1035,7 @@ export type PurchaseShipment = {
    __typename?: 'PurchaseShipment';
   shipmentItemId: Maybe<Scalars['Int']>;
   purchaseItemId: Maybe<Scalars['Int']>;
+  purchaseId: Maybe<Scalars['Int']>;
   quantity: Maybe<Scalars['BigDecimal']>;
 };
 
@@ -1010,6 +1043,7 @@ export type PurchaseShipmentInput = {
   shipmentItemId: Maybe<Scalars['Int']>;
   purchaseItemId: Maybe<Scalars['Int']>;
   quantity: Maybe<Scalars['BigDecimal']>;
+  purchaseId: Maybe<Scalars['Long']>;
 };
 
 export type Query = {
@@ -1294,10 +1328,12 @@ export type ShipmentItemInput = {
 
 export type ShipmentItemSummary = {
    __typename?: 'ShipmentItemSummary';
+  id: Maybe<Scalars['Int']>;
   trackingNum: Maybe<Scalars['String']>;
   total: Maybe<Scalars['Long']>;
   status: Maybe<Scalars['String']>;
   processed: Maybe<Scalars['Long']>;
+  reference: Maybe<Scalars['String']>;
 };
 
 export enum ShipmentStatus {
@@ -1399,6 +1435,32 @@ export type VariationOption = {
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type GetImageUploadUrlMutationVariables = {
+  filename: Maybe<Scalars['String']>;
+};
+
+
+export type GetImageUploadUrlMutation = (
+  { __typename?: 'Mutation' }
+  & { getImageUploadUrl: Maybe<(
+    { __typename?: 'PresignedUrl' }
+    & Pick<PresignedUrl, 'uploadUrl' | 'imageUrl' | 'status'>
+  )> }
+);
+
+export type GetUploadUrlMutationVariables = {
+  filename: Maybe<Scalars['String']>;
+};
+
+
+export type GetUploadUrlMutation = (
+  { __typename?: 'Mutation' }
+  & { getUploadUrl: Maybe<(
+    { __typename?: 'PresignedUrl' }
+    & Pick<PresignedUrl, 'uploadUrl' | 'imageUrl' | 'status'>
+  )> }
+);
+
 export type MerchantsQueryVariables = {};
 
 
@@ -1497,6 +1559,112 @@ export type SetShipmentStatusMutation = (
 );
 
 
+export const GetImageUploadUrlDocument = gql`
+    mutation getImageUploadUrl($filename: String) {
+  getImageUploadUrl(filename: $filename) {
+    uploadUrl
+    imageUrl
+    status
+  }
+}
+    `;
+export type GetImageUploadUrlMutationFn = ApolloReactCommon.MutationFunction<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>;
+export type GetImageUploadUrlComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>, 'mutation'>;
+
+    export const GetImageUploadUrlComponent = (props: GetImageUploadUrlComponentProps) => (
+      <ApolloReactComponents.Mutation<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables> mutation={GetImageUploadUrlDocument} {...props} />
+    );
+    
+export type GetImageUploadUrlProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>
+    } & TChildProps;
+export function withGetImageUploadUrl<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetImageUploadUrlMutation,
+  GetImageUploadUrlMutationVariables,
+  GetImageUploadUrlProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables, GetImageUploadUrlProps<TChildProps, TDataName>>(GetImageUploadUrlDocument, {
+      alias: 'getImageUploadUrl',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetImageUploadUrlMutation__
+ *
+ * To run a mutation, you first call `useGetImageUploadUrlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGetImageUploadUrlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [getImageUploadUrlMutation, { data, loading, error }] = useGetImageUploadUrlMutation({
+ *   variables: {
+ *      filename: // value for 'filename'
+ *   },
+ * });
+ */
+export function useGetImageUploadUrlMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>) {
+        return ApolloReactHooks.useMutation<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>(GetImageUploadUrlDocument, baseOptions);
+      }
+export type GetImageUploadUrlMutationHookResult = ReturnType<typeof useGetImageUploadUrlMutation>;
+export type GetImageUploadUrlMutationResult = ApolloReactCommon.MutationResult<GetImageUploadUrlMutation>;
+export type GetImageUploadUrlMutationOptions = ApolloReactCommon.BaseMutationOptions<GetImageUploadUrlMutation, GetImageUploadUrlMutationVariables>;
+export const GetUploadUrlDocument = gql`
+    mutation getUploadUrl($filename: String) {
+  getUploadUrl(filename: $filename) {
+    uploadUrl
+    imageUrl
+    status
+  }
+}
+    `;
+export type GetUploadUrlMutationFn = ApolloReactCommon.MutationFunction<GetUploadUrlMutation, GetUploadUrlMutationVariables>;
+export type GetUploadUrlComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<GetUploadUrlMutation, GetUploadUrlMutationVariables>, 'mutation'>;
+
+    export const GetUploadUrlComponent = (props: GetUploadUrlComponentProps) => (
+      <ApolloReactComponents.Mutation<GetUploadUrlMutation, GetUploadUrlMutationVariables> mutation={GetUploadUrlDocument} {...props} />
+    );
+    
+export type GetUploadUrlProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<GetUploadUrlMutation, GetUploadUrlMutationVariables>
+    } & TChildProps;
+export function withGetUploadUrl<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetUploadUrlMutation,
+  GetUploadUrlMutationVariables,
+  GetUploadUrlProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, GetUploadUrlMutation, GetUploadUrlMutationVariables, GetUploadUrlProps<TChildProps, TDataName>>(GetUploadUrlDocument, {
+      alias: 'getUploadUrl',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetUploadUrlMutation__
+ *
+ * To run a mutation, you first call `useGetUploadUrlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGetUploadUrlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [getUploadUrlMutation, { data, loading, error }] = useGetUploadUrlMutation({
+ *   variables: {
+ *      filename: // value for 'filename'
+ *   },
+ * });
+ */
+export function useGetUploadUrlMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<GetUploadUrlMutation, GetUploadUrlMutationVariables>) {
+        return ApolloReactHooks.useMutation<GetUploadUrlMutation, GetUploadUrlMutationVariables>(GetUploadUrlDocument, baseOptions);
+      }
+export type GetUploadUrlMutationHookResult = ReturnType<typeof useGetUploadUrlMutation>;
+export type GetUploadUrlMutationResult = ApolloReactCommon.MutationResult<GetUploadUrlMutation>;
+export type GetUploadUrlMutationOptions = ApolloReactCommon.BaseMutationOptions<GetUploadUrlMutation, GetUploadUrlMutationVariables>;
 export const MerchantsDocument = gql`
     query merchants {
   merchants {

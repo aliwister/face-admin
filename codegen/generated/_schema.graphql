@@ -273,7 +273,7 @@ type Mutation {
   """
   acceptItem(shipmentItemId: Long, packageId: Long, accepted: BigDecimal, rejected: BigDecimal): Message
   acceptPackage(pkg: PackageInput): Pkg
-  acceptShipment(trackingNum: String): Shipment
+  acceptShipment(trackingNum: String, payment: PaymentInput, invoiceLink: String): Shipment
   addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
@@ -307,6 +307,7 @@ type Mutation {
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
   getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+  getUploadUrl(filename: String, contentType: String): PresignedUrl
   importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
   indexProduct(id: Int): Attribute
   issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
@@ -316,6 +317,7 @@ type Mutation {
 
   """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
+  removeItem(shipmentItemId: Long): Message
   resetPassword(email: String): String
   saveShipment(shipment: ShipmentInput): Shipment
   sendOrderLevelEmail(id: ID, template: String): Message
@@ -325,6 +327,7 @@ type Mutation {
   setCart(secureKey: String, items: [CartItemInput]): Cart
   setOrderState(id: ID, state: OrderState): Order
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
+  unpackItem(shipmentItemId: Long): Message
   updateCart(secureKey: String, items: [CartItemInput]): Cart
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
 }
@@ -453,6 +456,12 @@ type Payment {
   authCode: String
 }
 
+input PaymentInput {
+  price: PriceInput
+  invoiceNum: String
+  userId: Long
+}
+
 type Pkg {
   id: ID
   length: BigDecimal
@@ -479,6 +488,11 @@ type PresignedUrl {
   uploadUrl: String
   imageUrl: String
   status: String
+}
+
+input PriceInput {
+  amount: BigDecimal
+  currency: String
 }
 
 type PricingRequest {
@@ -682,6 +696,7 @@ type PurchaseQueue {
 type PurchaseShipment {
   shipmentItemId: Int
   purchaseItemId: Int
+  purchaseId: Int
   quantity: BigDecimal
 }
 
@@ -689,6 +704,7 @@ input PurchaseShipmentInput {
   shipmentItemId: Int
   purchaseItemId: Int
   quantity: BigDecimal
+  purchaseId: Long
 }
 
 type Query {
@@ -802,10 +818,12 @@ input ShipmentItemInput {
 }
 
 type ShipmentItemSummary {
+  id: Int
   trackingNum: String
   total: Long
   status: String
   processed: Long
+  reference: String
 }
 
 enum ShipmentStatus {
