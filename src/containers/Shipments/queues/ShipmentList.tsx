@@ -5,7 +5,7 @@ import {Paper, TableContainer} from "@material-ui/core";
 import {Tablelate} from "components/Table/Tabelate";
 import {Styles} from "../ShipQueue";
 
-export function IncomingShipments({data}) {
+export function ShipmentList({data}) {
   const columns = React.useMemo(
     () => [
       {
@@ -30,14 +30,6 @@ export function IncomingShipments({data}) {
           {
             Header: 'Carrier',
             accessor: 'carrier',
-          },
-          {
-            Header: 'Pkg Count',
-            accessor: 'pkgCount',
-          },
-          {
-            Header: 'Arrived Pkgs',
-            accessor: 'arrivedPkgs',
           }
         ],
       },

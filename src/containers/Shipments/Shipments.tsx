@@ -35,9 +35,9 @@ import {StatusMultiSelect} from "./components/StatusMultiSelect";
 import {AcceptShipmentDialog} from "./components/AcceptShipmentDialog";
 import {IncomingShipments} from "./queues/IncomingShipments";
 
-const INCOMING_SHIPMENT_QUEUE = gql`
-  query incomingShipmentQueue {
-    incomingShipmentQueue {
+const SHIPMENT_QUEUE = gql`
+  query shipmentList($viewName: ShipmentListView) {
+    shipmentList(viewName: $viewName) {
       id
       createdDate
       trackingNum
@@ -140,11 +140,10 @@ export default function Shipments() {
     context: { clientName: "adminLink" }
   });  */
 
-  const { data, error, refetch } = useQuery(INCOMING_SHIPMENT_QUEUE, {
-/*    variables: {
-      status: status,
-      type: 'CUSTOMER'
-    },*/
+  const { data, error, refetch } = useQuery(SHIPMENT_QUEUE, {
+    variables: {
+      viewName: 'INCOMING'
+    },
     context: { clientName: "adminLink" }
   });
 
@@ -233,16 +232,41 @@ export default function Shipments() {
   const handleChange = (event, newValue) => {
     if(tab != newValue) {
       setTab(newValue);
+
+      console.log(newValue)
       if(newValue == 0) {
         refetch({
-            status: status,
-            type: 'CUSTOMER'
+            viewName: "INCOMING"
           });
       }
-      if (newValue == 1) {
+      else if (newValue == 1) {
         refetch({
-          status: status,
-          type: 'PURCHASE'
+          viewName: "ALL_PURCHASE"
+        });
+      }
+      else if (newValue == 2) {
+        refetch({
+          viewName: "UNCLOSED_TRANSIT"
+        });
+      }
+      else if (newValue == 3) {
+        refetch({
+          viewName: "CANCELLED_TRANSIT"
+        });
+      }
+      else if (newValue ==4) {
+        refetch({
+          viewName: "ALL_TRANSIT"
+        });
+      }
+      else if (newValue == 5) {
+        refetch({
+          viewName: "CUSTOMER_SCHEDULED"
+        });
+      }
+      else if (newValue == 6) {
+        refetch({
+          viewName: "CUSTOMER_FAILED"
         });
       }
     }
@@ -297,10 +321,13 @@ export default function Shipments() {
         <Grid item xs={12}>
           <AppBar position="static">
             <Tabs value={tab} onChange={handleChange}>
-              <Tab label="Customer"  />
-              <Tab label="Purchase"  />
-              <Tab label="Transit"  />
-              <Tab label="Return"  />
+              <Tab label="Incoming"  />
+              <Tab label="All Purchase"  />
+              <Tab label="Unclosed"  />
+              <Tab label="Cancelled Transit"  />
+              <Tab label="All Transit"  />
+              <Tab label="Customer Scheduled"  />
+              <Tab label="Customer Failed"  />
             </Tabs>
           </AppBar>
 
