@@ -9,6 +9,7 @@ import Checkbox from '../../components/CheckBox/CheckBox';
 import { useAlert } from "react-alert";
 import { Link } from 'react-router-dom';
 import {
+  Box,
   Grid,
   Paper,
   Table,
@@ -16,7 +17,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow, Typography
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -34,6 +35,8 @@ import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {StatusMultiSelect} from "./components/StatusMultiSelect";
 import {AcceptShipmentDialog} from "./components/AcceptShipmentDialog";
 import {IncomingShipments} from "./queues/IncomingShipments";
+import {CustomerShipmentList} from "./queues/CustomerShipmentList";
+import {TransitShipmentList} from "./queues/TransitShipmentList";
 
 const SHIPMENT_QUEUE = gql`
   query shipmentList($viewName: ShipmentListView) {
@@ -109,6 +112,27 @@ const useStyles = makeStyles(theme => ({
   },
 
 }));
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box p={3}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
 
 export default function Shipments() {
   const [checkedId, setCheckedId] = useState([]);
@@ -331,9 +355,27 @@ export default function Shipments() {
             </Tabs>
           </AppBar>
 
-          <TableContainer component={Paper}>
+          <TabPanel value={tab} index={0}>
             {data && <IncomingShipments data={data}/>}
-          </TableContainer>
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
+            {data && <IncomingShipments data={data}/>}
+          </TabPanel>
+          <TabPanel value={tab} index={2}>
+            {data && <TransitShipmentList data={data} refetch={refetch}/>}
+          </TabPanel>
+          <TabPanel value={tab} index={3}>
+            {data && <TransitShipmentList data={data} refetch={refetch}/>}
+          </TabPanel>
+          <TabPanel value={tab} index={4}>
+            {data && <TransitShipmentList data={data} refetch={refetch}/>}
+          </TabPanel>
+          <TabPanel value={tab} index={5}>
+            {data && <CustomerShipmentList data={data}/>}
+          </TabPanel>
+          <TabPanel value={tab} index={6}>
+            {data && <CustomerShipmentList data={data}/>}
+          </TabPanel>
         </Grid>
       </Grid>
     </>
