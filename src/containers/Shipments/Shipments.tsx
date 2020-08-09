@@ -371,10 +371,10 @@ export default function Shipments() {
             {data && <TransitShipmentList data={data} refetch={refetch}/>}
           </TabPanel>
           <TabPanel value={tab} index={5}>
-            {data && <CustomerShipmentList data={data}/>}
+            {data && <CustomerShipmentList data={data}  refetch={refetch}/>}
           </TabPanel>
           <TabPanel value={tab} index={6}>
-            {data && <CustomerShipmentList data={data}/>}
+            {data && <CustomerShipmentList data={data} refetch={refetch}/>}
           </TabPanel>
         </Grid>
       </Grid>

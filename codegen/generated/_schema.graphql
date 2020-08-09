@@ -138,16 +138,6 @@ type Gallery {
   url: String!
 }
 
-type IncomingShipmentQueue {
-  id: Long
-  createdDate: String
-  shipmentMethod: String
-  trackingNum: String
-  pkgCount: Int
-  arrivedPkgs: Int
-  status: String
-}
-
 type Inventory {
   productId: Long
   title: String
@@ -329,6 +319,7 @@ type Mutation {
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
   unpackItem(shipmentItemId: Long): Message
   updateCart(secureKey: String, items: [CartItemInput]): Cart
+  updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
 }
 
@@ -714,7 +705,6 @@ type Query {
   ebay(id: String): Product
   getAddresses(customerId: Int): [Address]
   getProductBySku(sku: String, isParent: Boolean = false): Product
-  incomingShipmentQueue: [IncomingShipmentQueue]
 
   """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
   inventory: [Inventory]
@@ -748,11 +738,13 @@ type Query {
   shipment(id: ID): Shipment
   shipmentItemsByTrackingNums(trackingNums: [String]): [ShipmentItem]
   shipmentItemsCountByTrackingNums(trackingNums: [String]): [ShipmentItemSummary]
+  shipmentList(viewName: ShipmentListView): [ShipmentList]
   shipments(status: [ShipmentStatus], type: ShipmentType): [Shipment]
   shipmentsByRef(ref: String): [Shipment]
   sortQueue(keyword: String): [SortQueue]
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
+  unshippedPurchases: [PurchaseQueue]
 }
 
 type Shipment {
@@ -824,6 +816,26 @@ type ShipmentItemSummary {
   status: String
   processed: Long
   reference: String
+}
+
+type ShipmentList {
+  id: Long
+  createdDate: String
+  shipmentMethod: String
+  trackingNum: String
+  pkgCount: Int
+  arrivedPkgs: Int
+  status: String
+}
+
+enum ShipmentListView {
+  INCOMING
+  ALL_PURCHASE
+  UNCLOSED_TRANSIT
+  CANCELLED_TRANSIT
+  ALL_TRANSIT
+  CUSTOMER_SCHEDULED
+  CUSTOMER_FAILED
 }
 
 enum ShipmentStatus {

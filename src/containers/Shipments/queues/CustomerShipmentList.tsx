@@ -4,8 +4,29 @@ import Grid from "@material-ui/core/Grid";
 import {Paper, TableContainer} from "@material-ui/core";
 import {Tablelate} from "components/Table/Tabelate";
 import {Styles} from "../ShipQueue";
+import Button from "@material-ui/core/Button";
+import {useUpdateFromDetrackMutation} from "../../../codegen/generated/_graphql";
+import { useAlert } from "react-alert";
+export function CustomerShipmentList({data, refetch}) {
 
-export function CustomerShipmentList({data}) {
+
+  const [updateFromDetrackMutation] = useUpdateFromDetrackMutation({ context: { clientName: "adminLink" }});
+  const alert = useAlert();
+
+
+
+  const handleUpdateFromDetrack = async (id) => {
+    const {
+      data: { updateFromDetrack },
+    }: any = await updateFromDetrackMutation({
+      variables: { id: id},
+    });
+    if(updateFromDetrack) {
+      alert.success(updateFromDetrack.value);
+      refetch();
+    }
+  }
+
   const columns = React.useMemo(
     () => [
       {
@@ -30,6 +51,10 @@ export function CustomerShipmentList({data}) {
           {
             Header: 'Carrier',
             accessor: 'carrier',
+          },
+          {
+            Header: 'Action',
+            accessor: (row) => (<Button variant="contained" color="secondary" onClick = {() => handleUpdateFromDetrack(row.trackingNum)}>Update from Detrack</Button>)
           }
         ],
       },

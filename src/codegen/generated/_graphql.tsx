@@ -165,17 +165,6 @@ export type Gallery = {
   url: Scalars['String'];
 };
 
-export type IncomingShipmentQueue = {
-   __typename?: 'IncomingShipmentQueue';
-  id: Maybe<Scalars['Long']>;
-  createdDate: Maybe<Scalars['String']>;
-  shipmentMethod: Maybe<Scalars['String']>;
-  trackingNum: Maybe<Scalars['String']>;
-  pkgCount: Maybe<Scalars['Int']>;
-  arrivedPkgs: Maybe<Scalars['Int']>;
-  status: Maybe<Scalars['String']>;
-};
-
 export type Inventory = {
    __typename?: 'Inventory';
   productId: Maybe<Scalars['Long']>;
@@ -361,6 +350,7 @@ export type Mutation = {
   setShipmentStatus: Maybe<Message>;
   unpackItem: Maybe<Message>;
   updateCart: Maybe<Cart>;
+  updateFromDetrack: Maybe<Message>;
   updatePurchase: Maybe<Purchase>;
 };
 
@@ -651,6 +641,11 @@ export type MutationUnpackItemArgs = {
 export type MutationUpdateCartArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
+export type MutationUpdateFromDetrackArgs = {
+  id: Maybe<Scalars['String']>;
 };
 
 
@@ -1054,7 +1049,6 @@ export type Query = {
   ebay: Maybe<Product>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
   getProductBySku: Maybe<Product>;
-  incomingShipmentQueue: Maybe<Array<Maybe<IncomingShipmentQueue>>>;
   /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
@@ -1085,11 +1079,13 @@ export type Query = {
   shipment: Maybe<Shipment>;
   shipmentItemsByTrackingNums: Maybe<Array<Maybe<ShipmentItem>>>;
   shipmentItemsCountByTrackingNums: Maybe<Array<Maybe<ShipmentItemSummary>>>;
+  shipmentList: Maybe<Array<Maybe<ShipmentList>>>;
   shipments: Maybe<Array<Maybe<Shipment>>>;
   shipmentsByRef: Maybe<Array<Maybe<Shipment>>>;
   sortQueue: Maybe<Array<Maybe<SortQueue>>>;
   track: Maybe<Array<Maybe<ShipmentTrackingMap>>>;
   trackingEvents: Maybe<Array<Maybe<TrackingEvent>>>;
+  unshippedPurchases: Maybe<Array<Maybe<PurchaseQueue>>>;
 };
 
 
@@ -1243,6 +1239,11 @@ export type QueryShipmentItemsCountByTrackingNumsArgs = {
 };
 
 
+export type QueryShipmentListArgs = {
+  viewName: Maybe<ShipmentListView>;
+};
+
+
 export type QueryShipmentsArgs = {
   status: Maybe<Array<Maybe<ShipmentStatus>>>;
   type: Maybe<ShipmentType>;
@@ -1335,6 +1336,27 @@ export type ShipmentItemSummary = {
   processed: Maybe<Scalars['Long']>;
   reference: Maybe<Scalars['String']>;
 };
+
+export type ShipmentList = {
+   __typename?: 'ShipmentList';
+  id: Maybe<Scalars['Long']>;
+  createdDate: Maybe<Scalars['String']>;
+  shipmentMethod: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  pkgCount: Maybe<Scalars['Int']>;
+  arrivedPkgs: Maybe<Scalars['Int']>;
+  status: Maybe<Scalars['String']>;
+};
+
+export enum ShipmentListView {
+  Incoming = 'INCOMING',
+  AllPurchase = 'ALL_PURCHASE',
+  UnclosedTransit = 'UNCLOSED_TRANSIT',
+  CancelledTransit = 'CANCELLED_TRANSIT',
+  AllTransit = 'ALL_TRANSIT',
+  CustomerScheduled = 'CUSTOMER_SCHEDULED',
+  CustomerFailed = 'CUSTOMER_FAILED'
+}
 
 export enum ShipmentStatus {
   Pending = 'PENDING',
@@ -1553,6 +1575,19 @@ export type SetShipmentStatusMutationVariables = {
 export type SetShipmentStatusMutation = (
   { __typename?: 'Mutation' }
   & { setShipmentStatus: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+export type UpdateFromDetrackMutationVariables = {
+  id: Maybe<Scalars['String']>;
+};
+
+
+export type UpdateFromDetrackMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFromDetrack: Maybe<(
     { __typename?: 'Message' }
     & Pick<Message, 'value'>
   )> }
@@ -2030,3 +2065,54 @@ export function useSetShipmentStatusMutation(baseOptions?: ApolloReactHooks.Muta
 export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipmentStatusMutation>;
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
+export const UpdateFromDetrackDocument = gql`
+    mutation updateFromDetrack($id: String) {
+  updateFromDetrack(id: $id) {
+    value
+  }
+}
+    `;
+export type UpdateFromDetrackMutationFn = ApolloReactCommon.MutationFunction<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>;
+export type UpdateFromDetrackComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>, 'mutation'>;
+
+    export const UpdateFromDetrackComponent = (props: UpdateFromDetrackComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables> mutation={UpdateFromDetrackDocument} {...props} />
+    );
+    
+export type UpdateFromDetrackProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>
+    } & TChildProps;
+export function withUpdateFromDetrack<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateFromDetrackMutation,
+  UpdateFromDetrackMutationVariables,
+  UpdateFromDetrackProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables, UpdateFromDetrackProps<TChildProps, TDataName>>(UpdateFromDetrackDocument, {
+      alias: 'updateFromDetrack',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useUpdateFromDetrackMutation__
+ *
+ * To run a mutation, you first call `useUpdateFromDetrackMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateFromDetrackMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateFromDetrackMutation, { data, loading, error }] = useUpdateFromDetrackMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useUpdateFromDetrackMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>(UpdateFromDetrackDocument, baseOptions);
+      }
+export type UpdateFromDetrackMutationHookResult = ReturnType<typeof useUpdateFromDetrackMutation>;
+export type UpdateFromDetrackMutationResult = ApolloReactCommon.MutationResult<UpdateFromDetrackMutation>;
+export type UpdateFromDetrackMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateFromDetrackMutation, UpdateFromDetrackMutationVariables>;

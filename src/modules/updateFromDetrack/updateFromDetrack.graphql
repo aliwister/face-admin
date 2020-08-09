@@ -1,0 +1,5 @@
+mutation updateFromDetrack($id: String) {
+  updateFromDetrack (id: $id) {
+    value
+  }
+}
