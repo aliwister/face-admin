@@ -23,6 +23,8 @@ import {
   INVENTORY,
   SHIPQ,
   IMPORTQ,
+  OUTSTANDINGQ,
+  UNSHIPPEDQ
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
@@ -30,6 +32,8 @@ import ShipmentDetails from "./containers/Shipments/ShipmentDetails";
 import Inventory from "./containers/Shipments/Inventory";
 import ShipQueue from "./containers/Shipments/ShipQueue";
 import ImportQueue from "./containers/Shipments/ImportQueue";
+import OutstandingQueue from "./containers/Purchases/OutstandingQueue";
+import UnshippedQueue from "./containers/Purchases/UnshippedQueue";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
 const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
@@ -229,6 +233,20 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <ImportQueue />
+              </Suspense>
+            </AdminLayout>
+          </PrivateRoute>
+          <PrivateRoute path={OUTSTANDINGQ}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <OutstandingQueue />
+              </Suspense>
+            </AdminLayout>
+        </PrivateRoute>
+        <PrivateRoute path={UNSHIPPEDQ}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <UnshippedQueue />
               </Suspense>
             </AdminLayout>
           </PrivateRoute>

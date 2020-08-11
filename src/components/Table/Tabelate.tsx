@@ -21,6 +21,7 @@ export function Tablelate({ columns, data }) {
     {
       columns,
       data,
+      initialState: { pageSize: 50 }
     },
     useSortBy,
     usePagination

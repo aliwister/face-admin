@@ -37,6 +37,7 @@ import {AcceptShipmentDialog} from "./components/AcceptShipmentDialog";
 import {IncomingShipments} from "./queues/IncomingShipments";
 import {CustomerShipmentList} from "./queues/CustomerShipmentList";
 import {TransitShipmentList} from "./queues/TransitShipmentList";
+import {TabPanel} from "../../components/TabPanel/TabPanel";
 
 const SHIPMENT_QUEUE = gql`
   query shipmentList($viewName: ShipmentListView) {
@@ -113,25 +114,6 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
 
 
 export default function Shipments() {

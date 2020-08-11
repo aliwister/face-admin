@@ -241,6 +241,7 @@ export default function Purchases() {
   return (
       <>
       <NewPurchaseDialog open={open} onClose={handleClose}  />
+
       <Grid container spacing={1}>
 
             <Grid item  md={3} >
@@ -279,6 +280,16 @@ export default function Purchases() {
               <Button variant="contained" color="primary" onClick={handleClickOpen} >
                 New Purchase
               </Button>
+              <Link to="outstanding-queue">
+                <Button variant="contained" color="secondary">
+                  Outstanding Items
+                </Button>
+              </Link>
+              <Link to="unshipped-queue">
+                <Button variant="contained" color="secondary">
+                  Unshipped
+                </Button>
+              </Link>
             </Grid>
 
       <Grid item xs={12}>
