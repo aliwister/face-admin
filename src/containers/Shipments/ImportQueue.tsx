@@ -142,7 +142,7 @@ export default function ImportQueue() {
   const [printLabelDialog, setPrintlabeldialog] = useState(false);
   const [label, setLabel] = useState('');
   const [item, setItem] = useState(-1);
-  const [selected, setSelected] = useState([]);
+  const [mult, setMult] = useState(1);
   const [checkedId, setCheckedId] = useState([]);
   const [trackingNums, setTrackingnums] = useState("");
 
@@ -237,6 +237,9 @@ export default function ImportQueue() {
  // const handleAcceptClose = () => dispatch({type: 'SELECT_ACCEPT_ITEM_CANCEL'})
  // const handleIssueClose = () => dispatch({type: 'ISSUE_ITEM_CANCEL'})
 
+  function handleSetMult(event) {
+    setMult(event.target.value);
+  }
 
   const onSubmit = e => {
     //console.log(data);
@@ -322,6 +325,7 @@ export default function ImportQueue() {
             </form>
           }*/
         />
+        <input onChange={(e) => handleSetMult(e)} />
         <Table  size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
@@ -365,7 +369,7 @@ export default function ImportQueue() {
                   </a>:
                   <span>{item.productId}</span>
                 }</TableCell>
-                <TableCell>{item.price}</TableCell>
+                <TableCell>{item.price* mult}</TableCell>
                 <TableCell  align="right">
                   {item.purchaseShipments && item.purchaseShipments.map((p) => (
                     <div> {p.purchaseItemId} <Link to={`/purchase-details/${p.purchaseId}`} target="_blank">{p.purchaseId}</Link> </div>
