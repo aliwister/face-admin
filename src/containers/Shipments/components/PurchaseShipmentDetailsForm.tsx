@@ -50,6 +50,13 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
       />
       <Grid container xs={12} md={12} spacing={1}>
         <Grid item md={6}>
+
+          <TextField size="small" label="Carrier" variant="outlined" className={classes.textField} name="shipmentMethod" inputRef={register}/>
+          </Grid>
+          <Grid item md={6}>
+          <TextField size="small" label="Tracking" variant="outlined" className={classes.textField} name="trackingNum" inputRef={register}/>
+          </Grid>
+        <Grid item md={6}>
           <Controller
             as={<Select
                   options={merchants.merchants}

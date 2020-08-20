@@ -70,8 +70,8 @@ const ADD_TRACKING_EVENT = gql`
   }
 `;
 const SHIPMENT_ITEMS = gql`
-query shipmentItemsByTrackingNums($trackingNums: [String]) {
-  shipmentItemsByTrackingNums(trackingNums: $trackingNums) {
+query shipmentItemsByTrackingNums($trackingNums: [String], $showClosed: Boolean) {
+  shipmentItemsByTrackingNums(trackingNums: $trackingNums, showClosed: $showClosed) {
     id
     sequence
     quantity
@@ -143,6 +143,7 @@ export default function ImportQueue() {
   const [label, setLabel] = useState('');
   const [item, setItem] = useState(-1);
   const [mult, setMult] = useState(1);
+  const [showClosed, setShowclosed] = useState(false);
   const [checkedId, setCheckedId] = useState([]);
   const [trackingNums, setTrackingnums] = useState("");
 
@@ -241,11 +242,15 @@ export default function ImportQueue() {
     setMult(event.target.value);
   }
 
+  function handleShowClosed() {
+    setShowclosed(!showClosed);
+  }
+
   const onSubmit = e => {
     //console.log(data);
     //const trackingNums =  data["trackingNums"];
     console.log(trackingNums.split(/\r?\n/));
-    refetch({trackingNums: trackingNums.split(/\r?\n/)});
+    refetch({trackingNums: trackingNums.split(/\r?\n/), showClosed: showClosed});
     cntrefetch({trackingNums: trackingNums.split(/\r?\n/)});
     return false;
   }
@@ -326,6 +331,10 @@ export default function ImportQueue() {
           }*/
         />
         <input onChange={(e) => handleSetMult(e)} />
+        <Checkbox
+          onClick={handleShowClosed}
+          value={showClosed}
+        /> Show Closed
         <Table  size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
