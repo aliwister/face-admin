@@ -39,10 +39,11 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Checkbox from "@material-ui/core/Checkbox";
 import {EditOrderDialog} from "./EditOrderDialog";
 import TableFooter from "@material-ui/core/TableFooter";
-import {CancelOrderDialog} from "./components/CancelOrderDialog";
+import {ActionReasonDialog} from "./components/ActionReasonDialog";
 import {useOrderAQuery} from "../../codegen/generated/_graphql";
 import LaunchIcon from '@material-ui/icons/Launch';
 import {Shipments} from "./components/Shipments";
+import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
@@ -61,6 +62,13 @@ mutation editOrder($id: ID, $orderItems: [OrderItemInput]) {
 const CANCEL_ORDER = gql`
 mutation cancelOrder($id: ID, $reason: String) {
   cancelOrder(id:$id, reason:$reason) {
+    id
+  }
+}
+`;
+const CLOSE_ORDER = gql`
+mutation closeOrder($id: ID, $reason: String) {
+  closeOrder(id:$id, reason:$reason) {
     id
   }
 }
@@ -136,6 +144,7 @@ export default function OrderDetails(props) {
   const [sendVoltageEmailMutation] = useMutation(SEND_VOLTAGE_EMAIL, { context: { clientName: "shopLink" }});
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
+  const [closeOrderMutation] = useMutation(CLOSE_ORDER, { context: { clientName: "shopLink" }});
   const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
@@ -154,6 +163,7 @@ export default function OrderDetails(props) {
   const [checked, setChecked] = useState(false);
   const [editdialog, setEditdialog] = useState(false);
   const [canceldialog, setCanceldialog] = useState(false);
+  const [closedialog, setClosedialog] = useState(false);
   const [b2,setB2] = useState(true);
   const alert = useAlert();
 
@@ -190,6 +200,18 @@ export default function OrderDetails(props) {
     if(cancelOrder)  {
       alert.success(cancelOrder.id);
       setCanceldialog(false);
+      await refetch();
+    }
+  }
+  const onCloseOrder = async formData => {
+    const {
+      data: { closeOrder },
+    }: any = await closeOrderMutation({
+      variables: {id: orderData.orderA.id, reason: formData.reason}
+    });
+    if(closeOrder)  {
+      alert.success(closeOrder.id);
+      setClosedialog(false);
       await refetch();
     }
   }
@@ -240,12 +262,14 @@ export default function OrderDetails(props) {
   }
   const onEditStart = () => setEditdialog(true);
   const onCancelStart = () => setCanceldialog(true);
-  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false);}
+  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);}
+  const onCloseStart = () => {setClosedialog(true);}
 
   return (
     <Grid fluid={true}>
       <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.orderItems} />
-      <CancelOrderDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} />
+      <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
+      <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
       <Row>
         <Col lg={2} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
@@ -365,6 +389,7 @@ export default function OrderDetails(props) {
                 <Button onClick={onEditStart}>Edit Order</Button>
                 <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>
+                <Button onClick={onCloseStart}>Close</Button>
               </ButtonGroup>
 
             </div>

@@ -49,6 +49,7 @@ const SHIPMENT_QUEUE = gql`
       pkgCount
       arrivedPkgs
       status
+      sender
     }
   }
 `;

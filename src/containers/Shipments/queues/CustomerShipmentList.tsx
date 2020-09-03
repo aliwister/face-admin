@@ -45,12 +45,8 @@ export function CustomerShipmentList({data, refetch}) {
             accessor: (row) => (<a href={`https://www.trackingmore.com/${row.shipmentMethod}-tracking.html?number=${row.trackingNum}`} target="_blank">{row.trackingNum}</a>)
           },
           {
-            Header: 'Name',
-            accessor: 'shipmentMethod',
-          },
-          {
             Header: 'Carrier',
-            accessor: 'carrier',
+            accessor: 'shipmentMethod',
           },
           {
             Header: 'Action',

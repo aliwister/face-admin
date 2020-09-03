@@ -20,14 +20,14 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const CancelOrderDialog = ({open, onSubmit, onClose}) =>{
+export const ActionReasonDialog = ({open, onSubmit, onClose, title}) =>{
   const { register, handleSubmit, errors } = useForm();
   const classes = useStyles();
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle id="form-dialog-title">Cancel Order</DialogTitle>
+      <DialogTitle id="form-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <TextField
           id="outlined-multiline-static"
@@ -39,7 +39,7 @@ export const CancelOrderDialog = ({open, onSubmit, onClose}) =>{
           inputRef={register({ required: true })}/>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="primary" type="submit" size="large">Cancel</Button>
+        <Button variant="contained" color="primary" type="submit" size="large">Yes</Button>
       </DialogActions>
     </form>
     </Dialog>
