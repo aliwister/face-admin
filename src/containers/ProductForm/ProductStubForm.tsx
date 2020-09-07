@@ -11,7 +11,6 @@ import DrawerBox from '../../components/DrawerBox/DrawerBox';
 import { Row, Col } from '../../components/FlexBox/FlexBox';
 import Input from '../../components/Input/Input';
 import { Textarea } from '../../components/Textarea/Textarea';
-import Select from '../../components/Select/Select';
 import { FormFields, FormLabel } from '../../components/FormFields/FormFields';
 import { useAlert } from "react-alert";
 import {
@@ -27,11 +26,14 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import {CircularProgress} from "@material-ui/core";
 import {MerchantProductsDocument} from "../../codegen/generated/_graphql";
 import {MerchantLookup} from "../../components/Merchant/MerchantsLookup";
+import {watch} from "fs";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
 
 
 const GET_IMAGE_UPLOAD_URL = gql`
-  mutation getImageUploadUrl($filename: String) {
-    getImageUploadUrl(filename: $filename) {
+  mutation getAdminImageUploadUrl($filename: String, $merchant: String) {
+    getAdminImageUploadUrl(filename: $filename, merchant: $merchant) {
       uploadUrl
       imageUrl
       status
@@ -39,9 +41,9 @@ const GET_IMAGE_UPLOAD_URL = gql`
   }    
 `;
 export const CREATE_PRODUCT = gql`
-  mutation createMerchantProduct($product: AddProductInput!) {
-    createMerchantProduct(product: $product) {
-      value
+  mutation createProduct($product: AddProductInput!, $isSaveES: Boolean, $currentMerchantId: Long) {
+    createProduct(product: $product, isSaveES: $isSaveES, currentMerchantId: $currentMerchantId) {
+      ref
     }
   }
 `;
@@ -66,13 +68,29 @@ const AddProduct: React.FC<Props> = props => {
   ]);
   const updateData = useDrawerState('data');
   //console.log(updateData);
-  const { register, handleSubmit, setValue } = useForm({defaultValues: updateData});
+  const { watch, register, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      name: 'Name',
+      upc: '123',
+      sku: 'sku',
+      brand: 'brand',
+      cost: 11,
+      shipping: 0,
+      features: ['feature1'],
+      weight: 3,
+      sale_price: 111,
+      availability: 123
+    }
+    // defaultValues: updateData
+    //
+  });
   const [type, setType] = useState([]);
   const [tag, setTag] = useState([]);
   const [files, setFiles] = useState([]);
   const [description, setDescription] = useState('');
   const [description_ar, setDescriptionar] = useState('');
   const [price, setPrice] = useState(1);
+  const [to, setTo] = useState('usa');
   const [salePrice, setSaleprice] = useState(0);
   const [buttonlabel, setButtonlabel] = useState("Create Product");
   const classes = useStyles();
@@ -116,25 +134,8 @@ const AddProduct: React.FC<Props> = props => {
 
   const [getImageUrl] = useMutation(GET_IMAGE_UPLOAD_URL, { context: { clientName: "shopLink" }});
 
-  const [createMerchantProduct] = useMutation(CREATE_PRODUCT, {
+  const [createProductMutation] = useMutation(CREATE_PRODUCT, {
     context: { clientName: "shopLink" },
-    update(cache, { data: { createMerchantProduct } }) {
-      const { products } = cache.readQuery({
-        query: MerchantProductsDocument,
-      });
-
-      cache.writeQuery({
-        query: MerchantProductsDocument,
-        data: {
-          products: {
-            __typename: products.__typename,
-            items: [createMerchantProduct, ...products.items],
-            hasMore: true,
-            totalCount: products.items.length + 1,
-          },
-        },
-      });
-    },
   });
   const handleMultiChange = ({ value }) => {
     //console.log(value);
@@ -202,24 +203,32 @@ const AddProduct: React.FC<Props> = props => {
 
     console.log(newProduct);
 
-    createMerchantProduct({
-      variables: { product: newProduct },
+    const {
+      data: {createProduct}
+    }:  any = await
+      createProductMutation({
+      variables: { product: newProduct, isSaveES: false, currentMerchantId: merchant.id },
     });
+
+    console.log(createProduct);
     closeDrawer();
     setLoading(false);
     alert.success("Product saved successfully");
+    alert.success("https://www.badals.com/product/"+createProduct.ref)
   };
 
   const handleUpload = async () => {
+    if(!merchant)
+      return alert.error("Please select merchant first");
     const [pendingImage] = files;
     //console.log(pendingImage);
     const filename = pendingImage.path;
-    const { data: { getImageUploadUrl },}: any = await getImageUrl({variables: {filename: filename, contentType: pendingImage.type}});
+    const { data: { getAdminImageUploadUrl },}: any = await getImageUrl({variables: {filename: filename, merchant: merchant.name, contentType: pendingImage.type}});
 
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", pendingImage.type);
 
-    await fetch(getImageUploadUrl.uploadUrl, {
+    await fetch(getAdminImageUploadUrl.uploadUrl, {
       method: 'put',
       headers: myHeaders,
       body: pendingImage,
@@ -229,10 +238,46 @@ const AddProduct: React.FC<Props> = props => {
     }).catch(function(err){
       console.log(err);
     });
-    return getImageUploadUrl.imageUrl;
+    return getAdminImageUploadUrl.imageUrl;
     ///console.log(res);
     //return { fields: {}, meta: { fileUrl: "https://badal-assets.s3-eu-west-1.amazonaws.com/"+name }, url: getImageUploadUrl.value }
   }
+
+  function calculatePrice(e) {
+    e.preventDefault();
+    if(!watch('weight'))
+      return alert.error("Enter weight first");
+    if(!watch('cost'))
+      return alert.error("Enter cost first");
+    if(!watch('shipping'))
+      return alert.error("Enter shipping first");
+    if(!watch('cost'))
+      return alert.error("Enter cost first");
+
+    switch(to) {
+      case 'uk':
+        alert.success('uk price');
+        break;
+      case 'usa':
+        alert.success('usa price');
+        break;
+      case 'oman':
+        alert.success('oman price');
+        break;
+      case 'uae':
+        alert.success('uae price');
+        break;
+
+    }
+
+
+    setValue('salePrice', 123)
+    return false;
+  }
+
+  const handleTo = (event) => {
+    setTo(event.target.value);
+  };
 
   return (
     <>
@@ -275,7 +320,15 @@ const AddProduct: React.FC<Props> = props => {
                   },
                 }}
               >
-                <Uploader onChange={handleUploader} handleUpload={handleUpload } />
+
+                  <Uploader onChange={handleUploader} handleUpload={handleUpload } />
+
+
+              </DrawerBox>
+              <DrawerBox>
+                <FormFields>
+                  <MerchantLookup setMerchant={setMerchant} selected={merchant}/>
+                </FormFields>
               </DrawerBox>
             </Col>
           </Row>
@@ -290,10 +343,9 @@ const AddProduct: React.FC<Props> = props => {
             <Col lg={8}>
               <DrawerBox>
                 <Row>
+
                   <Col lg={6}>
-                    <FormFields>
-                      <MerchantLookup setMerchant={setMerchant} selected={merchant}/>
-                    </FormFields>
+
                     <FormFields>
                       <FormLabel>Name</FormLabel>
                       <Input
@@ -342,28 +394,49 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Cost (For reference/Overriden by agreement)</FormLabel>
+                      <FormLabel>Cost (USD)</FormLabel>
                       <Input
                         inputRef={register}
                         name="cost"
                         pattern="^\d*(\.\d{0,2})?$"
                       />
                     </FormFields>
+                    <FormFields>
+                      <FormLabel>Shipping (USD)</FormLabel>
+                      <Input
+                        inputRef={register}
+                        name="shipping"
+                        pattern="^\d*(\.\d{0,2})?$"
+                      />
+                    </FormFields>
 
                     <FormFields>
-                      <FormLabel>Product Weight (KG)</FormLabel>
+                      <FormLabel>Weight (KG)</FormLabel>
                       <Input
                         inputRef={register()}
                         name="weight"
                         pattern="^\d*(\.\d{0,2})?$"
                       />
                     </FormFields>
-
                     <FormFields>
-                      <FormLabel>Price (OMR)</FormLabel>
+                      <FormLabel>Ship To</FormLabel>
+                      <Select
+                        value={to}
+                        onChange={handleTo}
+                      >
+                        <MenuItem value="oman">Oman</MenuItem>
+                        <MenuItem value="usa">USA</MenuItem>
+                        <MenuItem value="uae">UAE</MenuItem>
+                        <MenuItem value="ukvatfree">UK VAT FREE</MenuItem>
+                        <MenuItem value="uk">UK</MenuItem>
+                        <MenuItem value="china">China</MenuItem>
+                      </Select>
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Price (OMR)</FormLabel><button onClick={calculatePrice}>Calculate</button>
                       <Input
                         inputRef={register({ required: true })}
-                        name="price"
+                        name="salePrice"
                         pattern="^\d*(\.\d{0,2})?$"
                         onChange={(e) => setPrice(e.target.value)}
                       />
@@ -374,6 +447,14 @@ const AddProduct: React.FC<Props> = props => {
                         type="number"
                         inputRef={register({ required: true })}
                         name="availability"
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Quantity</FormLabel>
+                      <Input
+                        type="number"
+                        inputRef={register({ required: true })}
+                        name="quantity"
                       />
                     </FormFields>
 
