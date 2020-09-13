@@ -137,13 +137,13 @@ export default function Transactions() {
         if (!fetchMoreResult) return prev;
 
         return Object.assign({}, prev, {
-          ordersA: {
+          transactions: {
             // @ts-ignore
-            __typename: prev.ordersA.__typename,
+            __typename: prev.transactions.__typename,
             // @ts-ignore
-            items: [...prev.ordersA.items, ...fetchMoreResult.ordersA.items],
+            items: [...prev.transactions.items, ...fetchMoreResult.transactions.items],
             // @ts-ignore
-            hasMore: fetchMoreResult.ordersA.hasMore,
+            hasMore: fetchMoreResult.transactions.hasMore,
           },
         });
       },
