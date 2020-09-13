@@ -23,6 +23,7 @@ export const SHIPQ = '/ship-queue';
 export const IMPORTQ = '/import-queue';
 export const OUTSTANDINGQ = '/outstanding-queue';
 export const UNSHIPPEDQ = '/unshipped-queue';
+export const ACCOUNTING = '/accounting';
 export const CART = '/cart';
 export const SIGNUP = '/signup';
 // **************** ROUTE CONSTANT END **************************

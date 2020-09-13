@@ -5,6 +5,7 @@ type AuthProps = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isMerchant: boolean;
+  isFinance: boolean;
   authenticate: Function;
   signout: Function;
   token: String;
@@ -47,11 +48,22 @@ const isValidMerchant = () => {
   if (inMemoryToken) return true;
   return false;
 };
+const isValidFinance = () => {
+    const token = Cookies.get('authorities');
+    if(token && token.indexOf("ROLE_FINANCE") > -1) {
+        return true;
+    }
+    return false;
+  // @ts-ignore
+  if (inMemoryToken) return true;
+  return false;
+};
 
 const AuthProvider = (props: any) => {
   const [isAuthenticated, makeAuthenticated] = React.useState(isValidToken());
   const [isAdmin, makeAdmin] = React.useState(isValidAdmin());
   const [isMerchant, makeMerchant] = React.useState(isValidMerchant());
+  const [isFinance, makeFinance] = React.useState(isValidFinance());
   const [token, setToken] = React.useState("");
 
   async function authenticate({username, password}, cb) {
@@ -81,6 +93,7 @@ const AuthProvider = (props: any) => {
         isAuthenticated,
         isAdmin,
         isMerchant,
+        isFinance,
         authenticate,
         signout,
         token

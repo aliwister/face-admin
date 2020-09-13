@@ -306,6 +306,9 @@ export type Mutation = {
   addTrackingEvent: Maybe<Message>;
   approveProduct: Maybe<Product>;
   cancelOrder: Maybe<Order>;
+  cancelPurchase: Maybe<Purchase>;
+  closeOrder: Maybe<Order>;
+  closePurchase: Maybe<Purchase>;
   completePricingRequest: Maybe<Message>;
   completePricingRequestAndEmail: Maybe<Message>;
   contact: Maybe<Message>;
@@ -315,7 +318,7 @@ export type Mutation = {
   createNewProduct: Maybe<Product>;
   createOrder: Maybe<Order>;
   createOverride: Maybe<Product>;
-  createProduct: Maybe<Product>;
+  createProduct: Maybe<MerchantProduct>;
   /** createOrderFromCart(cart: CartInput): Order */
   createPurchase: Maybe<Purchase>;
   /**
@@ -328,6 +331,7 @@ export type Mutation = {
   createShipment: Maybe<Shipment>;
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
+  getAdminImageUploadUrl: Maybe<PresignedUrl>;
   getImageUploadUrl: Maybe<PresignedUrl>;
   getUploadUrl: Maybe<PresignedUrl>;
   importProducts: Maybe<Message>;
@@ -345,8 +349,12 @@ export type Mutation = {
   sendPaymentSms: Maybe<Message>;
   sendProductLevelEmail: Maybe<Message>;
   sendToDetrack: Maybe<Message>;
+  setAccountingCode: Maybe<Message>;
   setCart: Maybe<Cart>;
   setOrderState: Maybe<Order>;
+  setProcessedDate: Maybe<Message>;
+  setPurchaseState: Maybe<Purchase>;
+  setSettlementDate: Maybe<Message>;
   setShipmentStatus: Maybe<Message>;
   unpackItem: Maybe<Message>;
   updateCart: Maybe<Cart>;
@@ -432,6 +440,24 @@ export type MutationCancelOrderArgs = {
 };
 
 
+export type MutationCancelPurchaseArgs = {
+  id: Maybe<Scalars['ID']>;
+  reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCloseOrderArgs = {
+  id: Maybe<Scalars['ID']>;
+  reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationClosePurchaseArgs = {
+  id: Maybe<Scalars['ID']>;
+  reason: Maybe<Scalars['String']>;
+};
+
+
 export type MutationCompletePricingRequestArgs = {
   id: Maybe<Scalars['Long']>;
 };
@@ -480,15 +506,14 @@ export type MutationCreateOverrideArgs = {
   active: Maybe<Scalars['Boolean']>;
   lazy: Maybe<Scalars['Boolean']>;
   merchantId: Maybe<Scalars['Int']>;
+  submitOnly: Maybe<Scalars['Int']>;
 };
 
 
 export type MutationCreateProductArgs = {
-  ref: Maybe<Scalars['Int']>;
-  parent: Maybe<Scalars['Int']>;
-  sku: Maybe<Scalars['String']>;
-  upc: Maybe<Scalars['String']>;
-  releaseDate: Maybe<Scalars['LocalDate']>;
+  product: Maybe<AddProductInput>;
+  isSaveES: Maybe<Scalars['Boolean']>;
+  currentMerchantId: Maybe<Scalars['Long']>;
 };
 
 
@@ -513,6 +538,13 @@ export type MutationEditOrderArgs = {
   id: Maybe<Scalars['ID']>;
   orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
   reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationGetAdminImageUploadUrlArgs = {
+  filename: Maybe<Scalars['String']>;
+  merchant: Maybe<Scalars['String']>;
+  contentType: Maybe<Scalars['String']>;
 };
 
 
@@ -615,6 +647,12 @@ export type MutationSendToDetrackArgs = {
 };
 
 
+export type MutationSetAccountingCodeArgs = {
+  paymentId: Maybe<Scalars['ID']>;
+  code: Maybe<Scalars['String']>;
+};
+
+
 export type MutationSetCartArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
@@ -624,6 +662,24 @@ export type MutationSetCartArgs = {
 export type MutationSetOrderStateArgs = {
   id: Maybe<Scalars['ID']>;
   state: Maybe<OrderState>;
+};
+
+
+export type MutationSetProcessedDateArgs = {
+  paymentId: Maybe<Scalars['ID']>;
+  date: Maybe<Scalars['Date']>;
+};
+
+
+export type MutationSetPurchaseStateArgs = {
+  id: Maybe<Scalars['ID']>;
+  state: Maybe<OrderState>;
+};
+
+
+export type MutationSetSettlementDateArgs = {
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
+  date: Maybe<Scalars['Date']>;
 };
 
 
@@ -723,7 +779,8 @@ export enum OrderState {
   PartiallyDelivered = 'PARTIALLY_DELIVERED',
   Delivered = 'DELIVERED',
   Shipped = 'SHIPPED',
-  Cancelled = 'CANCELLED'
+  Cancelled = 'CANCELLED',
+  Closed = 'CLOSED'
 }
 
 export type OutstandingQueue = {
@@ -739,6 +796,7 @@ export type OutstandingQueue = {
   orderId: Maybe<Scalars['Long']>;
   orderItemId: Maybe<Scalars['Long']>;
   productId: Maybe<Scalars['Long']>;
+  wait: Maybe<Scalars['Int']>;
 };
 
 export enum OverrideType {
@@ -781,12 +839,29 @@ export type Payment = {
   orderId: Maybe<Scalars['Long']>;
   amount: Maybe<Scalars['BigDecimal']>;
   authCode: Maybe<Scalars['String']>;
+  transactionId: Maybe<Scalars['String']>;
+  cardNumber: Maybe<Scalars['String']>;
+  createdDate: Maybe<Scalars['String']>;
+  orderReference: Maybe<Scalars['String']>;
+  account: Maybe<Scalars['String']>;
+  bankAccountNumber: Maybe<Scalars['String']>;
+  bankName: Maybe<Scalars['String']>;
+  bankOwnerName: Maybe<Scalars['String']>;
+  settlementDate: Maybe<Scalars['String']>;
+  processedDate: Maybe<Scalars['String']>;
 };
 
 export type PaymentInput = {
   price: Maybe<PriceInput>;
   invoiceNum: Maybe<Scalars['String']>;
   userId: Maybe<Scalars['Long']>;
+};
+
+export type PaymentResponse = {
+   __typename?: 'PaymentResponse';
+  items: Array<Payment>;
+  total: Scalars['Int'];
+  hasMore: Scalars['Boolean'];
 };
 
 export type Pkg = {
@@ -834,6 +909,7 @@ export type PricingRequest = {
   parent: Maybe<Scalars['String']>;
   merchantId: Maybe<Scalars['Int']>;
   merchantName: Maybe<Scalars['String']>;
+  createdDate: Maybe<Scalars['String']>;
 };
 
 export type Product = {
@@ -877,6 +953,7 @@ export type Product = {
   availability: Maybe<Scalars['String']>;
   features: Maybe<Array<Maybe<Scalars['String']>>>;
   browseNode: Maybe<Scalars['String']>;
+  inStock: Maybe<Scalars['Boolean']>;
 };
 
 export enum ProductGroup {
@@ -1076,6 +1153,7 @@ export type Query = {
   purchases: Maybe<Array<Maybe<Purchase>>>;
   relatedProducts: Array<Product>;
   shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
+  shipQueueByCustomerId: Maybe<Array<Maybe<ShipQueue>>>;
   shipment: Maybe<Shipment>;
   shipmentItemsByTrackingNums: Maybe<Array<Maybe<ShipmentItem>>>;
   shipmentItemsCountByTrackingNums: Maybe<Array<Maybe<ShipmentItemSummary>>>;
@@ -1085,7 +1163,10 @@ export type Query = {
   sortQueue: Maybe<Array<Maybe<SortQueue>>>;
   track: Maybe<Array<Maybe<ShipmentTrackingMap>>>;
   trackingEvents: Maybe<Array<Maybe<TrackingEvent>>>;
+  transaction: Maybe<Payment>;
+  transactions: Maybe<PaymentResponse>;
   unshippedPurchases: Maybe<Array<Maybe<PurchaseQueue>>>;
+  unshippedQueue: Maybe<Array<Maybe<UnshippedQueue>>>;
 };
 
 
@@ -1224,6 +1305,11 @@ export type QueryRelatedProductsArgs = {
 };
 
 
+export type QueryShipQueueByCustomerIdArgs = {
+  customerId: Maybe<Scalars['Long']>;
+};
+
+
 export type QueryShipmentArgs = {
   id: Maybe<Scalars['ID']>;
 };
@@ -1231,6 +1317,7 @@ export type QueryShipmentArgs = {
 
 export type QueryShipmentItemsByTrackingNumsArgs = {
   trackingNums: Maybe<Array<Maybe<Scalars['String']>>>;
+  showClosed: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1262,6 +1349,23 @@ export type QuerySortQueueArgs = {
 
 export type QueryTrackArgs = {
   ref: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTransactionArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryTransactionsArgs = {
+  paymentMethods: Maybe<Array<Maybe<Scalars['String']>>>;
+  offset: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  searchText: Maybe<Scalars['String']>;
+  from: Maybe<Scalars['Date']>;
+  to: Maybe<Scalars['Date']>;
+  customerId: Maybe<Scalars['Long']>;
+  accountCode: Maybe<Scalars['String']>;
 };
 
 export type Shipment = {
@@ -1346,6 +1450,7 @@ export type ShipmentList = {
   pkgCount: Maybe<Scalars['Int']>;
   arrivedPkgs: Maybe<Scalars['Int']>;
   status: Maybe<Scalars['String']>;
+  sender: Maybe<Scalars['String']>;
 };
 
 export enum ShipmentListView {
@@ -1442,6 +1547,19 @@ export type TrackingEventItem = {
   createdDate: Maybe<Scalars['String']>;
   details: Maybe<Scalars['String']>;
   eventDate: Maybe<Scalars['LocalDateTime']>;
+};
+
+export type UnshippedQueue = {
+   __typename?: 'UnshippedQueue';
+  id: Maybe<Scalars['ID']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  date: Maybe<Scalars['String']>;
+  price: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  image: Maybe<Scalars['String']>;
+  sku: Maybe<Scalars['String']>;
+  po: Maybe<Scalars['Long']>;
 };
 
 export type Variation = {
@@ -1566,6 +1684,48 @@ export type PurchaseQuery = (
   )> }
 );
 
+export type SetProcessedDateMutationVariables = {
+  paymentId: Maybe<Scalars['ID']>;
+  date: Maybe<Scalars['Date']>;
+};
+
+
+export type SetProcessedDateMutation = (
+  { __typename?: 'Mutation' }
+  & { setProcessedDate: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+export type SetAccountingCodeMutationVariables = {
+  paymentId: Maybe<Scalars['ID']>;
+  code: Maybe<Scalars['String']>;
+};
+
+
+export type SetAccountingCodeMutation = (
+  { __typename?: 'Mutation' }
+  & { setAccountingCode: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+export type SetSettlementDateMutationVariables = {
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
+  date: Maybe<Scalars['Date']>;
+};
+
+
+export type SetSettlementDateMutation = (
+  { __typename?: 'Mutation' }
+  & { setSettlementDate: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
 export type SetShipmentStatusMutationVariables = {
   id: Maybe<Scalars['Long']>;
   status: Maybe<ShipmentStatus>;
@@ -1577,6 +1737,30 @@ export type SetShipmentStatusMutation = (
   & { setShipmentStatus: Maybe<(
     { __typename?: 'Message' }
     & Pick<Message, 'value'>
+  )> }
+);
+
+export type TransactionsQueryVariables = {
+  paymentMethods: Maybe<Array<Maybe<Scalars['String']>>>;
+  offset: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  searchText: Maybe<Scalars['String']>;
+  from?: Maybe<Scalars['Date']>;
+  to?: Maybe<Scalars['Date']>;
+  customerId?: Maybe<Scalars['Long']>;
+  accountCode?: Maybe<Scalars['String']>;
+};
+
+
+export type TransactionsQuery = (
+  { __typename?: 'Query' }
+  & { transactions: Maybe<(
+    { __typename?: 'PaymentResponse' }
+    & Pick<PaymentResponse, 'total' | 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'Payment' }
+      & Pick<Payment, 'id' | 'paymentMethod' | 'orderId' | 'amount' | 'authCode' | 'transactionId' | 'cardNumber' | 'createdDate' | 'orderReference' | 'account' | 'bankAccountNumber' | 'bankName' | 'bankOwnerName' | 'settlementDate' | 'processedDate'>
+    )> }
   )> }
 );
 
@@ -2013,6 +2197,162 @@ export function usePurchaseLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHoo
 export type PurchaseQueryHookResult = ReturnType<typeof usePurchaseQuery>;
 export type PurchaseLazyQueryHookResult = ReturnType<typeof usePurchaseLazyQuery>;
 export type PurchaseQueryResult = ApolloReactCommon.QueryResult<PurchaseQuery, PurchaseQueryVariables>;
+export const SetProcessedDateDocument = gql`
+    mutation setProcessedDate($paymentId: ID, $date: Date) {
+  setProcessedDate(paymentId: $paymentId, date: $date) {
+    value
+  }
+}
+    `;
+export type SetProcessedDateMutationFn = ApolloReactCommon.MutationFunction<SetProcessedDateMutation, SetProcessedDateMutationVariables>;
+export type SetProcessedDateComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SetProcessedDateMutation, SetProcessedDateMutationVariables>, 'mutation'>;
+
+    export const SetProcessedDateComponent = (props: SetProcessedDateComponentProps) => (
+      <ApolloReactComponents.Mutation<SetProcessedDateMutation, SetProcessedDateMutationVariables> mutation={SetProcessedDateDocument} {...props} />
+    );
+    
+export type SetProcessedDateProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SetProcessedDateMutation, SetProcessedDateMutationVariables>
+    } & TChildProps;
+export function withSetProcessedDate<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SetProcessedDateMutation,
+  SetProcessedDateMutationVariables,
+  SetProcessedDateProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SetProcessedDateMutation, SetProcessedDateMutationVariables, SetProcessedDateProps<TChildProps, TDataName>>(SetProcessedDateDocument, {
+      alias: 'setProcessedDate',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSetProcessedDateMutation__
+ *
+ * To run a mutation, you first call `useSetProcessedDateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetProcessedDateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setProcessedDateMutation, { data, loading, error }] = useSetProcessedDateMutation({
+ *   variables: {
+ *      paymentId: // value for 'paymentId'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useSetProcessedDateMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetProcessedDateMutation, SetProcessedDateMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetProcessedDateMutation, SetProcessedDateMutationVariables>(SetProcessedDateDocument, baseOptions);
+      }
+export type SetProcessedDateMutationHookResult = ReturnType<typeof useSetProcessedDateMutation>;
+export type SetProcessedDateMutationResult = ApolloReactCommon.MutationResult<SetProcessedDateMutation>;
+export type SetProcessedDateMutationOptions = ApolloReactCommon.BaseMutationOptions<SetProcessedDateMutation, SetProcessedDateMutationVariables>;
+export const SetAccountingCodeDocument = gql`
+    mutation setAccountingCode($paymentId: ID, $code: String) {
+  setAccountingCode(paymentId: $paymentId, code: $code) {
+    value
+  }
+}
+    `;
+export type SetAccountingCodeMutationFn = ApolloReactCommon.MutationFunction<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>;
+export type SetAccountingCodeComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>, 'mutation'>;
+
+    export const SetAccountingCodeComponent = (props: SetAccountingCodeComponentProps) => (
+      <ApolloReactComponents.Mutation<SetAccountingCodeMutation, SetAccountingCodeMutationVariables> mutation={SetAccountingCodeDocument} {...props} />
+    );
+    
+export type SetAccountingCodeProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>
+    } & TChildProps;
+export function withSetAccountingCode<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SetAccountingCodeMutation,
+  SetAccountingCodeMutationVariables,
+  SetAccountingCodeProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SetAccountingCodeMutation, SetAccountingCodeMutationVariables, SetAccountingCodeProps<TChildProps, TDataName>>(SetAccountingCodeDocument, {
+      alias: 'setAccountingCode',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSetAccountingCodeMutation__
+ *
+ * To run a mutation, you first call `useSetAccountingCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetAccountingCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setAccountingCodeMutation, { data, loading, error }] = useSetAccountingCodeMutation({
+ *   variables: {
+ *      paymentId: // value for 'paymentId'
+ *      code: // value for 'code'
+ *   },
+ * });
+ */
+export function useSetAccountingCodeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>(SetAccountingCodeDocument, baseOptions);
+      }
+export type SetAccountingCodeMutationHookResult = ReturnType<typeof useSetAccountingCodeMutation>;
+export type SetAccountingCodeMutationResult = ApolloReactCommon.MutationResult<SetAccountingCodeMutation>;
+export type SetAccountingCodeMutationOptions = ApolloReactCommon.BaseMutationOptions<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>;
+export const SetSettlementDateDocument = gql`
+    mutation setSettlementDate($paymentIds: [Long], $date: Date) {
+  setSettlementDate(paymentIds: $paymentIds, date: $date) {
+    value
+  }
+}
+    `;
+export type SetSettlementDateMutationFn = ApolloReactCommon.MutationFunction<SetSettlementDateMutation, SetSettlementDateMutationVariables>;
+export type SetSettlementDateComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SetSettlementDateMutation, SetSettlementDateMutationVariables>, 'mutation'>;
+
+    export const SetSettlementDateComponent = (props: SetSettlementDateComponentProps) => (
+      <ApolloReactComponents.Mutation<SetSettlementDateMutation, SetSettlementDateMutationVariables> mutation={SetSettlementDateDocument} {...props} />
+    );
+    
+export type SetSettlementDateProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SetSettlementDateMutation, SetSettlementDateMutationVariables>
+    } & TChildProps;
+export function withSetSettlementDate<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SetSettlementDateMutation,
+  SetSettlementDateMutationVariables,
+  SetSettlementDateProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SetSettlementDateMutation, SetSettlementDateMutationVariables, SetSettlementDateProps<TChildProps, TDataName>>(SetSettlementDateDocument, {
+      alias: 'setSettlementDate',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSetSettlementDateMutation__
+ *
+ * To run a mutation, you first call `useSetSettlementDateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetSettlementDateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setSettlementDateMutation, { data, loading, error }] = useSetSettlementDateMutation({
+ *   variables: {
+ *      paymentIds: // value for 'paymentIds'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useSetSettlementDateMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetSettlementDateMutation, SetSettlementDateMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetSettlementDateMutation, SetSettlementDateMutationVariables>(SetSettlementDateDocument, baseOptions);
+      }
+export type SetSettlementDateMutationHookResult = ReturnType<typeof useSetSettlementDateMutation>;
+export type SetSettlementDateMutationResult = ApolloReactCommon.MutationResult<SetSettlementDateMutation>;
+export type SetSettlementDateMutationOptions = ApolloReactCommon.BaseMutationOptions<SetSettlementDateMutation, SetSettlementDateMutationVariables>;
 export const SetShipmentStatusDocument = gql`
     mutation setShipmentStatus($id: Long, $status: ShipmentStatus) {
   setShipmentStatus(id: $id, status: $status) {
@@ -2065,6 +2405,83 @@ export function useSetShipmentStatusMutation(baseOptions?: ApolloReactHooks.Muta
 export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipmentStatusMutation>;
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
+export const TransactionsDocument = gql`
+    query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $searchText: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = "") {
+  transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, searchText: $searchText, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode) {
+    total
+    hasMore
+    items {
+      id
+      paymentMethod
+      orderId
+      amount
+      authCode
+      transactionId
+      cardNumber
+      createdDate
+      orderReference
+      account
+      bankAccountNumber
+      bankName
+      bankOwnerName
+      settlementDate
+      processedDate
+    }
+  }
+}
+    `;
+export type TransactionsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<TransactionsQuery, TransactionsQueryVariables>, 'query'>;
+
+    export const TransactionsComponent = (props: TransactionsComponentProps) => (
+      <ApolloReactComponents.Query<TransactionsQuery, TransactionsQueryVariables> query={TransactionsDocument} {...props} />
+    );
+    
+export type TransactionsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<TransactionsQuery, TransactionsQueryVariables>
+    } & TChildProps;
+export function withTransactions<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  TransactionsQuery,
+  TransactionsQueryVariables,
+  TransactionsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, TransactionsQuery, TransactionsQueryVariables, TransactionsProps<TChildProps, TDataName>>(TransactionsDocument, {
+      alias: 'transactions',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useTransactionsQuery__
+ *
+ * To run a query within a React component, call `useTransactionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTransactionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTransactionsQuery({
+ *   variables: {
+ *      paymentMethods: // value for 'paymentMethods'
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      searchText: // value for 'searchText'
+ *      from: // value for 'from'
+ *      to: // value for 'to'
+ *      customerId: // value for 'customerId'
+ *      accountCode: // value for 'accountCode'
+ *   },
+ * });
+ */
+export function useTransactionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<TransactionsQuery, TransactionsQueryVariables>) {
+        return ApolloReactHooks.useQuery<TransactionsQuery, TransactionsQueryVariables>(TransactionsDocument, baseOptions);
+      }
+export function useTransactionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<TransactionsQuery, TransactionsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<TransactionsQuery, TransactionsQueryVariables>(TransactionsDocument, baseOptions);
+        }
+export type TransactionsQueryHookResult = ReturnType<typeof useTransactionsQuery>;
+export type TransactionsLazyQueryHookResult = ReturnType<typeof useTransactionsLazyQuery>;
+export type TransactionsQueryResult = ApolloReactCommon.QueryResult<TransactionsQuery, TransactionsQueryVariables>;
 export const UpdateFromDetrackDocument = gql`
     mutation updateFromDetrack($id: String) {
   updateFromDetrack(id: $id) {

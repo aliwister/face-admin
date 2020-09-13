@@ -70,7 +70,7 @@ const AddProduct: React.FC<Props> = props => {
   //console.log(updateData);
   const { watch, register, handleSubmit, setValue } = useForm({
     defaultValues: {
-      name: 'Name',
+/*      name: 'Name',
       upc: '123',
       sku: 'sku',
       brand: 'brand',
@@ -78,8 +78,8 @@ const AddProduct: React.FC<Props> = props => {
       shipping: 0,
       features: ['feature1'],
       weight: 3,
-      sale_price: 111,
-      availability: 123
+      sale_price: 111,*/
+      availability: 200
     }
     // defaultValues: updateData
     //
@@ -96,6 +96,7 @@ const AddProduct: React.FC<Props> = props => {
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
   const [merchant, setMerchant] = useState(null);
+  const [currency, setCurrency] = useState('usd');
 
   const alert = useAlert();
 
@@ -251,32 +252,62 @@ const AddProduct: React.FC<Props> = props => {
       return alert.error("Enter cost first");
     if(!watch('shipping'))
       return alert.error("Enter shipping first");
-    if(!watch('cost'))
-      return alert.error("Enter cost first");
 
+    let cost = watch('cost').toString;
+    let shipping = watch('shipping').toString;
+    let weight = watch('weight').toString;
+
+    const conversion = {'aed': .105,'usd': .386,'gbp': .53};
+
+    let priceInOmr = (Number(cost) + Number(shipping) + Number(weight))* conversion[currency] * 1.07;
     switch(to) {
       case 'uk':
-        alert.success('uk price');
+        priceInOmr += Number(weight)*5 + 3;
         break;
       case 'usa':
-        alert.success('usa price');
+        setCurrency('usd');
+        let weightInLbs = Number(weight) * 2.2;
+        let weightMult = 5;
+        if(weightInLbs > 20)
+          weightMult = 4;
+
+        priceInOmr += weightInLbs*weightMult*conversion['usd'] + 2;
         break;
       case 'oman':
-        alert.success('oman price');
+        priceInOmr += 5;
+        if(priceInOmr > 300)
+          priceInOmr += 15;
+        //setCurrency('USD');
         break;
       case 'uae':
-        alert.success('uae price');
+        priceInOmr += Number(weight) + 3;
         break;
-
     }
 
 
-    setValue('salePrice', 123)
+    setValue('salePrice', priceInOmr)
     return false;
   }
 
   const handleTo = (event) => {
     setTo(event.target.value);
+    switch(to) {
+      case 'uk':
+        setCurrency('gbp');
+        break;
+      case 'usa':
+        setCurrency('usd');
+        break;
+      case 'oman':
+        //setCurrency('USD');
+        break;
+      case 'uae':
+        setCurrency('aed');
+        break;
+    }
+  };
+  const handleCurrency = (event) => {
+    setCurrency(event.target.value);
   };
 
   return (
@@ -394,7 +425,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Cost (USD)</FormLabel>
+                      <FormLabel>Cost ({currency})</FormLabel>
                       <Input
                         inputRef={register}
                         name="cost"
@@ -402,7 +433,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Shipping (USD)</FormLabel>
+                      <FormLabel>Shipping ({currency})</FormLabel>
                       <Input
                         inputRef={register}
                         name="shipping"
@@ -430,6 +461,15 @@ const AddProduct: React.FC<Props> = props => {
                         <MenuItem value="ukvatfree">UK VAT FREE</MenuItem>
                         <MenuItem value="uk">UK</MenuItem>
                         <MenuItem value="china">China</MenuItem>
+                      </Select>
+                      <Select
+                        value={to}
+                        onChange={handleCurrency}
+                      >
+                        <MenuItem value="usd">$</MenuItem>
+                        <MenuItem value="gbp">GBP</MenuItem>
+                        <MenuItem value="uae">DHS</MenuItem>
+                        <MenuItem value="omr">OMR</MenuItem>
                       </Select>
                     </FormFields>
                     <FormFields>

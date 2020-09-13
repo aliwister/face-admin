@@ -11,11 +11,11 @@ import {
   DASHBOARD,
   PRODUCTS,
   PURCHASES,
-    SHIPMENTS,
+  SHIPMENTS,
   ORDERS,
   CUSTOMERS,
   COUPONS,
-  SETTINGS,
+  SETTINGS, ACCOUNTING,
 } from '../../../settings/constants';
 import { AuthContext } from '../../../context/auth';
 import {
@@ -43,6 +43,13 @@ const sidebarMenus = [
     path: PRODUCTS,
     exact: false,
     isMerchant: 1,
+    icon: <ProductIcon />,
+  },
+  {
+    name: 'Accounting',
+    path: ACCOUNTING,
+    exact: false,
+    isFinance: 1,
     icon: <ProductIcon />,
   },
   {
@@ -94,7 +101,7 @@ export default withRouter(function Sidebar({
   style,
   onMenuItemClick,
 }: any) {
-  const { signout, isMerchant, isAdmin } = useContext(AuthContext);
+  const { signout, isMerchant, isAdmin, isFinance } = useContext(AuthContext);
   return (
     <SidebarWrapper ref={refs} style={style}>
       <MenuWrapper>
@@ -116,6 +123,21 @@ export default withRouter(function Sidebar({
               {menu.name}
             </NavLink>}
           {isAdmin && menu.isAdmin &&
+            <NavLink
+              to={menu.path}
+              key={index}
+              exact={menu.exact}
+              activeStyle={{
+                color: '#00C58D',
+                backgroundColor: '#f7f7f7',
+                borderRadius: '50px 0 0 50px',
+              }}
+              onClick={onMenuItemClick}
+            >
+              {menu.icon ? <Svg>{menu.icon}</Svg> : ''}
+              {menu.name}
+            </NavLink>}
+            {isFinance && menu.isFinance &&
             <NavLink
               to={menu.path}
               key={index}

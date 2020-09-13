@@ -1,0 +1,31 @@
+  query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $searchText: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = "") {
+    transactions(paymentMethods: $paymentMethods
+                 offset: $offset
+                 limit: $limit
+                 searchText: $searchText
+                 from: $from
+                 to: $to
+                 customerId: $customerId
+                 accountCode: $accountCode)
+    {
+      total
+      hasMore
+      items {
+        id
+        paymentMethod
+        orderId
+        amount
+        authCode
+        transactionId
+        cardNumber
+        createdDate
+        orderReference
+        account
+        bankAccountNumber
+        bankName
+        bankOwnerName
+        settlementDate
+        processedDate
+      }
+    }
+  }

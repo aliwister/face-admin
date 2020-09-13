@@ -1,0 +1,5 @@
+  mutation setSettlementDate($paymentIds: [Long], $date: Date) {
+    setSettlementDate(paymentIds: $paymentIds, date: $date) {
+      value
+    }
+  }

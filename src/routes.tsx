@@ -24,7 +24,8 @@ import {
   SHIPQ,
   IMPORTQ,
   OUTSTANDINGQ,
-  UNSHIPPEDQ
+  UNSHIPPEDQ,
+  ACCOUNTING
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
@@ -34,6 +35,8 @@ import ShipQueue from "./containers/Shipments/ShipQueue";
 import ImportQueue from "./containers/Shipments/ImportQueue";
 import OutstandingQueue from "./containers/Purchases/OutstandingQueue";
 import UnshippedQueue from "./containers/Purchases/UnshippedQueue";
+import {TransactionsDocument} from "./codegen/generated/_graphql";
+import Transactions from "./containers/Accounting/Transactions";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
 const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
@@ -67,7 +70,7 @@ const Signup = lazy(() => import("./containers/Signup/Signup"));
  */
 
 function PrivateRoute({ children, ...rest }) {
-  const { isAuthenticated, isAdmin, isMerchant } = useContext(AuthContext);
+  const { isAuthenticated, isAdmin, isMerchant, isFinance } = useContext(AuthContext);
   console.log('in private route:',isAuthenticated);
   return (
     <Route
@@ -89,7 +92,7 @@ function PrivateRoute({ children, ...rest }) {
 }
 
 function EmployeeRoute({ children, ...rest }) {
-  const { isAuthenticated, isAdmin, isMerchant  } = useContext(AuthContext);
+  const { isAuthenticated, isAdmin, isMerchant, isFinance  } = useContext(AuthContext);
   console.log('in private route:',isAuthenticated);
   return (
     <Route
@@ -111,13 +114,34 @@ function EmployeeRoute({ children, ...rest }) {
 }
 
 function MerchantRoute({ children, ...rest }) {
-  const { isAuthenticated, isAdmin, isMerchant  } = useContext(AuthContext);
+  const { isAuthenticated, isAdmin, isMerchant, isFinance  } = useContext(AuthContext);
   console.log('in private route:',isAuthenticated);
   return (
     <Route
       {...rest}
       render={({ location }) =>
         isAuthenticated && isMerchant? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+function FinanceRoute({ children, ...rest }) {
+  const { isAuthenticated, isAdmin, isMerchant, isFinance  } = useContext(AuthContext);
+  console.log('in private route:',isAuthenticated);
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isAuthenticated && isFinance? (
           children
         ) : (
           <Redirect
@@ -151,6 +175,13 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </MerchantRoute>
+          <FinanceRoute path={ACCOUNTING}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <Transactions />
+              </Suspense>
+            </AdminLayout>
+          </FinanceRoute>
           <MerchantRoute path={IMPORT_PRODUCTS}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>

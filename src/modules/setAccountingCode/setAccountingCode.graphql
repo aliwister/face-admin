@@ -1,0 +1,5 @@
+mutation setAccountingCode($paymentId: ID, $code:String) {
+  setAccountingCode (paymentId: $paymentId, code: $code) {
+    value
+  }
+}

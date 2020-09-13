@@ -272,6 +272,9 @@ type Mutation {
   addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
   approveProduct(id: ID): Product
   cancelOrder(id: ID, reason: String): Order
+  cancelPurchase(id: ID, reason: String): Purchase
+  closeOrder(id: ID, reason: String): Order
+  closePurchase(id: ID, reason: String): Purchase
   completePricingRequest(id: Long): Message
   completePricingRequestAndEmail(id: Long): Message
   contact(id: Int): Message
@@ -280,8 +283,8 @@ type Mutation {
   createMerchantProduct(product: AddProductInput): Message
   createNewProduct(product: ProductInput): Product
   createOrder(id: Int): Order
-  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
-  createProduct(ref: Int, parent: Int, sku: String, upc: String, releaseDate: LocalDate): Product
+  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int): Product
+  createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
 
   """createOrderFromCart(cart: CartInput): Order"""
   createPurchase(dto: PurchaseInput): Purchase
@@ -296,6 +299,7 @@ type Mutation {
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
+  getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
   getImageUploadUrl(filename: String, contentType: String): PresignedUrl
   getUploadUrl(filename: String, contentType: String): PresignedUrl
   importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
@@ -314,8 +318,12 @@ type Mutation {
   sendPaymentSms(id: ID, mobile: String): Message
   sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
+  setAccountingCode(paymentId: ID, code: String): Message
   setCart(secureKey: String, items: [CartItemInput]): Cart
   setOrderState(id: ID, state: OrderState): Order
+  setProcessedDate(paymentId: ID, date: Date): Message
+  setPurchaseState(id: ID, state: OrderState): Purchase
+  setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
   unpackItem(shipmentItemId: Long): Message
   updateCart(secureKey: String, items: [CartItemInput]): Cart
@@ -390,6 +398,7 @@ enum OrderState {
   DELIVERED
   SHIPPED
   CANCELLED
+  CLOSED
 }
 
 type OutstandingQueue {
@@ -404,6 +413,7 @@ type OutstandingQueue {
   orderId: Long
   orderItemId: Long
   productId: Long
+  wait: Int
 }
 
 enum OverrideType {
@@ -445,12 +455,28 @@ type Payment {
   orderId: Long
   amount: BigDecimal
   authCode: String
+  transactionId: String
+  cardNumber: String
+  createdDate: String
+  orderReference: String
+  account: String
+  bankAccountNumber: String
+  bankName: String
+  bankOwnerName: String
+  settlementDate: String
+  processedDate: String
 }
 
 input PaymentInput {
   price: PriceInput
   invoiceNum: String
   userId: Long
+}
+
+type PaymentResponse {
+  items: [Payment!]!
+  total: Int!
+  hasMore: Boolean!
 }
 
 type Pkg {
@@ -494,6 +520,7 @@ type PricingRequest {
   parent: String
   merchantId: Int
   merchantName: String
+  createdDate: String
 }
 
 type Product {
@@ -537,6 +564,7 @@ type Product {
   availability: String
   features: [String]
   browseNode: String
+  inStock: Boolean
 }
 
 enum ProductGroup {
@@ -735,8 +763,9 @@ type Query {
   purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
   relatedProducts(type: String, slug: String!): [Product!]!
   shipQueue: [ShipQueue]
+  shipQueueByCustomerId(customerId: Long): [ShipQueue]
   shipment(id: ID): Shipment
-  shipmentItemsByTrackingNums(trackingNums: [String]): [ShipmentItem]
+  shipmentItemsByTrackingNums(trackingNums: [String], showClosed: Boolean): [ShipmentItem]
   shipmentItemsCountByTrackingNums(trackingNums: [String]): [ShipmentItemSummary]
   shipmentList(viewName: ShipmentListView): [ShipmentList]
   shipments(status: [ShipmentStatus], type: ShipmentType): [Shipment]
@@ -744,7 +773,10 @@ type Query {
   sortQueue(keyword: String): [SortQueue]
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
+  transaction(id: ID): Payment
+  transactions(paymentMethods: [String], offset: Int, limit: Int, searchText: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
+  unshippedQueue: [UnshippedQueue]
 }
 
 type Shipment {
@@ -826,6 +858,7 @@ type ShipmentList {
   pkgCount: Int
   arrivedPkgs: Int
   status: String
+  sender: String
 }
 
 enum ShipmentListView {
@@ -916,6 +949,18 @@ type TrackingEventItem {
   createdDate: String
   details: String
   eventDate: LocalDateTime
+}
+
+type UnshippedQueue {
+  id: ID
+  description: String
+  quantity: BigDecimal
+  date: String
+  price: BigDecimal
+  weight: BigDecimal
+  image: String
+  sku: String
+  po: Long
 }
 
 type Variation {

@@ -1,0 +1,5 @@
+mutation setProcessedDate($paymentId: ID, $date:Date) {
+  setProcessedDate (paymentId: $paymentId, date: $date) {
+    value
+  }
+}
