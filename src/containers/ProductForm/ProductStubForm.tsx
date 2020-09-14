@@ -79,7 +79,8 @@ const AddProduct: React.FC<Props> = props => {
       features: ['feature1'],
       weight: 3,
       sale_price: 111,*/
-      availability: 200
+      availability: 200,
+      upc: '0',
     }
     // defaultValues: updateData
     //
@@ -253,19 +254,20 @@ const AddProduct: React.FC<Props> = props => {
     if(!watch('shipping'))
       return alert.error("Enter shipping first");
 
-    let cost = watch('cost').toString;
-    let shipping = watch('shipping').toString;
-    let weight = watch('weight').toString;
-
-    const conversion = {'aed': .105,'usd': .386,'gbp': .53};
+    let cost = watch('cost');
+    let shipping = watch('shipping');
+    let weight = watch('weight');
+    alert.success(weight);
+    const conversion = {'aed': .105,'usd': .386,'gbp': .53,'omr': 1};
 
     let priceInOmr = (Number(cost) + Number(shipping) + Number(weight))* conversion[currency] * 1.07;
+    alert.success(priceInOmr);
     switch(to) {
       case 'uk':
         priceInOmr += Number(weight)*5 + 3;
         break;
       case 'usa':
-        setCurrency('usd');
+        //setCurrency('usd');
         let weightInLbs = Number(weight) * 2.2;
         let weightMult = 5;
         if(weightInLbs > 20)
@@ -285,7 +287,7 @@ const AddProduct: React.FC<Props> = props => {
     }
 
 
-    setValue('salePrice', priceInOmr)
+    setValue('salePrice', Math.round(10*priceInOmr) / 10.0 );
     return false;
   }
 
@@ -299,7 +301,7 @@ const AddProduct: React.FC<Props> = props => {
         setCurrency('usd');
         break;
       case 'oman':
-        //setCurrency('USD');
+        setCurrency('omr');
         break;
       case 'uae':
         setCurrency('aed');
@@ -463,12 +465,12 @@ const AddProduct: React.FC<Props> = props => {
                         <MenuItem value="china">China</MenuItem>
                       </Select>
                       <Select
-                        value={to}
+                        value={currency}
                         onChange={handleCurrency}
                       >
                         <MenuItem value="usd">$</MenuItem>
                         <MenuItem value="gbp">GBP</MenuItem>
-                        <MenuItem value="uae">DHS</MenuItem>
+                        <MenuItem value="aed">AED</MenuItem>
                         <MenuItem value="omr">OMR</MenuItem>
                       </Select>
                     </FormFields>

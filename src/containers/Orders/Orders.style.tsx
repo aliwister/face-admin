@@ -5,7 +5,7 @@ import TextField from "@material-ui/core/TextField";
 export const OrderInfoPaper = styled(Paper)`
   padding: ${ props  =>  props.theme.spacing(1)}px;
   margin-top: ${ props  =>  props.theme.spacing(2)}px;
-  height: 310px;
+  min-height: 200px;
 `;
 
 export const ThinTextBox = styled(TextField)`

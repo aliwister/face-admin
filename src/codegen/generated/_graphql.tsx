@@ -1655,7 +1655,7 @@ export type OrderAQuery = (
       & Pick<OrderItem, 'id' | 'sequence' | 'productId' | 'productSku' | 'productUrl' | 'productName' | 'price' | 'quantity' | 'image' | 'lineTotal' | 'po'>
     )>>>, payments: Maybe<Array<Maybe<(
       { __typename?: 'Payment' }
-      & Pick<Payment, 'id' | 'paymentMethod' | 'authCode' | 'amount'>
+      & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate'>
     )>>> }
   )> }
 );
@@ -2067,9 +2067,11 @@ export const OrderADocument = gql`
     }
     payments {
       id
+      createdDate
       paymentMethod
       authCode
       amount
+      processedDate
     }
     currency
     balance

@@ -9,6 +9,23 @@ import {Controller, useForm} from "react-hook-form";
 import CardHeader from "@material-ui/core/CardHeader";
 import Select from "react-select";
 import {Link} from "react-router-dom";
+import {useQuery} from "@apollo/react-hooks";
+import {gql} from "apollo-boost";
+import ShipQueueTable from "./ShipQueueTable";
+
+const SHIP_QUEUE = gql`
+query shipQueueByCustomerId($customerId: Long) {
+  shipQueueByCustomerId(customerId: $customerId) {
+    id
+    fullName 
+    reference
+    total
+    done
+    todo
+    carrier
+  }
+}
+`;
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -33,12 +50,14 @@ export const CustomerShipmentDetailsForm = ({shipment, onSubmit}) => {
     }
   });
   const classes = useStyles();
+  const { data, loading, error, refetch } = useQuery(SHIP_QUEUE, {variables: {customerId: shipment.customerId}, context: { clientName: "adminLink" }});
 
   function onSubmitForm(data) {
     onSubmit(data);
   }
 
   return (
+    <>
     <SectionCard>
       <form className={classes.form} onSubmit={handleSubmit(onSubmitForm)}>
       <CardHeader
@@ -58,8 +77,21 @@ export const CustomerShipmentDetailsForm = ({shipment, onSubmit}) => {
         <Grid item md={12}>
           <TextField fullWidth size="small" label="Estimated Date" variant="outlined" type="date" name="estimatedShipDate" className={classes.textField} inputRef={register}/>
         </Grid>
+        <Grid item md={12}>
+          <TextField fullWidth size="small" label="Estimated Date" variant="outlined" type="date" name="estimatedShipDate" className={classes.textField} inputRef={register}/>
+        </Grid>
       </Grid>
       </form>
     </SectionCard>
+    <SectionCard>
+      <CardHeader
+        subheader="Other Customer Shipments"
+        action={<></>}
+      />
+      {data &&
+      <ShipQueueTable data={data.shipQueueByCustomerId} loading={loading}/>
+      }
+    </SectionCard>
+      </>
   );
 }

@@ -271,7 +271,7 @@ export default function OrderDetails(props) {
       <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
       <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
       <Row>
-        <Col lg={2} sm={6} xs={12} className='mb-30'>
+        <Col lg={6} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Basic Info</Typography>
             <List>
@@ -302,7 +302,7 @@ export default function OrderDetails(props) {
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={2} sm={6} xs={12} className='mb-30'>
+        <Col lg={6} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Delivery Info</Typography>
             <List>
@@ -333,7 +333,7 @@ export default function OrderDetails(props) {
             </List>
           </OrderInfoPaper>
         </Col>
-        <Col lg={4} sm={3} xs={12} className='mb-30'>
+        <Col lg={4} sm={4} xs={12} className='mb-30'>
           <OrderInfoPaper>
             <Typography variant="caption">Totals</Typography>
             <Table  size="small" aria-label="a dense table">
@@ -375,7 +375,7 @@ export default function OrderDetails(props) {
             </Table>
           </OrderInfoPaper>
         </Col>
-        <Col lg={4} sm={3} xs={12} className='mb-30'>
+        <Col lg={8} sm={8} xs={12} className='mb-30'>
           <Payment order={orderData.orderA} refetch={refetch}/>
         </Col>
       </Row>

@@ -123,10 +123,11 @@ export default function Payment({order, refetch}) {
             <TableHead>
               <TableRow>
                 <TableCell>#</TableCell>
+                <TableCell>Date</TableCell>
                 <TableCell>Method</TableCell>
                 <TableCell>Authcode</TableCell>
                 <TableCell>Amount</TableCell>
-                <TableCell></TableCell>
+                <TableCell>Processed</TableCell>
               </TableRow>
             </TableHead>
             {order && order.payments && (
@@ -137,9 +138,11 @@ export default function Payment({order, refetch}) {
                     <TableCell component="th" scope="row">
                       {row.id}
                     </TableCell>
+                    <TableCell align="left">{row.createdDate.substr(0,10)}</TableCell>
                     <TableCell align="left">{row.paymentMethod}</TableCell>
                     <TableCell align="left">{row.authCode}</TableCell>
                     <TableCell align="left">OMR {row.amount}</TableCell>
+                    <TableCell align="left">{row.processedDate?row.processedDate.substr(0,10):""}</TableCell>
                     <TableCell align="right"><Button variant="contained" size="small" onClick={() => handleRefundDialogOpen(row)}>Refund</Button></TableCell>
                   </TableRow>
                 ))}

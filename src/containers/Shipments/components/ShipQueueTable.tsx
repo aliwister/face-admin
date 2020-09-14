@@ -14,20 +14,6 @@ import Grid from "@material-ui/core/Grid";
 import {Link} from "react-router-dom";
 import styled from 'styled-components'
 import {Tablelate} from "components/Table/Tabelate";
-import ShipQueueTable from "./components/ShipQueueTable";
-const SHIP_Q = gql`
-query shipQueue {
-  shipQueue {
-    id
-    fullName 
-    reference
-    total
-    done
-    todo
-    carrier
-  }
-}
-`;
 
 export const Styles = styled.div`
   padding: 1rem;
@@ -70,17 +56,48 @@ const useStyles = makeStyles(theme => ({
 
 
 
-export default function ShipQueue() {
-  const { data, loading, error, refetch } = useQuery(SHIP_Q, { context: { clientName: "adminLink" }});
+export default function ShipQueueTable({ data, loading}) {
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Ship Queue',
+        columns: [
+          {
+            Header: 'ID',
+            accessor: (row) => (<Link to={`shipment-details/${row.id}/PREP`}>{row.id}</Link>)
+          },
+          {
+            Header: 'Ref',
+            accessor: 'reference',
+          },
+          {
+            Header: 'Name',
+            accessor: 'fullName',
+          },          {
+            Header: 'Carrier',
+            accessor: 'carrier',
+          },
+          {
+            Header: 'Progress',
+            accessor: (row) => (Math.round(100*row.todo/((row.total+0) - (row.done+0))) + "%")
+          },
+        ],
+      },
+    ],
+    []
+  )
 
   if(loading)
     return <></>
 
   return (
-     <>
-      <Grid container xs={12} md={12} spacing={1}>
-        <ShipQueueTable data={data.shipQueue} loading={loading}/>
-      </Grid>
-     </>
+    <>
+
+        <TableContainer component={Paper}>
+          <Styles>
+            <Tablelate columns={columns} data={data} />
+          </Styles>
+        </TableContainer>
+    </>
   );
 }

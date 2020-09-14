@@ -66,7 +66,7 @@ export default function Transactions() {
   const [settlement, setSettlement] = useState(false);
   const [coding, setCoding] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [status, setStatus] = useState(PAYMENT_METHODS);
+  const [status, setStatus] = useState([{value: 'checkoutcom', label: 'checkoutcom'}]);
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const [from, setFrom] = useState(null);
@@ -354,9 +354,9 @@ export default function Transactions() {
                       }}
                     /></TableCell>
                     <TableCell component="th" scope="row">
-                      <Link to={`order-details/${row.id}`}>{row.id}</Link>
+                      {row.id}
                     </TableCell>
-                    <TableCell align="left">{row.orderReference}</TableCell>
+                    <TableCell align="left"><Link to={`order-details/${row.orderReference}`}>{row.orderReference}</Link></TableCell>
                     <TableCell align="left"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                     <TableCell align="left">{row.amount}</TableCell>
                     <TableCell align="left">{row.paymentMethod}</TableCell>
