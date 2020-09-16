@@ -45,10 +45,20 @@ import LaunchIcon from '@material-ui/icons/Launch';
 import {Shipments} from "./components/Shipments";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
+
+
+
 const SEND_PAYMENT_SMS = gql`
 mutation sendPaymentSms($id: ID, $mobile: String) {
   sendPaymentSms(id:$id, mobile:$mobile) {
     value
+  }
+}
+`;
+const GET_ADMIN_FILE = gql`
+mutation getAdminFile($filename: String) {
+  getAdminFile(filename:$filename) {
+    uploadUrl
   }
 }
 `;
@@ -112,6 +122,10 @@ query track ($ref: String) {
         eventDate
         details
       }
+      docs {
+        id
+        fileKey
+      }
     }
   }
 }
@@ -145,6 +159,7 @@ export default function OrderDetails(props) {
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
   const [closeOrderMutation] = useMutation(CLOSE_ORDER, { context: { clientName: "shopLink" }});
+  const [getAdminFileMutation] = useMutation(GET_ADMIN_FILE, { context: { clientName: "shopLink" }});
   const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
@@ -213,6 +228,18 @@ export default function OrderDetails(props) {
       alert.success(closeOrder.id);
       setClosedialog(false);
       await refetch();
+    }
+  }
+
+  const onGetAdminFile = async fileKey => {
+    const {
+      data: { getAdminFile },
+    }: any = await getAdminFileMutation({
+      variables: {filename: fileKey}
+    });
+    if(getAdminFile)  {
+      //alert.success(getAdminFile.uploadUrl);
+      window.open(getAdminFile.uploadUrl, '_blank', 'noopener,noreferrer')
     }
   }
 
@@ -469,7 +496,7 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          <Shipments shipments={dShip} />
+          <Shipments shipments={dShip} onGetAdminFile={onGetAdminFile}/>
         </Col>
       </Row>
     </Grid>

@@ -15,6 +15,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import {Link} from "react-router-dom";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,10 +31,15 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.text.secondary,
   },
 }));
-export const Shipments = ({shipments}) =>{
+export const Shipments = ({shipments, onGetAdminFile}) =>{
   const classes = useStyles();
   if(!shipments)
     return (<div>Loading</div>)
+
+  function handleDownload(fileKey: any) {
+    console.log(fileKey);
+    onGetAdminFile(fileKey);
+  }
 
   return (
     <Grid container>
@@ -93,6 +99,28 @@ export const Shipments = ({shipments}) =>{
                           {row.eventDate}
                         </TableCell>
                         <TableCell align="center">{row.shipmentEventDescription} {row.details}</TableCell>
+                      </TableRow>
+
+                    ))}
+                  </TableBody>
+
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+              <ExpansionPanel>
+                <ExpansionPanelSummary>
+                  <Typography className={classes.heading}>Docs</Typography>
+                  <Typography className={classes.secondaryHeading}>Shipment Files</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+
+                  <TableBody>
+                    {s.shipment.docs && s.shipment.docs.map(row => (
+
+                      <TableRow key={row.id}>
+                        <TableCell align="left">
+                          {row.fileKey}
+                        </TableCell>
+                        <TableCell align="center"><Button color="secondary" variant="contained" onClick={()=>handleDownload(row.fileKey)}>Download</Button></TableCell>
                       </TableRow>
 
                     ))}
