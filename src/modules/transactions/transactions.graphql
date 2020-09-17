@@ -1,8 +1,8 @@
-  query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $searchText: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = "") {
+  query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null) {
     transactions(paymentMethods: $paymentMethods
                  offset: $offset
                  limit: $limit
-                 searchText: $searchText
+                 maxAmount: $maxAmount
                  from: $from
                  to: $to
                  customerId: $customerId

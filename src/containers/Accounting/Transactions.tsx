@@ -71,6 +71,7 @@ export default function Transactions() {
   const [search, setSearch] = useState([]);
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
+  const [amount, setAmount] = useState(null);
   const [total, setTotal] = useState(0);
   const alert = useAlert();
   const classes = useStyles();
@@ -88,9 +89,10 @@ export default function Transactions() {
         paymentMethods: arrayToObject(status, 'value'),
         limit: 15,
         offset: 0,
-        searchText: "",
+        maxAmount: amount,
         from: from,
-        to: to
+        to: to,
+        accountCode: null
       },
       fetchPolicy: "network-only",
       context: { clientName: "shopLink" }
@@ -106,13 +108,14 @@ export default function Transactions() {
   }
 
   function refresh() {
+
+
     if (status && status.length) {
       refetch({
         paymentMethods: arrayToObject(status, 'value'),
-
+        maxAmount: null,
         limit: 15,
         offset: 0,
-        searchText: "",
         from: from,
         to: to
       });
@@ -121,7 +124,7 @@ export default function Transactions() {
         paymentMethods: [],
         limit: 15,
         offset: 0,
-        searchText:""
+        maxAmount:null,
       });
     }
   }
@@ -264,6 +267,11 @@ export default function Transactions() {
     return refresh();
   }
 
+  function handleMaxAmount(event) {
+    setAmount(""+event.target.value)
+    return refresh();
+  }
+
   return (
     <Grid container spacing={1}>
       <Grid item  md={5} >
@@ -297,7 +305,17 @@ export default function Transactions() {
           }}
           onChange={handleTo}
         />
-
+        <TextField
+          id="maxAmount"
+          label="Max Amount"
+          type="number"
+          inputProps={{step: 0.1}}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={handleMaxAmount}
+        />
       </Grid>
       <Grid item  md={3} style={{textAlign: 'right'}}>
         <Button variant="contained" color="primary" onClick={onSetSettlement} >

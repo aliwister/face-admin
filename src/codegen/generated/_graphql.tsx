@@ -331,6 +331,7 @@ export type Mutation = {
   createShipment: Maybe<Shipment>;
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
+  getAdminFile: Maybe<PresignedUrl>;
   getAdminImageUploadUrl: Maybe<PresignedUrl>;
   getImageUploadUrl: Maybe<PresignedUrl>;
   getUploadUrl: Maybe<PresignedUrl>;
@@ -538,6 +539,12 @@ export type MutationEditOrderArgs = {
   id: Maybe<Scalars['ID']>;
   orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
   reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationGetAdminFileArgs = {
+  filename: Maybe<Scalars['String']>;
+  contentType: Maybe<Scalars['String']>;
 };
 
 
@@ -1361,7 +1368,7 @@ export type QueryTransactionsArgs = {
   paymentMethods: Maybe<Array<Maybe<Scalars['String']>>>;
   offset: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
-  searchText: Maybe<Scalars['String']>;
+  maxAmount: Maybe<Scalars['String']>;
   from: Maybe<Scalars['Date']>;
   to: Maybe<Scalars['Date']>;
   customerId: Maybe<Scalars['Long']>;
@@ -1392,6 +1399,12 @@ export type Shipment = {
   customerFirstName: Maybe<Scalars['String']>;
   customerLastName: Maybe<Scalars['String']>;
   merchantName: Maybe<Scalars['String']>;
+};
+
+export type ShipmentDoc = {
+   __typename?: 'ShipmentDoc';
+  id: Maybe<Scalars['ID']>;
+  fileKey: Maybe<Scalars['String']>;
 };
 
 export type ShipmentInput = {
@@ -1481,6 +1494,7 @@ export type ShipmentTracking = {
    __typename?: 'ShipmentTracking';
   content: Maybe<Array<Maybe<Item>>>;
   progress: Maybe<Array<Maybe<TrackingEventItem>>>;
+  docs: Maybe<Array<Maybe<ShipmentDoc>>>;
   status: Maybe<Scalars['String']>;
   type: Maybe<Scalars['String']>;
   date: Maybe<Scalars['String']>;
@@ -1744,7 +1758,7 @@ export type TransactionsQueryVariables = {
   paymentMethods: Maybe<Array<Maybe<Scalars['String']>>>;
   offset: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
-  searchText: Maybe<Scalars['String']>;
+  maxAmount: Maybe<Scalars['String']>;
   from?: Maybe<Scalars['Date']>;
   to?: Maybe<Scalars['Date']>;
   customerId?: Maybe<Scalars['Long']>;
@@ -2408,8 +2422,8 @@ export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipme
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
 export const TransactionsDocument = gql`
-    query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $searchText: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = "") {
-  transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, searchText: $searchText, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode) {
+    query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null) {
+  transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, maxAmount: $maxAmount, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode) {
     total
     hasMore
     items {
@@ -2467,7 +2481,7 @@ export function withTransactions<TProps, TChildProps = {}, TDataName extends str
  *      paymentMethods: // value for 'paymentMethods'
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
- *      searchText: // value for 'searchText'
+ *      maxAmount: // value for 'maxAmount'
  *      from: // value for 'from'
  *      to: // value for 'to'
  *      customerId: // value for 'customerId'

@@ -299,6 +299,7 @@ type Mutation {
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
+  getAdminFile(filename: String, contentType: String): PresignedUrl
   getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
   getImageUploadUrl(filename: String, contentType: String): PresignedUrl
   getUploadUrl(filename: String, contentType: String): PresignedUrl
@@ -774,7 +775,7 @@ type Query {
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
   transaction(id: ID): Payment
-  transactions(paymentMethods: [String], offset: Int, limit: Int, searchText: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
+  transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
   unshippedQueue: [UnshippedQueue]
 }
@@ -803,6 +804,11 @@ type Shipment {
   customerFirstName: String
   customerLastName: String
   merchantName: String
+}
+
+type ShipmentDoc {
+  id: ID
+  fileKey: String
 }
 
 input ShipmentInput {
@@ -888,6 +894,7 @@ enum ShipmentStatus {
 type ShipmentTracking {
   content: [Item]
   progress: [TrackingEventItem]
+  docs: [ShipmentDoc]
   status: String
   type: String
   date: String
