@@ -1,5 +1,5 @@
-mutation setAccountingCode($paymentId: ID, $code:String) {
-  setAccountingCode (paymentId: $paymentId, code: $code) {
+mutation setAccountingCode($paymentIds: [Long], $code:String) {
+  setAccountingCode (paymentIds: $paymentIds, code: $code) {
     value
   }
 }

@@ -36,24 +36,28 @@ import {PURCHASEDETAILS} from "../../settings/constants";
 import NewPurchaseDialog from "./components/NewPurchaseDialog";
 
 const GET_ORDERS = gql`
-  query purchases($state: [OrderState], $limit: Int, $searchText: String) {
-    purchases(state: $state, limit: $limit, searchText: $searchText) {
-      id
-      currency
-      invoiceDate
-      subtotal
-      deliveryTotal
-      taxesTotal
-      discountTotal
-      total
-      merchantObj {
+  query purchases($state: [OrderState], $offset: Int = 0, $limit: Int, $searchText: String) {
+    purchases(state: $state, offset: $offset, limit: $limit, searchText: $searchText) {
+      total,
+      hasMore,
+      items {
         id
-        name
-      }
-      purchaseItems {
-        description
-        price
-        quantity
+        currency
+        invoiceDate
+        subtotal
+        deliveryTotal
+        taxesTotal
+        discountTotal
+        total
+        merchantObj {
+          id
+          name
+        }
+        purchaseItems {
+          description
+          price
+          quantity
+        }
       }
     }
   }
@@ -162,10 +166,10 @@ export default function Purchases() {
   });
 
   alert.success('in purchases');
-  const { data, error, refetch } = useQuery(GET_ORDERS, {
+  const { data, error, refetch, fetchMore } = useQuery(GET_ORDERS, {
     variables: {
       status: [],
-      limit: 10,
+      limit: 15,
       searchText: "",
     },
     fetchPolicy: "network-only",
@@ -181,12 +185,34 @@ export default function Purchases() {
     if (value.length) {
       refetch({
         status: [value[0].value],
-        limit: limit.length ? limit[0].value : null,
+        limit: 15, //limit.length ? limit[0].value : null,
         searchText: "",
       });
     } else {
       refetch({ status: [], limit:10, searchText:"" });
     }
+  }
+
+  function loadMore() {
+    fetchMore({
+      variables: {
+        offset: data.purchases.items.length,
+      },
+      updateQuery: (prev, {fetchMoreResult}) => {
+        if (!fetchMoreResult) return prev;
+
+        return Object.assign({}, prev, {
+          purchases: {
+            // @ts-ignore
+            __typename: prev.purchases.__typename,
+            // @ts-ignore
+            items: [...prev.purchases.items, ...fetchMoreResult.purchases.items],
+            // @ts-ignore
+            hasMore: fetchMoreResult.purchases.hasMore,
+          },
+        });
+      },
+    });
   }
 
   function handleLimit({ value }) {
@@ -308,10 +334,10 @@ export default function Purchases() {
                     <TableCell align="center">Status</TableCell>
                   </TableRow>
                 </TableHead>
-                {data && data.purchases.length && (
+                {data && data.purchases.items.length && (
                     <TableBody>
 
-                      {data.purchases.map(row => (
+                      {data.purchases.items.map(row => (
                           <TableRow key={row.orderId}>
                             <TableCell align="right"><Checkbox
                                 name={row.id}
@@ -359,6 +385,9 @@ export default function Purchases() {
                 )}
               </Table>
             </TableContainer>
+        {data && data.purchases && data.purchases.hasMore && (
+          <Button onClick={loadMore}>Load More</Button>
+        )}
       </Grid>
       </Grid>
         </>

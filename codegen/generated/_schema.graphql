@@ -319,10 +319,10 @@ type Mutation {
   sendPaymentSms(id: ID, mobile: String): Message
   sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
-  setAccountingCode(paymentId: ID, code: String): Message
+  setAccountingCode(paymentIds: [Long], code: String): Message
   setCart(secureKey: String, items: [CartItemInput]): Cart
   setOrderState(id: ID, state: OrderState): Order
-  setProcessedDate(paymentId: ID, date: Date): Message
+  setProcessedDate(paymentIds: [Long], date: Date): Message
   setPurchaseState(id: ID, state: OrderState): Purchase
   setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message

@@ -26,7 +26,6 @@ query unshippedQueue {
    image
    weight
    price
-   url
    sku
   }
 }

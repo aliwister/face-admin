@@ -1,5 +1,5 @@
-mutation setProcessedDate($paymentId: ID, $date:Date) {
-  setProcessedDate (paymentId: $paymentId, date: $date) {
+mutation setProcessedDate($paymentIds: [Long], $date:Date) {
+  setProcessedDate (paymentIds: $paymentIds, date: $date) {
     value
   }
 }

@@ -31,6 +31,7 @@ import TextField from "@material-ui/core/TextField";
 import {SetProcessedDateDialog} from "./components/SetProcessedDateDialog";
 import {SetSettlementDateDialog} from "./components/SetSettlementDateDialog";
 import {SetCodingDialog} from "./components/SetCodingDialog";
+import {ExportBmbCsvDialog} from "./components/ExportBmbCsvDialog";
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -73,6 +74,8 @@ export default function Transactions() {
   const [to, setTo] = useState(null);
   const [amount, setAmount] = useState(null);
   const [total, setTotal] = useState(0);
+  const [bmbcsv, setBmbcsv] = useState(false);
+  const [xerocsv, setXerocsv] = useState(false);
   const alert = useAlert();
   const classes = useStyles();
 
@@ -207,16 +210,12 @@ export default function Transactions() {
     }
   }
 
-  async function handleSetProcessed(id, formData) {
-    console.log(formData);
-    console.log(id);
+  async function handleSetProcessed(ids, formData) {
+
     const {
       data: { setProcessedDate },
     }: any = await setProcessedDateMutation({
-      variables: {
-        paymentId: id[0],
-        date: formData['date']
-      },
+      variables: { paymentIds: ids.map((i) => Number(i)), date: formData['date']},
     });
     if(setProcessedDate) {
       alert.success(setProcessedDate.value);
@@ -225,11 +224,11 @@ export default function Transactions() {
     }
   }
 
-  async function handleSetCoding(id, formData) {
+  async function handleSetCoding(ids, formData) {
     const {
       data: { setAccountingCode },
     }: any = await setAccountingCodeMutation({
-      variables: { paymentId: id, code: formData['code']},
+      variables: { paymentIds: ids.map((i) => Number(i)), code: formData['code']},
     });
     if(setAccountingCode) {
       alert.success(setAccountingCode.value);
@@ -251,10 +250,15 @@ export default function Transactions() {
     setCoding(true);
   }
 
+  function onExportBmb() {
+    setBmbcsv(true);
+  }
+
   function onClose() {
     setProcessed(false);
     setSettlement(false);
     setCoding(false);
+    setBmbcsv(false);
   }
 
   function handleFrom(event) {
@@ -327,6 +331,9 @@ export default function Transactions() {
         <Button variant="contained" color="primary" onClick={onSetCoding} >
           Set Account
         </Button>
+        <Button variant="contained" color="primary" onClick={onExportBmb} >
+          Export BMB CSV
+        </Button>
       </Grid>
       <Grid item xs={12}>
         <TableContainer component={Paper}>
@@ -397,6 +404,8 @@ export default function Transactions() {
         <SetProcessedDateDialog item={checkedId} open={processed} onClose={onClose} onSubmit={handleSetProcessed} title={"Set Processed Date"}/>
         <SetSettlementDateDialog item={checkedId} open={settlement} onClose={onClose} onSubmit={handleSetSettlement} title={"Set Processed Date"}/>
         <SetCodingDialog item={checkedId} open={coding} onClose={onClose} onSubmit={handleSetCoding} title={"Set Processed Date"}/>
+        {data && <ExportBmbCsvDialog checked={checkedId} items={data.transactions.items} open={bmbcsv} onClose={onClose} total={Math.abs(total)} title={"Generate BMB CSV"}/>}
+{/*        <ExportBmbCsvDialog item={checkedId} open={xerocsv} onClose={onClose} onSubmit={handleXeroCsv} title={"Generate Xero CSV"}/>*/}
       </Grid>
     </Grid>
   );

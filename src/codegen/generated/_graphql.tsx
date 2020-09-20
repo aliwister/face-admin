@@ -655,7 +655,7 @@ export type MutationSendToDetrackArgs = {
 
 
 export type MutationSetAccountingCodeArgs = {
-  paymentId: Maybe<Scalars['ID']>;
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   code: Maybe<Scalars['String']>;
 };
 
@@ -673,7 +673,7 @@ export type MutationSetOrderStateArgs = {
 
 
 export type MutationSetProcessedDateArgs = {
-  paymentId: Maybe<Scalars['ID']>;
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   date: Maybe<Scalars['Date']>;
 };
 
@@ -1699,7 +1699,7 @@ export type PurchaseQuery = (
 );
 
 export type SetProcessedDateMutationVariables = {
-  paymentId: Maybe<Scalars['ID']>;
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   date: Maybe<Scalars['Date']>;
 };
 
@@ -1713,7 +1713,7 @@ export type SetProcessedDateMutation = (
 );
 
 export type SetAccountingCodeMutationVariables = {
-  paymentId: Maybe<Scalars['ID']>;
+  paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   code: Maybe<Scalars['String']>;
 };
 
@@ -2214,8 +2214,8 @@ export type PurchaseQueryHookResult = ReturnType<typeof usePurchaseQuery>;
 export type PurchaseLazyQueryHookResult = ReturnType<typeof usePurchaseLazyQuery>;
 export type PurchaseQueryResult = ApolloReactCommon.QueryResult<PurchaseQuery, PurchaseQueryVariables>;
 export const SetProcessedDateDocument = gql`
-    mutation setProcessedDate($paymentId: ID, $date: Date) {
-  setProcessedDate(paymentId: $paymentId, date: $date) {
+    mutation setProcessedDate($paymentIds: [Long], $date: Date) {
+  setProcessedDate(paymentIds: $paymentIds, date: $date) {
     value
   }
 }
@@ -2254,7 +2254,7 @@ export function withSetProcessedDate<TProps, TChildProps = {}, TDataName extends
  * @example
  * const [setProcessedDateMutation, { data, loading, error }] = useSetProcessedDateMutation({
  *   variables: {
- *      paymentId: // value for 'paymentId'
+ *      paymentIds: // value for 'paymentIds'
  *      date: // value for 'date'
  *   },
  * });
@@ -2266,8 +2266,8 @@ export type SetProcessedDateMutationHookResult = ReturnType<typeof useSetProcess
 export type SetProcessedDateMutationResult = ApolloReactCommon.MutationResult<SetProcessedDateMutation>;
 export type SetProcessedDateMutationOptions = ApolloReactCommon.BaseMutationOptions<SetProcessedDateMutation, SetProcessedDateMutationVariables>;
 export const SetAccountingCodeDocument = gql`
-    mutation setAccountingCode($paymentId: ID, $code: String) {
-  setAccountingCode(paymentId: $paymentId, code: $code) {
+    mutation setAccountingCode($paymentIds: [Long], $code: String) {
+  setAccountingCode(paymentIds: $paymentIds, code: $code) {
     value
   }
 }
@@ -2306,7 +2306,7 @@ export function withSetAccountingCode<TProps, TChildProps = {}, TDataName extend
  * @example
  * const [setAccountingCodeMutation, { data, loading, error }] = useSetAccountingCodeMutation({
  *   variables: {
- *      paymentId: // value for 'paymentId'
+ *      paymentIds: // value for 'paymentIds'
  *      code: // value for 'code'
  *   },
  * });
