@@ -26,6 +26,8 @@
         bankOwnerName
         settlementDate
         processedDate
+        customer
+        cartId
       }
     }
   }

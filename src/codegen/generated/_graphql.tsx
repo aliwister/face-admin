@@ -854,8 +854,10 @@ export type Payment = {
   bankAccountNumber: Maybe<Scalars['String']>;
   bankName: Maybe<Scalars['String']>;
   bankOwnerName: Maybe<Scalars['String']>;
-  settlementDate: Maybe<Scalars['String']>;
-  processedDate: Maybe<Scalars['String']>;
+  settlementDate: Maybe<Scalars['Date']>;
+  processedDate: Maybe<Scalars['Date']>;
+  customer: Maybe<Scalars['String']>;
+  cartId: Maybe<Scalars['String']>;
 };
 
 export type PaymentInput = {
@@ -1110,6 +1112,13 @@ export type PurchaseQueue = {
   attributes: Maybe<Scalars['String']>;
 };
 
+export type PurchaseResponse = {
+   __typename?: 'PurchaseResponse';
+  items: Array<Purchase>;
+  total: Scalars['Int'];
+  hasMore: Scalars['Boolean'];
+};
+
 export type PurchaseShipment = {
    __typename?: 'PurchaseShipment';
   shipmentItemId: Maybe<Scalars['Int']>;
@@ -1157,7 +1166,7 @@ export type Query = {
   products: ProductResponse;
   purchase: Maybe<Purchase>;
   purchaseQueue: Maybe<Array<Maybe<PurchaseQueue>>>;
-  purchases: Maybe<Array<Maybe<Purchase>>>;
+  purchases: Maybe<PurchaseResponse>;
   relatedProducts: Array<Product>;
   shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
   shipQueueByCustomerId: Maybe<Array<Maybe<ShipQueue>>>;
@@ -1301,6 +1310,7 @@ export type QueryPurchaseArgs = {
 
 export type QueryPurchasesArgs = {
   state: Maybe<Array<Maybe<OrderState>>>;
+  offset: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
   searchText: Maybe<Scalars['String']>;
 };
@@ -1773,7 +1783,7 @@ export type TransactionsQuery = (
     & Pick<PaymentResponse, 'total' | 'hasMore'>
     & { items: Array<(
       { __typename?: 'Payment' }
-      & Pick<Payment, 'id' | 'paymentMethod' | 'orderId' | 'amount' | 'authCode' | 'transactionId' | 'cardNumber' | 'createdDate' | 'orderReference' | 'account' | 'bankAccountNumber' | 'bankName' | 'bankOwnerName' | 'settlementDate' | 'processedDate'>
+      & Pick<Payment, 'id' | 'paymentMethod' | 'orderId' | 'amount' | 'authCode' | 'transactionId' | 'cardNumber' | 'createdDate' | 'orderReference' | 'account' | 'bankAccountNumber' | 'bankName' | 'bankOwnerName' | 'settlementDate' | 'processedDate' | 'customer' | 'cartId'>
     )> }
   )> }
 );
@@ -2442,6 +2452,8 @@ export const TransactionsDocument = gql`
       bankOwnerName
       settlementDate
       processedDate
+      customer
+      cartId
     }
   }
 }

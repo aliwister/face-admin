@@ -32,6 +32,7 @@ import {SetProcessedDateDialog} from "./components/SetProcessedDateDialog";
 import {SetSettlementDateDialog} from "./components/SetSettlementDateDialog";
 import {SetCodingDialog} from "./components/SetCodingDialog";
 import {ExportBmbCsvDialog} from "./components/ExportBmbCsvDialog";
+import {ExportXeroCsvDialog} from "./components/ExportXeroCsvDialog";
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -253,6 +254,9 @@ export default function Transactions() {
   function onExportBmb() {
     setBmbcsv(true);
   }
+  function onExportXero() {
+    setXerocsv(true);
+  }
 
   function onClose() {
     setProcessed(false);
@@ -334,6 +338,9 @@ export default function Transactions() {
         <Button variant="contained" color="primary" onClick={onExportBmb} >
           Export BMB CSV
         </Button>
+        <Button variant="contained" color="primary" onClick={onExportXero} >
+          Export Xero CSV
+        </Button>
       </Grid>
       <Grid item xs={12}>
         <TableContainer component={Paper}>
@@ -404,8 +411,8 @@ export default function Transactions() {
         <SetProcessedDateDialog item={checkedId} open={processed} onClose={onClose} onSubmit={handleSetProcessed} title={"Set Processed Date"}/>
         <SetSettlementDateDialog item={checkedId} open={settlement} onClose={onClose} onSubmit={handleSetSettlement} title={"Set Processed Date"}/>
         <SetCodingDialog item={checkedId} open={coding} onClose={onClose} onSubmit={handleSetCoding} title={"Set Processed Date"}/>
-        {data && <ExportBmbCsvDialog checked={checkedId} items={data.transactions.items} open={bmbcsv} onClose={onClose} total={Math.abs(total)} title={"Generate BMB CSV"}/>}
-{/*        <ExportBmbCsvDialog item={checkedId} open={xerocsv} onClose={onClose} onSubmit={handleXeroCsv} title={"Generate Xero CSV"}/>*/}
+        {data && <ExportBmbCsvDialog  checked={checkedId} items={data.transactions.items} open={bmbcsv}  onClose={onClose} total={Math.abs(total)} title={"Generate BMB CSV"}/>}
+        {data && <ExportXeroCsvDialog checked={checkedId} items={data.transactions.items} open={xerocsv} onClose={onClose} total={Math.abs(total)} title={"Generate Xero CSV"}/>}
       </Grid>
     </Grid>
   );

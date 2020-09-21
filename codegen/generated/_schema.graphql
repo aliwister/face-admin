@@ -464,8 +464,10 @@ type Payment {
   bankAccountNumber: String
   bankName: String
   bankOwnerName: String
-  settlementDate: String
-  processedDate: String
+  settlementDate: Date
+  processedDate: Date
+  customer: String
+  cartId: String
 }
 
 input PaymentInput {
@@ -713,6 +715,12 @@ type PurchaseQueue {
   attributes: String
 }
 
+type PurchaseResponse {
+  items: [Purchase!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
 type PurchaseShipment {
   shipmentItemId: Int
   purchaseItemId: Int
@@ -761,7 +769,7 @@ type Query {
   products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
   purchase(id: ID): Purchase
   purchaseQueue: [PurchaseQueue]
-  purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+  purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
   relatedProducts(type: String, slug: String!): [Product!]!
   shipQueue: [ShipQueue]
   shipQueueByCustomerId(customerId: Long): [ShipQueue]

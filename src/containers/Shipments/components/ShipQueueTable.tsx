@@ -64,7 +64,7 @@ export default function ShipQueueTable({ data, loading}) {
         columns: [
           {
             Header: 'ID',
-            accessor: (row) => (<Link to={`shipment-details/${row.id}/PREP`}>{row.id}</Link>)
+            accessor: (row) => (<Link to={`/shipment-details/${row.id}/PREP`}>{row.id}</Link>)
           },
           {
             Header: 'Ref',

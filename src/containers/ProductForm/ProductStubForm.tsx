@@ -164,12 +164,18 @@ const AddProduct: React.FC<Props> = props => {
     console.log(data);
     console.log(merchant);
 
+    if(!merchant) {
+      alert.error("Must select merchant");
+      return;
+    }
+
     setLoading(true);
 
 
     const newProduct = {
       merchantId: merchant.id,
       id: updateData?Number(updateData.id):null,
+      url: data.url,
       sku: data.sku,
       name: data.name,
       name_ar: data.name_ar,
@@ -190,6 +196,7 @@ const AddProduct: React.FC<Props> = props => {
       salePrice: Number(data.salePrice),
       //discountInPercent: Number(data.discountInPercent),
       quantity: Number(data.quantity),
+      dial: data.dial,
       //browseNode: arrayToObject(type,'value')[0],
       //slug: data.name,
       //creation_date: new Date(),
@@ -408,6 +415,20 @@ const AddProduct: React.FC<Props> = props => {
                         name="features"
                       />
                     </FormFields>
+                    <FormFields>
+                      <FormLabel>URL</FormLabel>
+                      <Input
+                        inputRef={register()}
+                        name="url"
+                      />
+                    </FormFields>
+                    <FormFields>
+                      <FormLabel>Speed Dial (Must start with *)</FormLabel>
+                      <Input
+                        inputRef={register({pattern: /\*.+/ })}
+                        name="dial"
+                      />
+                    </FormFields>
                   </Col>
                   <Col lg={6}>
                     <FormFields>
@@ -419,7 +440,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>SKU</FormLabel>
+                      <FormLabel>SKU/ASIN</FormLabel>
                       <Input
                         type="text"
                         inputRef={register({ required: true })}
@@ -427,7 +448,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Cost ({currency})</FormLabel>
+                      <FormLabel>Product Cost ({currency})</FormLabel>
                       <Input
                         inputRef={register}
                         name="cost"
@@ -435,7 +456,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Shipping ({currency})</FormLabel>
+                      <FormLabel>Shipping to {to} ({currency})</FormLabel>
                       <Input
                         inputRef={register}
                         name="shipping"
@@ -484,7 +505,7 @@ const AddProduct: React.FC<Props> = props => {
                       />
                     </FormFields>
                     <FormFields>
-                      <FormLabel>Availability (Hours)</FormLabel>
+                      <FormLabel>Availability (Hours) = {Number(watch('availability'))/8} Days</FormLabel>
                       <Input
                         type="number"
                         inputRef={register({ required: true })}
