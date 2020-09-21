@@ -254,8 +254,6 @@ export default function ImportQueue() {
     return false;
   }
 
-  if(loadingInventory)
-    return <></>
 
   function handleChange(event) {
     setTrackingnums(event.target.value)
