@@ -130,8 +130,7 @@ export default function ImportQueue() {
   const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{ context: { clientName: "adminLink" }});
   const [addTrackingEventMutation] = useMutation(ADD_TRACKING_EVENT,{ context: { clientName: "adminLink" }});
   const { data, loading, error, refetch } = useQuery(SHIPMENT_ITEMS, { context: { clientName: "adminLink" }});
-  const { data: cntdata, loading: cntloading, error: cnterror, refetch: cntrefetch } = useQuery(SHIPMENT_ITEMS_COUNT, { context: { clientName: "adminLink" }, fetchPolicy: "network-only",});
-  const { data: dataInventory, loading: loadingInventory, error: errorInventory, refetch: refetchInventory } = useQuery(INVENTORY, { context: { clientName: "adminLink" }});
+  const { data: cntdata, loading: cntloading, error: cnterror, refetch: cntrefetch } = useQuery(SHIPMENT_ITEMS_COUNT, { context: { clientName: "adminLink" }, fetchPolicy: "network-only"});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
   const { data:events, loading:eLoading} = useQuery(TRACKING_EVENTS, {context: { clientName: "adminLink" }});
   const { register, handleSubmit, errors } = useForm();
