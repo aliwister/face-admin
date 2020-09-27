@@ -21,6 +21,9 @@ import {ListItem} from "@material-ui/core";
 import ListItemText from "@material-ui/core/ListItemText";
 import {SendToDetrackDialog} from "./components/SendToDetrackDialog";
 import EditPackage from "./Packages/EditPackage";
+
+import {adminAPI} from "../../api/config";
+
 const ACCEPT_PACKAGE = gql`
   mutation acceptPackage($pkg: PackageInput) {
     acceptPackage(pkg: $pkg) {
@@ -170,7 +173,7 @@ function reducer(state, action) {
     case 'SEND_TO_DETRACK_END':
       return {
         ...state,
-        sendDetrackDialog: false,
+        sendDetrackDialog: false
       }
     case 'CLOSE_SHIPMENT_START':
       return {
@@ -268,7 +271,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
       instructions: shipment.handlingInstructions,
       date: shipment.estimated_ship_date,
       time: 'morning',
-      assignTo: data.assignTo.value,
+      assignTo: data.assignTo? data.assignTo.value: null,
 		  shipmentId: shipment.id
 	  }
     const {
@@ -278,6 +281,24 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
     });
     if(sendToDetrack)  {
       alert.success(sendToDetrack.value);
+      //window.open(process.env.ADMIN_APP_API+'/import/detrack-label?id='+sendToDetrack.results.do, '_blank', 'noopener,noreferrer')
+
+      adminAPI.get(`/import/detrack-label?id=${shipment.id + "-" + shipment.reference}`)
+        .then(response => {
+//Create a Blob from the PDF Stream
+          const file = new Blob(
+            [response.data],
+            {type: 'application/pdf'});
+//Build a URL from the file
+          const fileURL = URL.createObjectURL(file);
+//Open the URL on new Window
+          window.open(fileURL);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
+
       refreshShipment({id:shipment.id})
       dispatch({type:'SEND_TO_DETRACK_END'})
     }

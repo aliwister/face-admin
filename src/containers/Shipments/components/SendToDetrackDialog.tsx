@@ -21,7 +21,7 @@ export const SendToDetrackDialog = ({open, onClose, onSubmit}) => {
         <div>
           <Controller
             as={<Select options={DRIVERS}/>}
-            rules={{ required: true }}
+            rules={{ required: false }}
             name="assignTo"
             register={register}
             control={control}
