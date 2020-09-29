@@ -8,15 +8,14 @@ const headers = {
 };
 //alert(process.env.REST_URL);
 const badalsAPI = axios.create({
-  baseURL: 'https://api.badals.com/api', //process.env.REST_URL,
+  baseURL: process.env.REACT_APP_SHOP_API,
     headers: headers
 });
 
 export const adminAPI = axios.create({
-  baseURL: 'https://admin-boot.herokuapp.com/services/admin/api',
+  baseURL: process.env.REACT_APP_ADMIN_API,
   headers: headers
 });
-
 export const clearStore = () => {
     localStorage.removeItem('access_token');
     delete badalsAPI.defaults.headers.common.Authorization;
@@ -36,6 +35,7 @@ badalsAPI.interceptors.request.use(function (config) {
     if(token) {
         config.headers.Authorization = "Bearer " + token;
     }
+
     return config;
 });
 
@@ -45,6 +45,14 @@ adminAPI.interceptors.request.use(function (config) {
         config.headers.Authorization = "Bearer " + token;
     }
     return config;
+});
+
+axios.interceptors.request.use(function (config) {
+    const token = Cookies.get('token');
+    if(token) {
+        config.headers.Authorization = "Bearer " + token;
+    }
+  return config;
 });
 
 /*badalsAPI.interceptors.response.use(response => {

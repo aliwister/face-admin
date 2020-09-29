@@ -38,6 +38,7 @@ import {IncomingShipments} from "./queues/IncomingShipments";
 import {CustomerShipmentList} from "./queues/CustomerShipmentList";
 import {TransitShipmentList} from "./queues/TransitShipmentList";
 import {TabPanel} from "../../components/TabPanel/TabPanel";
+import {ImportAmazonCsvDialog} from "./components/ImportAmazonCsvDialog";
 
 const SHIPMENT_QUEUE = gql`
   query shipmentList($viewName: ShipmentListView) {
@@ -127,6 +128,8 @@ export default function Shipments() {
   const [tab, setTab] = React.useState(0);
   const [acceptdialog, setAcceptdialog] = React.useState(false);
   const [createdialog, setCreatedialog] = React.useState(false);
+  const [importcsvdialog, openImportcsvdialog] = React.useState(false);
+
   const [merchant, setMerchant] = React.useState({id:0});
   const alert = useAlert();
   const classes = useStyles();
@@ -193,6 +196,7 @@ export default function Shipments() {
   const handleClose = () => {
     setAcceptdialog(false);
     setCreatedialog(false);
+    openImportcsvdialog(false);
   };
 
   if(merhcnatsLoading) {
@@ -233,7 +237,8 @@ export default function Shipments() {
     setCreatedialog(true);
   }
 
-  function handlePrepareButton() {
+  function handleImportCsvButton() {
+    openImportcsvdialog(true);
   }
 
   const handleChange = (event, newValue) => {
@@ -280,17 +285,11 @@ export default function Shipments() {
 
   };
 
-  function handleUploader() {
-
-  }
-  function handleUpload() {
-
-  }
-
   return (
     <>
       <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
       <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} />
+      <ImportAmazonCsvDialog show={importcsvdialog} onClose={handleClose} />
       <Grid container spacing={1}>
         <Grid item  md={3} >
           <StatusMultiSelect handleStatus={handleStatus} status={status} />
@@ -306,8 +305,11 @@ export default function Shipments() {
           <Button variant="contained" color="primary" onClick={handleAcceptButton} >
             Accept
           </Button>
-          <Button variant="contained" color="primary" onClick={handlePrepareButton} >
+{/*          <Button variant="contained" color="primary" onClick={handlePrepareButton} >
             Prepare
+          </Button>*/}
+          <Button variant="contained" color="primary" onClick={handleImportCsvButton} >
+            Import CSV
           </Button>
 
           <Link to="import-queue">
