@@ -51,6 +51,8 @@ export type AddProductInput = {
   ref: Maybe<Scalars['String']>;
   discountInPercent: Maybe<Scalars['Int']>;
   merchantId: Maybe<Scalars['Int']>;
+  url: Maybe<Scalars['String']>;
+  dial: Maybe<Scalars['String']>;
 };
 
 export type Address = {
@@ -163,6 +165,30 @@ export type Customer = {
 export type Gallery = {
    __typename?: 'Gallery';
   url: Scalars['String'];
+};
+
+export type Hashtag = {
+   __typename?: 'Hashtag';
+  id: Maybe<Scalars['ID']>;
+  en: Maybe<Scalars['String']>;
+  ar: Maybe<Scalars['String']>;
+  icon: Maybe<Scalars['String']>;
+  position: Maybe<Scalars['Int']>;
+};
+
+export type HashtagInput = {
+  id: Maybe<Scalars['ID']>;
+  en: Maybe<Scalars['String']>;
+  ar: Maybe<Scalars['String']>;
+  icon: Maybe<Scalars['String']>;
+  position: Maybe<Scalars['Int']>;
+};
+
+export type HashtagResponse = {
+   __typename?: 'HashtagResponse';
+  items: Array<Hashtag>;
+  total: Scalars['Int'];
+  hasMore: Scalars['Boolean'];
 };
 
 export type Inventory = {
@@ -314,6 +340,7 @@ export type Mutation = {
   contact: Maybe<Message>;
   createCart: Maybe<CheckoutCart>;
   createCheckoutSession: Maybe<CheckoutSession>;
+  createHashtag: Maybe<Message>;
   createMerchantProduct: Maybe<Message>;
   createNewProduct: Maybe<Product>;
   createOrder: Maybe<Order>;
@@ -322,6 +349,7 @@ export type Mutation = {
   /** createOrderFromCart(cart: CartInput): Order */
   createPurchase: Maybe<Purchase>;
   /**
+   * processAmazonShipments: Message
    * printCode(shipmentId: Long): Message
    * savePackage(pkgId: Long, shipmentItems: [Long]): Pkg
    * scheduleShipment(id: Long, deliveryDate: LocalDate, comments: String, assignTo: String): Message
@@ -340,7 +368,6 @@ export type Mutation = {
   issueItem: Maybe<ItemIssuance>;
   pasLookup: Maybe<Product>;
   prepItem: Maybe<Message>;
-  processAmazonShipments: Maybe<Message>;
   /** cancelOrder(id: ID): Order */
   refundPayment: Maybe<Payment>;
   removeItem: Maybe<Message>;
@@ -352,6 +379,8 @@ export type Mutation = {
   sendToDetrack: Maybe<Message>;
   setAccountingCode: Maybe<Message>;
   setCart: Maybe<Cart>;
+  setDial: Maybe<Message>;
+  setHashtags: Maybe<Message>;
   setOrderState: Maybe<Order>;
   setProcessedDate: Maybe<Message>;
   setPurchaseState: Maybe<Purchase>;
@@ -485,6 +514,11 @@ export type MutationCreateCheckoutSessionArgs = {
 };
 
 
+export type MutationCreateHashtagArgs = {
+  hashtag: Maybe<HashtagInput>;
+};
+
+
 export type MutationCreateMerchantProductArgs = {
   product: Maybe<AddProductInput>;
 };
@@ -508,6 +542,7 @@ export type MutationCreateOverrideArgs = {
   lazy: Maybe<Scalars['Boolean']>;
   merchantId: Maybe<Scalars['Int']>;
   submitOnly: Maybe<Scalars['Int']>;
+  dial: Maybe<Scalars['String']>;
 };
 
 
@@ -663,6 +698,17 @@ export type MutationSetAccountingCodeArgs = {
 export type MutationSetCartArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
+export type MutationSetDialArgs = {
+  dial: Maybe<Scalars['String']>;
+};
+
+
+export type MutationSetHashtagsArgs = {
+  hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
+  ref: Maybe<Scalars['Long']>;
 };
 
 
@@ -963,6 +1009,8 @@ export type Product = {
   features: Maybe<Array<Maybe<Scalars['String']>>>;
   browseNode: Maybe<Scalars['String']>;
   inStock: Maybe<Scalars['Boolean']>;
+  hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
+  dial: Maybe<Scalars['String']>;
 };
 
 export enum ProductGroup {
@@ -1012,8 +1060,8 @@ export type ProductInput = {
    * releaseDate: LocalDate,
    * active: Boolean,
    * similarProducts: [Int],
-   * url: String,
    */
+  url: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
   brand: Maybe<Scalars['String']>;
   group: Maybe<Scalars['String']>;
@@ -1141,7 +1189,10 @@ export type Query = {
   customers: Maybe<Array<Maybe<Customer>>>;
   ebay: Maybe<Product>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
+  getCart: Maybe<Cart>;
+  getProductByDial: Maybe<Product>;
   getProductBySku: Maybe<Product>;
+  hashtags: Maybe<HashtagResponse>;
   /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
@@ -1206,9 +1257,26 @@ export type QueryGetAddressesArgs = {
 };
 
 
+export type QueryGetCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
+export type QueryGetProductByDialArgs = {
+  dial: Maybe<Scalars['String']>;
+};
+
+
 export type QueryGetProductBySkuArgs = {
   sku: Maybe<Scalars['String']>;
   isParent?: Maybe<Scalars['Boolean']>;
+};
+
+
+export type QueryHashtagsArgs = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 
@@ -1599,6 +1667,33 @@ export type VariationOption = {
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type CreateHashtagMutationVariables = {
+  hashtag: Maybe<HashtagInput>;
+};
+
+
+export type CreateHashtagMutation = (
+  { __typename?: 'Mutation' }
+  & { createHashtag: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+export type GetAdminImageUploadUrlMutationVariables = {
+  filename: Maybe<Scalars['String']>;
+  merchant: Maybe<Scalars['String']>;
+};
+
+
+export type GetAdminImageUploadUrlMutation = (
+  { __typename?: 'Mutation' }
+  & { getAdminImageUploadUrl: Maybe<(
+    { __typename?: 'PresignedUrl' }
+    & Pick<PresignedUrl, 'uploadUrl' | 'imageUrl' | 'status'>
+  )> }
+);
+
 export type GetImageUploadUrlMutationVariables = {
   filename: Maybe<Scalars['String']>;
 };
@@ -1622,6 +1717,24 @@ export type GetUploadUrlMutation = (
   & { getUploadUrl: Maybe<(
     { __typename?: 'PresignedUrl' }
     & Pick<PresignedUrl, 'uploadUrl' | 'imageUrl' | 'status'>
+  )> }
+);
+
+export type HashtagsQueryVariables = {
+  offset: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+export type HashtagsQuery = (
+  { __typename?: 'Query' }
+  & { hashtags: Maybe<(
+    { __typename?: 'HashtagResponse' }
+    & Pick<HashtagResponse, 'total' | 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'Hashtag' }
+      & Pick<Hashtag, 'id' | 'icon' | 'position' | 'en' | 'ar'>
+    )> }
   )> }
 );
 
@@ -1802,6 +1915,111 @@ export type UpdateFromDetrackMutation = (
 );
 
 
+export const CreateHashtagDocument = gql`
+    mutation createHashtag($hashtag: HashtagInput) {
+  createHashtag(hashtag: $hashtag) {
+    value
+  }
+}
+    `;
+export type CreateHashtagMutationFn = ApolloReactCommon.MutationFunction<CreateHashtagMutation, CreateHashtagMutationVariables>;
+export type CreateHashtagComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateHashtagMutation, CreateHashtagMutationVariables>, 'mutation'>;
+
+    export const CreateHashtagComponent = (props: CreateHashtagComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateHashtagMutation, CreateHashtagMutationVariables> mutation={CreateHashtagDocument} {...props} />
+    );
+    
+export type CreateHashtagProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateHashtagMutation, CreateHashtagMutationVariables>
+    } & TChildProps;
+export function withCreateHashtag<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateHashtagMutation,
+  CreateHashtagMutationVariables,
+  CreateHashtagProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateHashtagMutation, CreateHashtagMutationVariables, CreateHashtagProps<TChildProps, TDataName>>(CreateHashtagDocument, {
+      alias: 'createHashtag',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useCreateHashtagMutation__
+ *
+ * To run a mutation, you first call `useCreateHashtagMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateHashtagMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createHashtagMutation, { data, loading, error }] = useCreateHashtagMutation({
+ *   variables: {
+ *      hashtag: // value for 'hashtag'
+ *   },
+ * });
+ */
+export function useCreateHashtagMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateHashtagMutation, CreateHashtagMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateHashtagMutation, CreateHashtagMutationVariables>(CreateHashtagDocument, baseOptions);
+      }
+export type CreateHashtagMutationHookResult = ReturnType<typeof useCreateHashtagMutation>;
+export type CreateHashtagMutationResult = ApolloReactCommon.MutationResult<CreateHashtagMutation>;
+export type CreateHashtagMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateHashtagMutation, CreateHashtagMutationVariables>;
+export const GetAdminImageUploadUrlDocument = gql`
+    mutation getAdminImageUploadUrl($filename: String, $merchant: String) {
+  getAdminImageUploadUrl(filename: $filename, merchant: $merchant) {
+    uploadUrl
+    imageUrl
+    status
+  }
+}
+    `;
+export type GetAdminImageUploadUrlMutationFn = ApolloReactCommon.MutationFunction<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>;
+export type GetAdminImageUploadUrlComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>, 'mutation'>;
+
+    export const GetAdminImageUploadUrlComponent = (props: GetAdminImageUploadUrlComponentProps) => (
+      <ApolloReactComponents.Mutation<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables> mutation={GetAdminImageUploadUrlDocument} {...props} />
+    );
+    
+export type GetAdminImageUploadUrlProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>
+    } & TChildProps;
+export function withGetAdminImageUploadUrl<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetAdminImageUploadUrlMutation,
+  GetAdminImageUploadUrlMutationVariables,
+  GetAdminImageUploadUrlProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables, GetAdminImageUploadUrlProps<TChildProps, TDataName>>(GetAdminImageUploadUrlDocument, {
+      alias: 'getAdminImageUploadUrl',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetAdminImageUploadUrlMutation__
+ *
+ * To run a mutation, you first call `useGetAdminImageUploadUrlMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminImageUploadUrlMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [getAdminImageUploadUrlMutation, { data, loading, error }] = useGetAdminImageUploadUrlMutation({
+ *   variables: {
+ *      filename: // value for 'filename'
+ *      merchant: // value for 'merchant'
+ *   },
+ * });
+ */
+export function useGetAdminImageUploadUrlMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>) {
+        return ApolloReactHooks.useMutation<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>(GetAdminImageUploadUrlDocument, baseOptions);
+      }
+export type GetAdminImageUploadUrlMutationHookResult = ReturnType<typeof useGetAdminImageUploadUrlMutation>;
+export type GetAdminImageUploadUrlMutationResult = ApolloReactCommon.MutationResult<GetAdminImageUploadUrlMutation>;
+export type GetAdminImageUploadUrlMutationOptions = ApolloReactCommon.BaseMutationOptions<GetAdminImageUploadUrlMutation, GetAdminImageUploadUrlMutationVariables>;
 export const GetImageUploadUrlDocument = gql`
     mutation getImageUploadUrl($filename: String) {
   getImageUploadUrl(filename: $filename) {
@@ -1908,6 +2126,67 @@ export function useGetUploadUrlMutation(baseOptions?: ApolloReactHooks.MutationH
 export type GetUploadUrlMutationHookResult = ReturnType<typeof useGetUploadUrlMutation>;
 export type GetUploadUrlMutationResult = ApolloReactCommon.MutationResult<GetUploadUrlMutation>;
 export type GetUploadUrlMutationOptions = ApolloReactCommon.BaseMutationOptions<GetUploadUrlMutation, GetUploadUrlMutationVariables>;
+export const HashtagsDocument = gql`
+    query hashtags($offset: Int, $limit: Int) {
+  hashtags(offset: $offset, limit: $limit) {
+    total
+    hasMore
+    items {
+      id
+      icon
+      position
+      en
+      ar
+    }
+  }
+}
+    `;
+export type HashtagsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<HashtagsQuery, HashtagsQueryVariables>, 'query'>;
+
+    export const HashtagsComponent = (props: HashtagsComponentProps) => (
+      <ApolloReactComponents.Query<HashtagsQuery, HashtagsQueryVariables> query={HashtagsDocument} {...props} />
+    );
+    
+export type HashtagsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<HashtagsQuery, HashtagsQueryVariables>
+    } & TChildProps;
+export function withHashtags<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  HashtagsQuery,
+  HashtagsQueryVariables,
+  HashtagsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, HashtagsQuery, HashtagsQueryVariables, HashtagsProps<TChildProps, TDataName>>(HashtagsDocument, {
+      alias: 'hashtags',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useHashtagsQuery__
+ *
+ * To run a query within a React component, call `useHashtagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHashtagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHashtagsQuery({
+ *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useHashtagsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<HashtagsQuery, HashtagsQueryVariables>) {
+        return ApolloReactHooks.useQuery<HashtagsQuery, HashtagsQueryVariables>(HashtagsDocument, baseOptions);
+      }
+export function useHashtagsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<HashtagsQuery, HashtagsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<HashtagsQuery, HashtagsQueryVariables>(HashtagsDocument, baseOptions);
+        }
+export type HashtagsQueryHookResult = ReturnType<typeof useHashtagsQuery>;
+export type HashtagsLazyQueryHookResult = ReturnType<typeof useHashtagsLazyQuery>;
+export type HashtagsQueryResult = ApolloReactCommon.QueryResult<HashtagsQuery, HashtagsQueryVariables>;
 export const MerchantsDocument = gql`
     query merchants {
   merchants {

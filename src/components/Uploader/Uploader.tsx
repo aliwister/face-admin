@@ -64,9 +64,9 @@ const img = {
   height: '100%',
 };
 
-function Uploader({ onChange, imageURL }: any) {
+function Uploader({ current, onChange, imageURL }: any) {
   const [files, setFiles] = useState(
-    imageURL ? [{ name: 'demo', preview: imageURL }] : []
+    current ? [{ name: 'demo', preview: current }] : []
   );
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',

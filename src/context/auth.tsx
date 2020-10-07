@@ -70,9 +70,9 @@ const AuthProvider = (props: any) => {
       return badalsAPI.post(`/authenticate`, {"username": username, "password": password, "rememberMe": true})
           .then(res => {
               // @ts-ignore
-              console.log(res);
+/*              console.log(res);
               console.log(res.data);
-              console.log(res.data.id_token);
+              console.log(res.data.id_token);*/
               setToken(res.data.id_token);
               Cookies.set('token', res.data.id_token, {expires: 1});
               Cookies.set('authorities', res.data.authorities, {expires: 1});

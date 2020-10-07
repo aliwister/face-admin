@@ -13,7 +13,6 @@ import Placeholder from '../../components/Placeholder/Placeholder';
 import {Tab, TextField} from '@material-ui/core';
 import Tabs from '@material-ui/core/Tabs';
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import {Col, IMPORT_ALL} from "./ImportProducts";
 import {useForm} from "react-hook-form";
@@ -22,6 +21,7 @@ import {ImportAllDialog} from "./components/ImportAllDialog";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {useMerchantProductsQuery} from "../../codegen/generated/_graphql";
+import {Link} from "react-router-dom";
 
 export const ProductsRow = styled('div', ({ $theme }) => ({
   display: 'flex',
@@ -178,6 +178,7 @@ export default function Products() {
   const onClose = () => setDialog(false);
   return (
     <Grid container spacing={1}>
+
       <ImportAllDialog open={dialog} onClose={onClose} onSubmit={importAll} />
       <Backdrop open={backdrop}>
         <CircularProgress color="inherit" />
@@ -186,6 +187,10 @@ export default function Products() {
         <Header style={{ marginBottom: 15 }}>
           <Grid item md={2}>
         <Heading>Products</Heading>
+          <Link to="hashtags">
+            <Button variant="contained" color="secondary">
+              Hash Tags
+            </Button></Link>
           </Grid>
           <Grid item md={6}>
             <form onSubmit={handleSubmit(handleSearch)}>

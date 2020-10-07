@@ -25,7 +25,8 @@ import {
   IMPORTQ,
   OUTSTANDINGQ,
   UNSHIPPEDQ,
-  ACCOUNTING
+  ACCOUNTING,
+  HASHTAGS
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
@@ -37,6 +38,7 @@ import OutstandingQueue from "./containers/Purchases/OutstandingQueue";
 import UnshippedQueue from "./containers/Purchases/UnshippedQueue";
 import {TransactionsDocument} from "./codegen/generated/_graphql";
 import Transactions from "./containers/Accounting/Transactions";
+import Hashtags from "./containers/Hashtag/List";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
 const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
@@ -186,6 +188,13 @@ const Routes = () => {
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
                 <ImportProducts />
+              </Suspense>
+            </AdminLayout>
+          </MerchantRoute>
+          <MerchantRoute path={HASHTAGS}>
+            <AdminLayout>
+              <Suspense fallback={<InLineLoader />}>
+                <Hashtags />
               </Suspense>
             </AdminLayout>
           </MerchantRoute>

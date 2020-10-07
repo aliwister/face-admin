@@ -1,0 +1,14 @@
+query hashtags ( $offset: Int, $limit: Int){
+  hashtags(                 offset: $offset
+                            limit: $limit) {
+          total
+          hasMore
+          items {
+    id
+    icon
+    position
+    en
+    ar
+    }
+  }
+}

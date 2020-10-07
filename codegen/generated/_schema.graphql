@@ -26,6 +26,8 @@ input AddProductInput {
   ref: String
   discountInPercent: Int
   merchantId: Int
+  url: String
+  dial: String
 }
 
 type Address {
@@ -136,6 +138,28 @@ scalar Date
 
 type Gallery {
   url: String!
+}
+
+type Hashtag {
+  id: ID
+  en: String
+  ar: String
+  icon: String
+  position: Int
+}
+
+input HashtagInput {
+  id: ID
+  en: String
+  ar: String
+  icon: String
+  position: Int
+}
+
+type HashtagResponse {
+  items: [Hashtag!]!
+  total: Int!
+  hasMore: Boolean!
 }
 
 type Inventory {
@@ -280,16 +304,18 @@ type Mutation {
   contact(id: Int): Message
   createCart(cart: CheckoutCartInput): CheckoutCart
   createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+  createHashtag(hashtag: HashtagInput): Message
   createMerchantProduct(product: AddProductInput): Message
   createNewProduct(product: ProductInput): Product
   createOrder(id: Int): Order
-  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int): Product
+  createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
   createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
 
   """createOrderFromCart(cart: CartInput): Order"""
   createPurchase(dto: PurchaseInput): Purchase
 
   """
+  processAmazonShipments: Message
   printCode(shipmentId: Long): Message
   savePackage(pkgId: Long, shipmentItems: [Long]): Pkg
   scheduleShipment(id: Long, deliveryDate: LocalDate, comments: String, assignTo: String): Message
@@ -308,7 +334,6 @@ type Mutation {
   issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
   pasLookup(sku: String): Product
   prepItem(dto: PackagingContentInput): Message
-  processAmazonShipments: Message
 
   """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
@@ -321,6 +346,8 @@ type Mutation {
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
   setAccountingCode(paymentIds: [Long], code: String): Message
   setCart(secureKey: String, items: [CartItemInput]): Cart
+  setDial(dial: String): Message
+  setHashtags(hashtags: [String], ref: Long): Message
   setOrderState(id: ID, state: OrderState): Order
   setProcessedDate(paymentIds: [Long], date: Date): Message
   setPurchaseState(id: ID, state: OrderState): Purchase
@@ -568,6 +595,8 @@ type Product {
   features: [String]
   browseNode: String
   inStock: Boolean
+  hashtags: [String]
+  dial: String
 }
 
 enum ProductGroup {
@@ -618,8 +647,8 @@ input ProductInput {
   releaseDate: LocalDate,
   active: Boolean,
   similarProducts: [Int],
-  url: String,
   """
+  url: String
   name: String
   brand: String
   group: String
@@ -741,7 +770,10 @@ type Query {
   customers: [Customer]
   ebay(id: String): Product
   getAddresses(customerId: Int): [Address]
+  getCart(secureKey: String, items: [CartItemInput]): Cart
+  getProductByDial(dial: String): Product
   getProductBySku(sku: String, isParent: Boolean = false): Product
+  hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
 
   """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
   inventory: [Inventory]
