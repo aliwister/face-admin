@@ -112,8 +112,6 @@ export default function Transactions() {
   }
 
   function refresh() {
-
-
     if (status && status.length) {
       refetch({
         paymentMethods: arrayToObject(status, 'value'),
@@ -263,6 +261,7 @@ export default function Transactions() {
     setSettlement(false);
     setCoding(false);
     setBmbcsv(false);
+    setXerocsv(false);
   }
 
   function handleFrom(event) {

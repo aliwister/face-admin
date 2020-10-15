@@ -9,7 +9,7 @@ import { CSVLink, CSVDownload } from "react-csv";
 import {formatDate} from "baseui/datepicker";
 
 export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total}) => {
-  const { register, handleSubmit, errors } = useForm({
+  const { register, handleSubmit, errors, watch } = useForm({
     defaultValues: {
     }
   });
@@ -46,7 +46,7 @@ export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total
           }}
           inputRef={register({required: true})}
         />
-        {download && <CSVLink data={csvData}  enclosingCharacter={``} filename={"tranactions-"+formatDate(new Date(),'yyyy-MM-dd')+".csv"}>Download me</CSVLink>}
+        {download && <CSVLink data={csvData}  enclosingCharacter={``} filename={"tranactions-"+formatDate(watch('date'),'yyyy-MM-dd')+".csv"}>Download me</CSVLink>}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
