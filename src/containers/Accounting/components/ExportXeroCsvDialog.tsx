@@ -21,7 +21,7 @@ export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total
     const csvData = [["*Date","*Amount", "Payee","Description", "Reference","Check Number"]];
     csvData.push([formData.date,total,"Bank Muscat", "Settlement "+formData.date,"",""]);
     items.filter(function(el) { return checked.includes(el.id) }).forEach(function(a,b) {
-      csvData.push([formatDate(new Date(a.settlementDate),'yyyy-MM-dd'),a.amount, a.payee, a.paymentMethod, a.orderReference, a.cartId]);
+      csvData.push([formatDate(new Date(a.settlementDate),'yyyy-MM-dd'),a.amount, a.customer, a.paymentMethod, a.orderReference, a.cartId]);
     });
     setData(csvData);
     setDownload(true);
