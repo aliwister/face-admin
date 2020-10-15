@@ -15,6 +15,7 @@ export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total
   });
   const [download, setDownload] = useState(false);
   const [csvData, setData] = useState([]);
+  const [filename, setFilename] = useState("");
 
   const onSubmitDialog = (formData) => {
     console.log(formData);
@@ -24,6 +25,7 @@ export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total
       csvData.push([formatDate(new Date(a.settlementDate),'yyyy-MM-dd'),a.amount, a.customer, a.paymentMethod, a.orderReference, a.cartId]);
     });
     setData(csvData);
+    setFilename("tranactions-"+formData.date+".csv");
     setDownload(true);
   }
 
@@ -46,7 +48,7 @@ export const ExportXeroCsvDialog = ({checked, items, open, onClose, title, total
           }}
           inputRef={register({required: true})}
         />
-        {download && <CSVLink data={csvData}  enclosingCharacter={``} filename={"tranactions-"+formatDate(watch('date'),'yyyy-MM-dd')+".csv"}>Download me</CSVLink>}
+        {download && <CSVLink data={csvData}  enclosingCharacter={``} filename={filename}>Download me</CSVLink>}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>
