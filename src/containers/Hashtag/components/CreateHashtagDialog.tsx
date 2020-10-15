@@ -83,8 +83,8 @@ export default function CreateHashtagDialog({item, show, onClose, onSubmit}) {
             </div>
             <TextField disabled={true} fullWidth type="number" placeholder="id" name="id" inputRef={register({required: false})} />
             <TextField fullWidth type="number" placeholder="position" name="position" inputRef={register({required: true})} />
-            <TextField fullWidth type="text" placeholder="en" name="en" inputRef={register({required: true,pattern: /\#.+/ })} />
-            <TextField fullWidth type="text" placeholder="ar" name="ar" inputRef={register({required: true,pattern: /\#.+/})} />
+            <TextField fullWidth type="text" placeholder="en" name="en" inputRef={register({required: true,pattern: /.+/ })} />
+            <TextField fullWidth type="text" placeholder="ar" name="ar" inputRef={register({required: true,pattern: /.+/})} />
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
