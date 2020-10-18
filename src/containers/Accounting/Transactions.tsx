@@ -195,7 +195,7 @@ export default function Transactions() {
     let x = 0;
     if(nextState.length > 0) {
       x = data.transactions.items.filter(a => nextState.includes(a.id)).map(item => item.amount).reduce((prev, next) => prev + next);
-      setTotal(x);
+      setTotal(Math.round(Math.abs(x)*10)/10.0);
     }
 
   }

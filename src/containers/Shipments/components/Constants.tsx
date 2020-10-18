@@ -47,4 +47,5 @@ export const DRIVERS = [
 export const USERS = [
   {value: '8782', label: 'Shabib'},
   {value: '1', label: 'Ali'},
+  {value: '0', label: 'CC'},
 ]
