@@ -69,7 +69,7 @@ export default function Transactions() {
   const [coding, setCoding] = useState(false);
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState([{value: 'checkoutcom', label: 'checkoutcom'}]);
-  const [limit, setLimit] = useState([]);
+  const [limit, setLimit] = useState(15);
   const [search, setSearch] = useState([]);
   const [from, setFrom] = useState(null);
   const [to, setTo] = useState(null);
@@ -77,6 +77,8 @@ export default function Transactions() {
   const [total, setTotal] = useState(0);
   const [bmbcsv, setBmbcsv] = useState(false);
   const [xerocsv, setXerocsv] = useState(false);
+  const [unsettledonly, setUnsettledonly] = useState(false);
+
   const alert = useAlert();
   const classes = useStyles();
 
@@ -91,12 +93,13 @@ export default function Transactions() {
     {
       variables: {
         paymentMethods: arrayToObject(status, 'value'),
-        limit: 15,
+        limit: limit,
         offset: 0,
         maxAmount: amount,
         from: from,
         to: to,
-        accountCode: null
+        accountCode: null,
+        unsettledOnly: unsettledonly
       },
       fetchPolicy: "network-only",
       context: { clientName: "shopLink" }
@@ -116,10 +119,11 @@ export default function Transactions() {
       refetch({
         paymentMethods: arrayToObject(status, 'value'),
         maxAmount: null,
-        limit: 15,
+        limit: limit,
         offset: 0,
         from: from,
-        to: to
+        to: to,
+        unsettledOnly: unsettledonly
       });
     } else {
       refetch({
@@ -134,6 +138,7 @@ export default function Transactions() {
 
 
   function loadMore() {
+    setLimit(limit+15);
     fetchMore({
       variables: {
         offset: data.transactions.items.length,
@@ -281,7 +286,7 @@ export default function Transactions() {
 
   return (
     <Grid container spacing={1}>
-      <Grid item  md={5} >
+      <Grid item  md={4} >
         <Select
           value={status}
           onChange={handleStatus}
@@ -291,7 +296,7 @@ export default function Transactions() {
 
       </Grid>
 
-      <Grid  item  md={4} >
+      <Grid  item  md={5} >
         <TextField
           id="date"
           label="From"
@@ -323,6 +328,18 @@ export default function Transactions() {
           }}
           onChange={handleMaxAmount}
         />
+        <Checkbox
+          checked={unsettledonly}
+          onChange={() => setUnsettledonly(!unsettledonly)}
+          overrides={{
+            Checkmark: {
+              style: {
+                borderWidth: '2px',
+                borderRadius: '4px',
+              },
+            },
+          }}
+        >Unsettled Only</Checkbox>
       </Grid>
       <Grid item  md={3} style={{textAlign: 'right'}}>
         <Button variant="contained" color="primary" onClick={onSetSettlement} >
@@ -410,8 +427,8 @@ export default function Transactions() {
         <SetProcessedDateDialog item={checkedId} open={processed} onClose={onClose} onSubmit={handleSetProcessed} title={"Set Processed Date"}/>
         <SetSettlementDateDialog item={checkedId} open={settlement} onClose={onClose} onSubmit={handleSetSettlement} title={"Set Processed Date"}/>
         <SetCodingDialog item={checkedId} open={coding} onClose={onClose} onSubmit={handleSetCoding} title={"Set Processed Date"}/>
-        {data && <ExportBmbCsvDialog  checked={checkedId} items={data.transactions.items} open={bmbcsv}  onClose={onClose} total={Math.abs(total)} title={"Generate BMB CSV"}/>}
-        {data && <ExportXeroCsvDialog checked={checkedId} items={data.transactions.items} open={xerocsv} onClose={onClose} total={Math.abs(total)} title={"Generate Xero CSV"}/>}
+        {data && <ExportBmbCsvDialog  checked={checkedId} items={data.transactions.items} open={bmbcsv}  onClose={onClose} total={Math.round(Math.abs(total)*10)/10.0} title={"Generate BMB CSV"}/>}
+        {data && <ExportXeroCsvDialog checked={checkedId} items={data.transactions.items} open={xerocsv} onClose={onClose} total={Math.round(Math.abs(total)*10)/10.0} title={"Generate Xero CSV"}/>}
       </Grid>
     </Grid>
   );

@@ -159,6 +159,8 @@ export type Customer = {
   lastname: Maybe<Scalars['String']>;
   email: Maybe<Scalars['String']>;
   mobile: Maybe<Scalars['String']>;
+  totalPoints: Maybe<Scalars['Long']>;
+  spentPoints: Maybe<Scalars['Long']>;
 };
 
 
@@ -174,6 +176,7 @@ export type Hashtag = {
   ar: Maybe<Scalars['String']>;
   icon: Maybe<Scalars['String']>;
   position: Maybe<Scalars['Int']>;
+  products: Maybe<ProductResponse>;
 };
 
 export type HashtagInput = {
@@ -703,6 +706,7 @@ export type MutationSetCartArgs = {
 
 export type MutationSetDialArgs = {
   dial: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['Long']>;
 };
 
 
@@ -1193,10 +1197,12 @@ export type Query = {
   getProductByDial: Maybe<Product>;
   getProductBySku: Maybe<Product>;
   hashtags: Maybe<HashtagResponse>;
+  hashtagsWithProducts: Maybe<HashtagResponse>;
   /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
   me: Maybe<Customer>;
+  meTest: Maybe<Customer>;
   merchantProducts: Maybe<MerchantProductResponse>;
   merchants: Maybe<Array<Maybe<Merchant>>>;
   mws: Maybe<Product>;
@@ -1219,6 +1225,8 @@ export type Query = {
   purchaseQueue: Maybe<Array<Maybe<PurchaseQueue>>>;
   purchases: Maybe<PurchaseResponse>;
   relatedProducts: Array<Product>;
+  relatedTo: Maybe<HashtagResponse>;
+  rewards: Maybe<Array<Maybe<Reward>>>;
   shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
   shipQueueByCustomerId: Maybe<Array<Maybe<ShipQueue>>>;
   shipment: Maybe<Shipment>;
@@ -1277,6 +1285,17 @@ export type QueryGetProductBySkuArgs = {
 export type QueryHashtagsArgs = {
   offset?: Maybe<Scalars['Int']>;
   limit?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryHashtagsWithProductsArgs = {
+  offset?: Maybe<Scalars['Int']>;
+  limit?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryMeTestArgs = {
+  id: Maybe<Scalars['Long']>;
 };
 
 
@@ -1390,6 +1409,13 @@ export type QueryRelatedProductsArgs = {
 };
 
 
+export type QueryRelatedToArgs = {
+  ref: Maybe<Scalars['Long']>;
+  hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
+  title: Maybe<Scalars['String']>;
+};
+
+
 export type QueryShipQueueByCustomerIdArgs = {
   customerId: Maybe<Scalars['Long']>;
 };
@@ -1451,6 +1477,18 @@ export type QueryTransactionsArgs = {
   to: Maybe<Scalars['Date']>;
   customerId: Maybe<Scalars['Long']>;
   accountCode: Maybe<Scalars['String']>;
+  unsettledOnly: Maybe<Scalars['Boolean']>;
+};
+
+export type Reward = {
+   __typename?: 'Reward';
+  id: Maybe<Scalars['ID']>;
+  name: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
+  minimumCartAmount: Maybe<Scalars['Long']>;
+  discountValue: Maybe<Scalars['Long']>;
+  discountValidDays: Maybe<Scalars['Long']>;
+  points: Maybe<Scalars['Long']>;
 };
 
 export type Shipment = {
@@ -1886,6 +1924,7 @@ export type TransactionsQueryVariables = {
   to?: Maybe<Scalars['Date']>;
   customerId?: Maybe<Scalars['Long']>;
   accountCode?: Maybe<Scalars['String']>;
+  unsettledOnly?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -2711,8 +2750,8 @@ export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipme
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
 export const TransactionsDocument = gql`
-    query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null) {
-  transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, maxAmount: $maxAmount, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode) {
+    query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null, $unsettledOnly: Boolean = false) {
+  transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, maxAmount: $maxAmount, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode, unsettledOnly: $unsettledOnly) {
     total
     hasMore
     items {
@@ -2777,6 +2816,7 @@ export function withTransactions<TProps, TChildProps = {}, TDataName extends str
  *      to: // value for 'to'
  *      customerId: // value for 'customerId'
  *      accountCode: // value for 'accountCode'
+ *      unsettledOnly: // value for 'unsettledOnly'
  *   },
  * });
  */

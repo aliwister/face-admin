@@ -1,4 +1,4 @@
-  query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null) {
+  query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null, $unsettledOnly: Boolean = false) {
     transactions(paymentMethods: $paymentMethods
                  offset: $offset
                  limit: $limit
@@ -6,7 +6,9 @@
                  from: $from
                  to: $to
                  customerId: $customerId
-                 accountCode: $accountCode)
+                 accountCode: $accountCode
+                 unsettledOnly: $unsettledOnly
+                 )
     {
       total
       hasMore

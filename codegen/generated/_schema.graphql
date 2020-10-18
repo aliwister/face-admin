@@ -131,6 +131,8 @@ type Customer {
   lastname: String
   email: String
   mobile: String
+  totalPoints: Long
+  spentPoints: Long
 }
 
 """java.util.Date implementation"""
@@ -146,6 +148,7 @@ type Hashtag {
   ar: String
   icon: String
   position: Int
+  products: ProductResponse
 }
 
 input HashtagInput {
@@ -346,7 +349,7 @@ type Mutation {
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
   setAccountingCode(paymentIds: [Long], code: String): Message
   setCart(secureKey: String, items: [CartItemInput]): Cart
-  setDial(dial: String): Message
+  setDial(dial: String, ref: Long): Message
   setHashtags(hashtags: [String], ref: Long): Message
   setOrderState(id: ID, state: OrderState): Order
   setProcessedDate(paymentIds: [Long], date: Date): Message
@@ -774,12 +777,14 @@ type Query {
   getProductByDial(dial: String): Product
   getProductBySku(sku: String, isParent: Boolean = false): Product
   hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
+  hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
 
   """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
   inventory: [Inventory]
 
   """getAddress(addressId: Int): Address"""
   me: Customer
+  meTest(id: Long): Customer
   merchantProducts(text: String = "", type: String = "", offset: Int = 0, limit: Int = 10, lang: Int = 1, imported: Boolean = true): MerchantProductResponse
   merchants: [Merchant]
   mws(sku: String): Product
@@ -803,6 +808,8 @@ type Query {
   purchaseQueue: [PurchaseQueue]
   purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
   relatedProducts(type: String, slug: String!): [Product!]!
+  relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
+  rewards: [Reward]
   shipQueue: [ShipQueue]
   shipQueueByCustomerId(customerId: Long): [ShipQueue]
   shipment(id: ID): Shipment
@@ -815,9 +822,19 @@ type Query {
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
   transaction(id: ID): Payment
-  transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
+  transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String, unsettledOnly: Boolean): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
   unshippedQueue: [UnshippedQueue]
+}
+
+type Reward {
+  id: ID
+  name: String
+  description: String
+  minimumCartAmount: Long
+  discountValue: Long
+  discountValidDays: Long
+  points: Long
 }
 
 type Shipment {
