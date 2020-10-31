@@ -7,11 +7,10 @@ import {
 } from '../../components/FlexBox/FlexBox';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import { useForm, useFieldArray } from "react-hook-form";
 
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
-import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import { useAlert } from "react-alert";
 import {
   TableRow,
@@ -22,19 +21,14 @@ import {
   TableCell,
   Typography,
   TableBody } from '@material-ui/core';
-import Image from "../../components/Image/Image";
-import SaveIcon from '@material-ui/icons/Save';
+
 import DeleteIcon from '@material-ui/icons/Delete';
-import _ from 'lodash';
-import {useForm} from "react-hook-form";
+
 import {Alert} from "@material-ui/lab";
-const CREATE_PURCHASE = gql`
-  mutation createPurchase($dto: PurchaseInput) {
-    createPurchase(dto: $dto) {
-      id
-    }
-  }
-`;
+import {useFindByKeywordQuery, useHashtagsQuery, useCustomerQuery} from "../../codegen/generated/_graphql";
+import {SearchResults} from "./SearchResults";
+import TableForm from "../OrderForm/TableForm";
+
 const CREATE_CART = gql`
   mutation createCart($cart: CheckoutCartInput) {
     createCart(cart: $cart) {
@@ -44,15 +38,6 @@ const CREATE_CART = gql`
       secureKey
     }
   }
-`;
-
-const MERCHANTS = gql`
-query merchants {
-  merchants {
-    id
-    name
-  }
-}
 `;
 
 const useStyles = makeStyles(theme => ({
@@ -66,40 +51,101 @@ const useStyles = makeStyles(theme => ({
 
 export default function Cart() {
   const [createCartMutation] = useMutation(CREATE_CART, { context: { clientName: "shopLink" }});
-  const [po, setPO] = useState(0);
+  const [cart, setCart] = useState({items:[], })
+  const { data, error, refetch, fetchMore } = useFindByKeywordQuery(
+    {
+      variables: {
+        keyword: "dkny"
+      },
+      context: { clientName: "shopLink" }
+    });
+  const { data:customer, refetch:refetchCustomer } = useCustomerQuery(
+    {
+      variables: {
+        mobile: "96897072655"
+      },
+      context: { clientName: "shopLink" }
+    });
+  const { register, control, handleSubmit, watch } = useForm();
+  const { fields, append, remove} = useFieldArray(
+    {
+      control,
+      name: "items"
+    }
+  );
+
+  const add = ({ref,title, url, cost, price, sku}) => {
+    console.log(ref);
+    append(
+      {
+        productId: ref,
+        name: title,
+        description: title,
+        ref: ref,
+        url: url,
+        cost: cost,
+        price: price,
+        sku: sku,
+        quantity: 1,
+        pid: ""
+      });
+  }
+
+  function removeItem(index) {
+    console.log(index);
+    console.log(fields);
+    remove(index);
+  }
+
   const [items, setItems] = useState([]);
   const [secureKey, setSecureKey] = useState('');
   const [create, setCreate] = useState(true);
-
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [keyword, setKeyword] = useState('');
   const [total, setTotal] = useState();
   const [subtotal, setSubtotal] = useState();
-  const { register, handleSubmit, errors } = useForm();
+/*  const [customer, setCustomer] = useState();*/
 
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, { context: { clientName: "shopLink" }});
   const alert = useAlert();
   const classes = useStyles();
-
-  const calcSubtotal = () => items.reduce((sum,p) => sum + p.quantity * p.price, 0);
-  const onSubmit = data => {
+/*  const onSubmit = data => {
     console.log(data);
     let newItems =
         [...items,
           {...data}
         ];
     setItems(newItems);
-  }
+  }*/
 
-  const onSaveCart = async () => {
+  const onSubmit = async (data) => {
+    console.log(data);
+    const items = data.items.map(({pid, sku, url, productId, description, price, quantity, ref, cost}) => ({
+      productId: Number(productId),
+      sku,
+      name: description,
+      quantity,
+      price,
+      cost,
+      url
+    }));
+    const addresses = customer.customer.addresses.map(({id, alias, line1, line2, city, mobile, __typename}) => ({
+      id,
+      alias,
+      line1,
+      line2,
+      city,
+      mobile
+    }));
     let cart = {
-      name: name,
-      email: email,
-      phone: phone,
-      items: [
-          ...items
-      ]
+      name:  customer.customer.firstname + " " + customer.customer.lastname,
+      email: customer.customer.email,
+      phone: customer.customer.mobile,
+      //customerId: customer.customer.id,
+      items,
+      addresses: addresses
     };
     const {
       data: { createCart },
@@ -113,78 +159,59 @@ export default function Cart() {
     }
   }
 
-  if(merhcnatsLoading)
-    return <div>Loading</div>
 
+  function findCustomer() {
+    refetchCustomer({mobile: mobile});
+  }
+
+  function findProduct() {
+    refetch({keyword: keyword})
+  }
 
   return (
 
       <Grid item xs={12} md={12}>
-        <Heading>Cart</Heading>
+        <h1>Cart</h1>
 
-        {/*<TextField id="outlined-basic" label="Ref" variant="outlined" value={cart.id} onChange={(e) => handleUpdate('UPDATE_REF', e.target.value)}/>*/}
 
-        <Autocomplete
-            id="combo-box-demo"
-            //value={merchant}
-            options={merchants.merchants}
-            getOptionLabel={(option: any) => option.name}
-            // defaultValue={[merchants.merchants[merchantId]]}
-            style={{ width: 300 }}
-            //onChange={(event, value) => handleUpdate('UPDATE_MERCHANT',value)}
-            renderInput={params => <TextField {...params} label="Combo box" variant="outlined" />}
-        />
-        <TextField id="outlined-basic" label="Name" variant="outlined" value={name} onChange={(e) => setName(e.target.value)}/>
+{/*        <TextField id="outlined-basic" label="Name" variant="outlined" value={name} onChange={(e) => setName(e.target.value)}/>
         <TextField id="outlined-basic" label="Email" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <TextField id="outlined-basic" label="Phone" variant="outlined" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <TextField id="outlined-basic" label="Phone" variant="outlined" value={phone} onChange={(e) => setPhone(e.target.value)} />*/}
+        <TextField id="outlined-basic" label="Customer Phone number" variant="outlined" value={mobile} onChange={(e) => setMobile(e.target.value)}/>
+        {customer && customer.customer &&
+        <>
+          <TextField id="outlined-basic" label="Name" variant="outlined"
+                     value={customer.customer.firstname + " " + customer.customer.lastname}
+                     onChange={(e) => setName(e.target.value)}/>
+          <TextField id="outlined-basic" label="Email" variant="outlined" value={customer.customer.email}
+                     onChange={(e) => setEmail(e.target.value)}/>
+        </>
+        }
+        <span>{customer && customer.customer.firstname}</span>
+        <Button variant="contained" color="secondary" size="large" onClick={findCustomer}>
+          Find
+        </Button>
+
         {secureKey &&
         <Alert severity="success">https://checkout.badals.com/checkout/start?token={secureKey}</Alert>
 
         }
-        <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
-          Save Purchase
-        </Button>
+
         <Typography variant="h6">Cart Items</Typography>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell>#</TableCell>
-                <TableCell>Image</TableCell>
-                <TableCell>URL</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Cost</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items && items.map(q => (
-                  <TableRow key={q.title}>
-                    <TableCell align="right">{q.image}</TableCell>
-                    <TableCell align="right">{q.url}</TableCell>
-                    <TableCell align="right">{q.title}</TableCell>
-                    <TableCell align="right">{q.cost}</TableCell>
-                    <TableCell align="right">{q.price}</TableCell>
-                    <TableCell align="right">
-                      <Button
-                          variant="contained"
-                          color="secondary"
-                          className={classes.button}
-                          startIcon={<DeleteIcon />}
-                          //onClick={()=>handleRemove(q)}
-                      >
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TextField id="outlined-basic" label="Subtotal" variant="outlined" value={subtotal} disabled/>
-         <TextField id="outlined-basic" label="Total" variant="outlined" value={total} disabled/>
-        </TableContainer>
+        <TextField id="outlined-basic" label="Product Name" variant="outlined" value={keyword} onChange={(e) => setKeyword(e.target.value)}/>
+        <Button variant="contained" color="secondary" size="large" onClick={findProduct}>
+          Find
+        </Button>
+        <div>
+          {data && <SearchResults data={data.findByKeyword} add={add} />}
+        </div>
+        <Typography variant="h6">Cart Items</Typography>
+        <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={cart}/>
         <br/>
-        <Paper>
+{/*        <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
+          Save Cart
+        </Button>*/}
+        {/*<Paper>
           <Typography variant="subtitle1">Add New Cart Item</Typography>
           <form onSubmit={handleSubmit(onSubmit)}>
             <input type="url" placeholder="Image URL" name="image" ref={register({required: true})} />
@@ -196,7 +223,7 @@ export default function Cart() {
 
             <input type="submit" />
           </form>
-          {/*<form>
+          <form>
             <div>
               <TextField variant="filled" placeholder="Image URL" name="Image URL" value={image} onChange={(e) => setImage(e.target.value)}/>
             </div>
@@ -213,9 +240,9 @@ export default function Cart() {
               <TextField variant="filled" placeholder="Price" name="Price" value={price} onChange={(e) => setPrice(e.target.value)}/>
             </div>
 
-          </form>*/}
+          </form>
 
-        </Paper>
+        </Paper>*/}
     </Grid>
   );
 }

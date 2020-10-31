@@ -1,0 +1,18 @@
+query findByKeyword( $keyword: String) {
+  findByKeyword(keyword: $keyword) {
+      total
+      hasMore
+      items {
+        id
+        sku
+        ref
+        slug
+        image
+        title
+        brand
+
+        weight
+        salePrice
+      }
+  }
+}

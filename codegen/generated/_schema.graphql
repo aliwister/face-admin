@@ -38,6 +38,19 @@ type Address {
   line2: String
   city: String
   mobile: String
+  alias: String
+}
+
+input AddressPojo {
+  id: ID
+  line1: String
+  line2: String
+  firstName: String
+  lastName: String
+  mobile: String
+  city: String
+  alias: String
+  country: String
 }
 
 type Attribute {
@@ -105,8 +118,7 @@ input CheckoutCartInput {
   phone: String
   email: String
   secureKey: String
-
-  """addresses: [Address]"""
+  addresses: [AddressPojo]
   carrier: String
   currency: String
   items: [LineItemInput]
@@ -133,6 +145,7 @@ type Customer {
   mobile: String
   totalPoints: Long
   spentPoints: Long
+  addresses: [Address]
 }
 
 """java.util.Date implementation"""
@@ -199,7 +212,7 @@ type LineItem {
 }
 
 input LineItemInput {
-  productId: Int
+  productId: Long
   sku: String
   image: String
   name: String
@@ -326,6 +339,7 @@ type Mutation {
   unIssue(itemIssuanceId: Long) : Message
   """
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
+  createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
   getAdminFile(filename: String, contentType: String): PresignedUrl
@@ -770,8 +784,10 @@ input PurchaseShipmentInput {
 type Query {
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
+  customer(mobile: String): Customer
   customers: [Customer]
   ebay(id: String): Product
+  findByKeyword(keyword: String): ProductResponse
   getAddresses(customerId: Int): [Address]
   getCart(secureKey: String, items: [CartItemInput]): Cart
   getProductByDial(dial: String): Product
@@ -797,6 +813,7 @@ type Query {
   outstandingQueue(keyword: String): [OutstandingQueue]
   parentOf(sku: String): String
   pas(sku: String): Product
+  pasUk(sku: String): Product
   payments(orderId: ID): [Payment]
   prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
   pricingRequests: [PricingRequest]

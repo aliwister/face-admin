@@ -5,8 +5,8 @@ import { CloseIcon } from '../../components/AllSvgIcon';
 import { useDrawerState, useDrawerDispatch } from '../../context/DrawerContext';
 
 /** Drawer Components */
-import ProductForm from '../ProductForm/ProductForm';
-import ProductStubForm from '../ProductForm/ProductStubForm';
+import StubProductForm from '../ProductForm/StubProductForm';
+import CustomProductForm from '../ProductForm/CustomProductForm';
 import ProductUpdateForm from '../ProductForm/ProductUpdateForm';
 import CampaingForm from '../CampaingForm/CampaingForm';
 import CategoryForm from '../CategoryForm/CategoryForm';
@@ -15,8 +15,9 @@ import Sidebar from '../Layout/Sidebar/Sidebar';
 
 /** Components Name Constants */
 const DRAWER_COMPONENTS = {
-  PRODUCT_FORM: ProductStubForm,
-  PRODUCT_UPDATE_FORM: ProductStubForm,
+  PRODUCT_FORM: CustomProductForm,
+  STUB_PRODUCT_FORM: StubProductForm,
+  PRODUCT_UPDATE_FORM: CustomProductForm,
   CAMPAING_FORM: CampaingForm,
   CATEGORY_FORM: CategoryForm,
   STAFF_MEMBER_FORM: StaffMemberForm,

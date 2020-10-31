@@ -64,6 +64,19 @@ export type Address = {
   line2: Maybe<Scalars['String']>;
   city: Maybe<Scalars['String']>;
   mobile: Maybe<Scalars['String']>;
+  alias: Maybe<Scalars['String']>;
+};
+
+export type AddressPojo = {
+  id: Maybe<Scalars['ID']>;
+  line1: Maybe<Scalars['String']>;
+  line2: Maybe<Scalars['String']>;
+  firstName: Maybe<Scalars['String']>;
+  lastName: Maybe<Scalars['String']>;
+  mobile: Maybe<Scalars['String']>;
+  city: Maybe<Scalars['String']>;
+  alias: Maybe<Scalars['String']>;
+  country: Maybe<Scalars['String']>;
 };
 
 export type Attribute = {
@@ -132,7 +145,7 @@ export type CheckoutCartInput = {
   phone: Maybe<Scalars['String']>;
   email: Maybe<Scalars['String']>;
   secureKey: Maybe<Scalars['String']>;
-  /** addresses: [Address] */
+  addresses: Maybe<Array<Maybe<AddressPojo>>>;
   carrier: Maybe<Scalars['String']>;
   currency: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<LineItemInput>>>;
@@ -161,6 +174,7 @@ export type Customer = {
   mobile: Maybe<Scalars['String']>;
   totalPoints: Maybe<Scalars['Long']>;
   spentPoints: Maybe<Scalars['Long']>;
+  addresses: Maybe<Array<Maybe<Address>>>;
 };
 
 
@@ -232,7 +246,7 @@ export type LineItem = {
 };
 
 export type LineItemInput = {
-  productId: Maybe<Scalars['Int']>;
+  productId: Maybe<Scalars['Long']>;
   sku: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
@@ -360,6 +374,7 @@ export type Mutation = {
    * unIssue(itemIssuanceId: Long) : Message
    */
   createShipment: Maybe<Shipment>;
+  createStub: Maybe<MerchantProduct>;
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
   getAdminFile: Maybe<PresignedUrl>;
@@ -565,6 +580,13 @@ export type MutationCreateShipmentArgs = {
   shipment: Maybe<ShipmentInput>;
   shipmentItems: Maybe<Array<Maybe<ShipmentItemInput>>>;
   trackingNums?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type MutationCreateStubArgs = {
+  product: Maybe<AddProductInput>;
+  isSaveES: Maybe<Scalars['Boolean']>;
+  currentMerchantId: Maybe<Scalars['Long']>;
 };
 
 
@@ -1190,8 +1212,10 @@ export type Query = {
    __typename?: 'Query';
   categories: Array<Category>;
   category: Category;
+  customer: Maybe<Customer>;
   customers: Maybe<Array<Maybe<Customer>>>;
   ebay: Maybe<Product>;
+  findByKeyword: Maybe<ProductResponse>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
   getCart: Maybe<Cart>;
   getProductByDial: Maybe<Product>;
@@ -1214,6 +1238,7 @@ export type Query = {
   outstandingQueue: Maybe<Array<Maybe<OutstandingQueue>>>;
   parentOf: Maybe<Scalars['String']>;
   pas: Maybe<Product>;
+  pasUk: Maybe<Product>;
   payments: Maybe<Array<Maybe<Payment>>>;
   prepQueue: Maybe<Array<Maybe<PrepQueue>>>;
   pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
@@ -1255,8 +1280,18 @@ export type QueryCategoryArgs = {
 };
 
 
+export type QueryCustomerArgs = {
+  mobile: Maybe<Scalars['String']>;
+};
+
+
 export type QueryEbayArgs = {
   id: Maybe<Scalars['String']>;
+};
+
+
+export type QueryFindByKeywordArgs = {
+  keyword: Maybe<Scalars['String']>;
 };
 
 
@@ -1349,6 +1384,11 @@ export type QueryParentOfArgs = {
 
 
 export type QueryPasArgs = {
+  sku: Maybe<Scalars['String']>;
+};
+
+
+export type QueryPasUkArgs = {
   sku: Maybe<Scalars['String']>;
 };
 
@@ -1718,6 +1758,55 @@ export type CreateHashtagMutation = (
   )> }
 );
 
+export type CreateStubMutationVariables = {
+  product: Maybe<AddProductInput>;
+  isSaveES: Maybe<Scalars['Boolean']>;
+  currentMerchantId: Maybe<Scalars['Long']>;
+};
+
+
+export type CreateStubMutation = (
+  { __typename?: 'Mutation' }
+  & { createStub: Maybe<(
+    { __typename?: 'MerchantProduct' }
+    & Pick<MerchantProduct, 'ref'>
+  )> }
+);
+
+export type CustomerQueryVariables = {
+  mobile: Maybe<Scalars['String']>;
+};
+
+
+export type CustomerQuery = (
+  { __typename?: 'Query' }
+  & { customer: Maybe<(
+    { __typename?: 'Customer' }
+    & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
+    & { addresses: Maybe<Array<Maybe<(
+      { __typename?: 'Address' }
+      & Pick<Address, 'id' | 'alias' | 'line1' | 'line2' | 'city' | 'mobile'>
+    )>>> }
+  )> }
+);
+
+export type FindByKeywordQueryVariables = {
+  keyword: Maybe<Scalars['String']>;
+};
+
+
+export type FindByKeywordQuery = (
+  { __typename?: 'Query' }
+  & { findByKeyword: Maybe<(
+    { __typename?: 'ProductResponse' }
+    & Pick<ProductResponse, 'total' | 'hasMore'>
+    & { items: Array<(
+      { __typename?: 'Product' }
+      & Pick<Product, 'id' | 'sku' | 'ref' | 'slug' | 'image' | 'title' | 'brand' | 'weight' | 'salePrice'>
+    )> }
+  )> }
+);
+
 export type GetAdminImageUploadUrlMutationVariables = {
   filename: Maybe<Scalars['String']>;
   merchant: Maybe<Scalars['String']>;
@@ -2005,6 +2094,187 @@ export function useCreateHashtagMutation(baseOptions?: ApolloReactHooks.Mutation
 export type CreateHashtagMutationHookResult = ReturnType<typeof useCreateHashtagMutation>;
 export type CreateHashtagMutationResult = ApolloReactCommon.MutationResult<CreateHashtagMutation>;
 export type CreateHashtagMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateHashtagMutation, CreateHashtagMutationVariables>;
+export const CreateStubDocument = gql`
+    mutation createStub($product: AddProductInput, $isSaveES: Boolean, $currentMerchantId: Long) {
+  createStub(product: $product, isSaveES: $isSaveES, currentMerchantId: $currentMerchantId) {
+    ref
+  }
+}
+    `;
+export type CreateStubMutationFn = ApolloReactCommon.MutationFunction<CreateStubMutation, CreateStubMutationVariables>;
+export type CreateStubComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateStubMutation, CreateStubMutationVariables>, 'mutation'>;
+
+    export const CreateStubComponent = (props: CreateStubComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateStubMutation, CreateStubMutationVariables> mutation={CreateStubDocument} {...props} />
+    );
+    
+export type CreateStubProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<CreateStubMutation, CreateStubMutationVariables>
+    } & TChildProps;
+export function withCreateStub<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateStubMutation,
+  CreateStubMutationVariables,
+  CreateStubProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateStubMutation, CreateStubMutationVariables, CreateStubProps<TChildProps, TDataName>>(CreateStubDocument, {
+      alias: 'createStub',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useCreateStubMutation__
+ *
+ * To run a mutation, you first call `useCreateStubMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateStubMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createStubMutation, { data, loading, error }] = useCreateStubMutation({
+ *   variables: {
+ *      product: // value for 'product'
+ *      isSaveES: // value for 'isSaveES'
+ *      currentMerchantId: // value for 'currentMerchantId'
+ *   },
+ * });
+ */
+export function useCreateStubMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateStubMutation, CreateStubMutationVariables>) {
+        return ApolloReactHooks.useMutation<CreateStubMutation, CreateStubMutationVariables>(CreateStubDocument, baseOptions);
+      }
+export type CreateStubMutationHookResult = ReturnType<typeof useCreateStubMutation>;
+export type CreateStubMutationResult = ApolloReactCommon.MutationResult<CreateStubMutation>;
+export type CreateStubMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateStubMutation, CreateStubMutationVariables>;
+export const CustomerDocument = gql`
+    query customer($mobile: String) {
+  customer(mobile: $mobile) {
+    id
+    firstname
+    lastname
+    email
+    mobile
+    addresses {
+      id
+      alias
+      line1
+      line2
+      city
+      mobile
+    }
+  }
+}
+    `;
+export type CustomerComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<CustomerQuery, CustomerQueryVariables>, 'query'>;
+
+    export const CustomerComponent = (props: CustomerComponentProps) => (
+      <ApolloReactComponents.Query<CustomerQuery, CustomerQueryVariables> query={CustomerDocument} {...props} />
+    );
+    
+export type CustomerProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<CustomerQuery, CustomerQueryVariables>
+    } & TChildProps;
+export function withCustomer<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CustomerQuery,
+  CustomerQueryVariables,
+  CustomerProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, CustomerQuery, CustomerQueryVariables, CustomerProps<TChildProps, TDataName>>(CustomerDocument, {
+      alias: 'customer',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useCustomerQuery__
+ *
+ * To run a query within a React component, call `useCustomerQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCustomerQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCustomerQuery({
+ *   variables: {
+ *      mobile: // value for 'mobile'
+ *   },
+ * });
+ */
+export function useCustomerQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+        return ApolloReactHooks.useQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+      }
+export function useCustomerLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<CustomerQuery, CustomerQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<CustomerQuery, CustomerQueryVariables>(CustomerDocument, baseOptions);
+        }
+export type CustomerQueryHookResult = ReturnType<typeof useCustomerQuery>;
+export type CustomerLazyQueryHookResult = ReturnType<typeof useCustomerLazyQuery>;
+export type CustomerQueryResult = ApolloReactCommon.QueryResult<CustomerQuery, CustomerQueryVariables>;
+export const FindByKeywordDocument = gql`
+    query findByKeyword($keyword: String) {
+  findByKeyword(keyword: $keyword) {
+    total
+    hasMore
+    items {
+      id
+      sku
+      ref
+      slug
+      image
+      title
+      brand
+      weight
+      salePrice
+    }
+  }
+}
+    `;
+export type FindByKeywordComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<FindByKeywordQuery, FindByKeywordQueryVariables>, 'query'>;
+
+    export const FindByKeywordComponent = (props: FindByKeywordComponentProps) => (
+      <ApolloReactComponents.Query<FindByKeywordQuery, FindByKeywordQueryVariables> query={FindByKeywordDocument} {...props} />
+    );
+    
+export type FindByKeywordProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<FindByKeywordQuery, FindByKeywordQueryVariables>
+    } & TChildProps;
+export function withFindByKeyword<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  FindByKeywordQuery,
+  FindByKeywordQueryVariables,
+  FindByKeywordProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, FindByKeywordQuery, FindByKeywordQueryVariables, FindByKeywordProps<TChildProps, TDataName>>(FindByKeywordDocument, {
+      alias: 'findByKeyword',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useFindByKeywordQuery__
+ *
+ * To run a query within a React component, call `useFindByKeywordQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFindByKeywordQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFindByKeywordQuery({
+ *   variables: {
+ *      keyword: // value for 'keyword'
+ *   },
+ * });
+ */
+export function useFindByKeywordQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<FindByKeywordQuery, FindByKeywordQueryVariables>) {
+        return ApolloReactHooks.useQuery<FindByKeywordQuery, FindByKeywordQueryVariables>(FindByKeywordDocument, baseOptions);
+      }
+export function useFindByKeywordLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<FindByKeywordQuery, FindByKeywordQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<FindByKeywordQuery, FindByKeywordQueryVariables>(FindByKeywordDocument, baseOptions);
+        }
+export type FindByKeywordQueryHookResult = ReturnType<typeof useFindByKeywordQuery>;
+export type FindByKeywordLazyQueryHookResult = ReturnType<typeof useFindByKeywordLazyQuery>;
+export type FindByKeywordQueryResult = ApolloReactCommon.QueryResult<FindByKeywordQuery, FindByKeywordQueryVariables>;
 export const GetAdminImageUploadUrlDocument = gql`
     mutation getAdminImageUploadUrl($filename: String, $merchant: String) {
   getAdminImageUploadUrl(filename: $filename, merchant: $merchant) {

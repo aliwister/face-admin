@@ -54,7 +54,7 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
             currency: "omr"
           },
           invoiceNum: formData.invoiceNum,
-          userId: formData.user.id
+          userId: formData.user.value
         },
         invoiceLink: filename
       },

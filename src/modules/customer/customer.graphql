@@ -1,0 +1,17 @@
+query customer( $mobile: String) {
+  customer(mobile: $mobile) {
+    id
+    firstname
+    lastname
+    email
+    mobile
+    addresses {
+      id
+      alias
+      line1
+      line2
+      city
+      mobile
+    }
+  }
+}

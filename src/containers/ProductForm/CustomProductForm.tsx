@@ -66,6 +66,12 @@ const AddProduct: React.FC<Props> = props => {
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);
+
+  const openDrawer = useCallback(
+    () => dispatch({ type: 'OPEN_DRAWER', drawerComponent: 'STUB_PRODUCT_FORM' }),
+    [dispatch]
+  );
+
   const updateData = useDrawerState('data');
   //console.log(updateData);
   const { watch, register, handleSubmit, setValue } = useForm({
@@ -159,6 +165,8 @@ const AddProduct: React.FC<Props> = props => {
     array.map(t => t[prop]);
 
   const onSubmit = async data => {
+    alert.info("CUSTOM");
+    return;
     console.log(tag);
     console.log(type);
     console.log(data);
@@ -323,6 +331,7 @@ const AddProduct: React.FC<Props> = props => {
     <>
       <DrawerTitleWrapper>
         <DrawerTitle>Add Product</DrawerTitle>
+        <button onClick = {openDrawer}>Stub Only</button>
       </DrawerTitleWrapper>
 
       <Form onSubmit={handleSubmit(onSubmit)} style={{ height: '100%' }}>
@@ -574,5 +583,4 @@ const AddProduct: React.FC<Props> = props => {
     </>
   );
 };
-
 export default AddProduct;
