@@ -74,21 +74,23 @@ export default function Cart() {
     }
   );
 
-  const add = ({ref,title, url, cost, price, sku}) => {
+  const add = ({ref,title, url, cost, sku, salePrice, image}) => {
     console.log(ref);
     append(
       {
-        productId: ref,
         name: title,
         description: title,
         ref: ref,
+        productId: ref,
         url: url,
         cost: cost,
-        price: price,
+        price: salePrice,
         sku: sku,
         quantity: 1,
-        pid: ""
+        pid: "",
+        image: image,
       });
+
   }
 
   function removeItem(index) {
@@ -97,7 +99,6 @@ export default function Cart() {
     remove(index);
   }
 
-  const [items, setItems] = useState([]);
   const [secureKey, setSecureKey] = useState('');
   const [create, setCreate] = useState(true);
   const [name, setName] = useState('');
@@ -121,15 +122,15 @@ export default function Cart() {
   }*/
 
   const onSubmit = async (data) => {
-    console.log(data);
-    const items = data.items.map(({pid, sku, url, productId, description, price, quantity, ref, cost}) => ({
-      productId: Number(productId),
+    //console.log(data);
+    const items = data.items.map(({pid, sku, url, productId, description, price, quantity, ref, cost, image}) => ({
+      productId: Number(ref),
       sku,
       name: description,
       quantity,
       price,
       cost,
-      url
+      image
     }));
     const addresses = customer.customer.addresses.map(({id, alias, line1, line2, city, mobile, __typename}) => ({
       id,
@@ -139,6 +140,8 @@ export default function Cart() {
       city,
       mobile
     }));
+
+
     let cart = {
       name:  customer.customer.firstname + " " + customer.customer.lastname,
       email: customer.customer.email,

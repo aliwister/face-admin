@@ -17,8 +17,7 @@ export const SearchResults = ({data, add }) => {
             <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell></TableCell>
-                <TableCell align="right">Description</TableCell>
-                <TableCell align="right">Quantity</TableCell>
+                <TableCell align="left">Description</TableCell>
                 <TableCell align="right">Price</TableCell>
                 <TableCell align="right">Link</TableCell>
             </TableRow>
@@ -39,8 +38,7 @@ export const SearchResults = ({data, add }) => {
                             {q.title}
                         </TableCell>
                     }
-                    <TableCell align="right">{q.quantity}</TableCell>
-                    <TableCell align="right">{q.price}</TableCell>
+                    <TableCell align="right">{q.salePrice}</TableCell>
                     <TableCell align="right">
                         <Button
                             variant="contained"

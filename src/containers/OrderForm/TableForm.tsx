@@ -134,6 +134,24 @@ export default function TableForm({register, fields, onSubmit, remove, watch, or
                     ref={register({})}
                     onChange={(e) => handleUpdate('delivery', e.target.value)}
                   />
+                  <input
+                    name={`items[${index}].image`}
+                    defaultValue={`${item.image}`}
+                    type="hidden"
+                    ref={register({})}
+                  />
+                  <input
+                    name={`items[${index}].sku`}
+                    defaultValue={`${item.sku}`}
+                    type="hidden"
+                    ref={register({})}
+                  />
+                  <input
+                    name={`items[${index}].url`}
+                    defaultValue={`${item.url}`}
+                    type="hidden"
+                    ref={register({})}
+                  />
 
                   </TableCell>
 
