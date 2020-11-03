@@ -1,0 +1,15 @@
+query purchaseQueue {
+  purchaseQueue {
+    id
+    productName
+    quantity
+    price
+    image
+    sku
+    cost
+    orderId
+    productId
+    attributes
+    url
+  }
+}

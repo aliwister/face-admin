@@ -23,6 +23,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import {Link} from "react-router-dom";
+import {usePurchaseQueueQuery} from "../../../codegen/generated/_graphql";
 
 
 const UPDATE_PURCHASE = gql`
@@ -32,30 +33,8 @@ const UPDATE_PURCHASE = gql`
     }
   }
 `;
-const PURCHASE_QUEUE = gql`
-query purchaseQueue {
-  purchaseQueue {
-    id
-    productName
-    quantity
-    price
-    image
-    sku
-    cost
-    orderId
-    productId
-    attributes
-  }
-}
-`;
-const MERCHANTS = gql`
-query merchants {
-  merchants {
-    id
-    name
-  }
-}
-`;
+
+
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -76,7 +55,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function PurchaseQueue({handleAdd}) {
 
-  const { data, loading, error, refetch } = useQuery(PURCHASE_QUEUE, {fetchPolicy: "network-only", context: { clientName: "shopLink" }});
+  const { data, loading, error, refetch } = usePurchaseQueueQuery({fetchPolicy: "network-only", context: { clientName: "shopLink" }});
 
 
   const alert = useAlert();
@@ -113,9 +92,9 @@ export default function PurchaseQueue({handleAdd}) {
                   <TableRow key={q.id}>
                     <TableCell align="right">{q.id}</TableCell>
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-                    {q.sku ?
+                    {q.url ?
                         <TableCell component="th" scope="row">
-                          <a href={`http://www.amazon.com/dp/${q.sku}`} target="_blank">
+                          <a href={`${q.url}`} target="_blank">
                             {q.productName} <small>{q.attributes}</small>
                           </a>
                         </TableCell> : <TableCell component="th" scope="row">

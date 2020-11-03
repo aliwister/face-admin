@@ -1948,6 +1948,17 @@ export type PurchaseQuery = (
   )> }
 );
 
+export type PurchaseQueueQueryVariables = {};
+
+
+export type PurchaseQueueQuery = (
+  { __typename?: 'Query' }
+  & { purchaseQueue: Maybe<Array<Maybe<(
+    { __typename?: 'PurchaseQueue' }
+    & Pick<PurchaseQueue, 'id' | 'productName' | 'quantity' | 'price' | 'image' | 'sku' | 'cost' | 'orderId' | 'productId' | 'attributes' | 'url'>
+  )>>> }
+);
+
 export type SetProcessedDateMutationVariables = {
   paymentIds: Maybe<Array<Maybe<Scalars['Long']>>>;
   date: Maybe<Scalars['Date']>;
@@ -2811,6 +2822,67 @@ export function usePurchaseLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHoo
 export type PurchaseQueryHookResult = ReturnType<typeof usePurchaseQuery>;
 export type PurchaseLazyQueryHookResult = ReturnType<typeof usePurchaseLazyQuery>;
 export type PurchaseQueryResult = ApolloReactCommon.QueryResult<PurchaseQuery, PurchaseQueryVariables>;
+export const PurchaseQueueDocument = gql`
+    query purchaseQueue {
+  purchaseQueue {
+    id
+    productName
+    quantity
+    price
+    image
+    sku
+    cost
+    orderId
+    productId
+    attributes
+    url
+  }
+}
+    `;
+export type PurchaseQueueComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<PurchaseQueueQuery, PurchaseQueueQueryVariables>, 'query'>;
+
+    export const PurchaseQueueComponent = (props: PurchaseQueueComponentProps) => (
+      <ApolloReactComponents.Query<PurchaseQueueQuery, PurchaseQueueQueryVariables> query={PurchaseQueueDocument} {...props} />
+    );
+    
+export type PurchaseQueueProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<PurchaseQueueQuery, PurchaseQueueQueryVariables>
+    } & TChildProps;
+export function withPurchaseQueue<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  PurchaseQueueQuery,
+  PurchaseQueueQueryVariables,
+  PurchaseQueueProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, PurchaseQueueQuery, PurchaseQueueQueryVariables, PurchaseQueueProps<TChildProps, TDataName>>(PurchaseQueueDocument, {
+      alias: 'purchaseQueue',
+      ...operationOptions
+    });
+};
+
+/**
+ * __usePurchaseQueueQuery__
+ *
+ * To run a query within a React component, call `usePurchaseQueueQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePurchaseQueueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePurchaseQueueQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePurchaseQueueQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<PurchaseQueueQuery, PurchaseQueueQueryVariables>) {
+        return ApolloReactHooks.useQuery<PurchaseQueueQuery, PurchaseQueueQueryVariables>(PurchaseQueueDocument, baseOptions);
+      }
+export function usePurchaseQueueLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PurchaseQueueQuery, PurchaseQueueQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<PurchaseQueueQuery, PurchaseQueueQueryVariables>(PurchaseQueueDocument, baseOptions);
+        }
+export type PurchaseQueueQueryHookResult = ReturnType<typeof usePurchaseQueueQuery>;
+export type PurchaseQueueLazyQueryHookResult = ReturnType<typeof usePurchaseQueueLazyQuery>;
+export type PurchaseQueueQueryResult = ApolloReactCommon.QueryResult<PurchaseQueueQuery, PurchaseQueueQueryVariables>;
 export const SetProcessedDateDocument = gql`
     mutation setProcessedDate($paymentIds: [Long], $date: Date) {
   setProcessedDate(paymentIds: $paymentIds, date: $date) {
