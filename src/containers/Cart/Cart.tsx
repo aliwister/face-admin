@@ -125,6 +125,7 @@ export default function Cart() {
     //console.log(data);
     const items = data.items.map(({pid, sku, url, productId, description, price, quantity, ref, cost, image}) => ({
       productId: Number(ref),
+      ref: ref,
       sku,
       name: description,
       quantity,

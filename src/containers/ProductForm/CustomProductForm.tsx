@@ -166,11 +166,6 @@ const AddProduct: React.FC<Props> = props => {
 
   const onSubmit = async data => {
     alert.info("CUSTOM");
-    return;
-    console.log(tag);
-    console.log(type);
-    console.log(data);
-    console.log(merchant);
 
     if(!merchant) {
       alert.error("Must select merchant");
