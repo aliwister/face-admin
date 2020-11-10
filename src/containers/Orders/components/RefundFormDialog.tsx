@@ -58,6 +58,8 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment}) =>{
             <Select native name="bankName" inputRef={register({required: true})} >
               <option value="BANKMUSCAT">Bank Muscat</option>
               <option value="BANKDHOFAR">Bank Dhofar</option>
+              <option value="HSBC">HSBC</option>
+              <option value="AHLI">Ahli Bank</option>
               <option value="NBO">NBO</option>
               <option value="OAB">Oman Arab Bank</option>
             </Select>
