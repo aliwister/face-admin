@@ -8,6 +8,7 @@ query purchase($id: ID) {
     taxesTotal
     discountTotal
     total
+    ref
     merchantObj {
       id
       name

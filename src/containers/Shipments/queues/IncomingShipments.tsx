@@ -4,6 +4,7 @@ import Grid from "@material-ui/core/Grid";
 import {Paper, TableContainer} from "@material-ui/core";
 import {Tablelate} from "components/Table/Tabelate";
 import {Styles} from "../ShipQueue";
+import {Tracking} from "../../../components/Tracking/Tracking";
 
 export function IncomingShipments({data}) {
   const columns = React.useMemo(
@@ -24,7 +25,7 @@ export function IncomingShipments({data}) {
           },
           {
             Header: 'Tracking',
-            accessor: (row) => (<a href={`https://www.trackingmore.com/${row.shipmentMethod}-tracking.html?number=${row.trackingNum}`} target="_blank">{row.trackingNum}</a>)
+            accessor: (row) => (<Tracking trackingNum={row.trackingNum} label ={row.trackingNum} />)
           },
           {
             Header: 'Carrier',

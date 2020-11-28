@@ -16,6 +16,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import {Link} from "react-router-dom";
 import Button from "@material-ui/core/Button";
+import {Tracking} from "../../../components/Tracking/Tracking";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -52,7 +53,7 @@ export const Shipments = ({shipments, onGetAdminFile}) =>{
                 <Link to={`/shipment-details/${s.id}/EDIT`}>{s.id}</Link><br/>
               </Typography>
               <Typography className={classes.heading}>
-                <a href={`https://www.trackingmore.com/${s.shipment.carrier}-tracking.html?number=${s.shipment.trackingNum}`} target="_blank">Track {s.shipment.carrier} {s.shipment.trackingNum}</a>
+                <Tracking trackingNum = {s.shipment.trackingNum} label = {`Track ${s.shipment.carrier} ${s.shipment.trackingNum}`} />
 
               </Typography>
               <Typography variant="h4">

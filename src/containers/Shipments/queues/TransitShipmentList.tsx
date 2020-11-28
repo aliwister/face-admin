@@ -8,6 +8,7 @@ import Button from "@material-ui/core/Button";
 import ConfirmDialog from "../../../components/ConfirmDialog/ConfirmDialog";
 import {useSetShipmentStatusMutation} from "../../../codegen/generated/_graphql";
 import { useAlert } from "react-alert";
+import {Tracking} from "../../../components/Tracking/Tracking";
 export function TransitShipmentList({data, refetch}) {
   const [closeShipmentConfirmDialog, setClosedialog] = useState(false);
   const [shipmentId, setShipment] = useState(null);
@@ -50,7 +51,7 @@ export function TransitShipmentList({data, refetch}) {
           },
           {
             Header: 'Tracking',
-            accessor: (row) => (<a href={`https://www.trackingmore.com/${row.shipmentMethod}-tracking.html?number=${row.trackingNum}`} target="_blank">{row.trackingNum}</a>)
+            accessor: (row) => (<Tracking trackingNum={row.trackingNum} label ={row.trackingNum} />)
           },
           {
             Header: 'Name',

@@ -360,7 +360,7 @@ export default function Purchases() {
                             <TableCell align="left">{row.deliveryTotal}</TableCell>
                             <TableCell align="right">{row.taxesTotal}</TableCell>
 
-                            <TableCell align="center">OMR {row.total}</TableCell>
+                            <TableCell align="center">{row.currency} {row.total}</TableCell>
                             <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                             <TableCell align="right">
                               <Status

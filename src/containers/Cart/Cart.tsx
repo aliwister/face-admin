@@ -149,7 +149,8 @@ export default function Cart() {
       phone: customer.customer.mobile,
       //customerId: customer.customer.id,
       items,
-      addresses: addresses
+      addresses: addresses,
+      currency: data.currency.value,
     };
     const {
       data: { createCart },
@@ -210,7 +211,7 @@ export default function Cart() {
           {data && <SearchResults data={data.findByKeyword} add={add} />}
         </div>
         <Typography variant="h6">Cart Items</Typography>
-        <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={cart}/>
+        <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={cart} control={control}/>
         <br/>
 {/*        <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
           Save Cart

@@ -49,3 +49,13 @@ export const USERS = [
   {value: '1', label: 'Ali'},
   {value: '2649', label: 'Badals CC'},
 ]
+
+export const CURRENCIES = [
+  {value: 'OMR', label: 'OMR'},
+  {value: 'USD', label: 'USD'},
+  {value: 'GBP', label: 'GBP'},
+  {value: 'AED', label: 'AED'},
+  {value: 'EUR', label: 'EUR'},
+  {value: 'AUD', label: 'AUD'},
+  {value: 'SAR', label: 'SAR'}
+]

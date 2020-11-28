@@ -40,10 +40,11 @@ import Checkbox from "@material-ui/core/Checkbox";
 import {EditOrderDialog} from "./EditOrderDialog";
 import TableFooter from "@material-ui/core/TableFooter";
 import {ActionReasonDialog} from "./components/ActionReasonDialog";
-import {useOrderAQuery} from "../../codegen/generated/_graphql";
+import {useAddDiscountMutation, useOrderAQuery} from "../../codegen/generated/_graphql";
 import LaunchIcon from '@material-ui/icons/Launch';
 import {Shipments} from "./components/Shipments";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
+import badalsAPI, {flowAPI} from "../../api/config";
 
 
 
@@ -103,12 +104,11 @@ query track ($ref: String) {
   track(ref: $ref) {
     id
     shipment {
-    status
-    trackingNum
-    carrier
-    type
-    date
-    
+      status
+      trackingNum
+      carrier
+      type
+      date
       content {
         description
         image
@@ -160,6 +160,7 @@ export default function OrderDetails(props) {
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
   const [closeOrderMutation] = useMutation(CLOSE_ORDER, { context: { clientName: "shopLink" }});
   const [getAdminFileMutation] = useMutation(GET_ADMIN_FILE, { context: { clientName: "shopLink" }});
+  const [addDiscountMutation] = useAddDiscountMutation({context : {clientName: "shopLink"}});
   const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
@@ -195,6 +196,36 @@ export default function OrderDetails(props) {
     }
   }
 
+  const onReturnRequest = async data => {
+
+    let testData = {
+      "type": "returnWorkflow",
+      "externalId": "132123",
+      "activate": true,
+      "stateVariables": {"requestData": {"orderId":123}}
+    };
+
+    return flowAPI.put("/workflow-instance", testData)
+      .then(res => {
+        console.log(res);
+      });
+/*    return flowAPI.get("/workflow-executor")
+      .then(res => {
+        console.log(res);
+      });*/
+  }
+
+  const onAddDiscount = async formData => {
+    const {
+      data: { editOrder },
+    }: any = await editOrderMutation({
+      variables: {id: orderData.orderA.id, orderItems: [...formData.orderItems]}
+    });
+    if(editOrder)  {
+      alert.success(editOrder.id);
+      await refetch();
+    }
+  }
   const onEditOrder = async formData => {
     const {
       data: { editOrder },
@@ -415,6 +446,7 @@ export default function OrderDetails(props) {
                 <Button onClick={onSendSms} disabled={!contactbutton}>Send Payment SMS</Button>
                 <Button onClick={onEditStart}>Edit Order</Button>
                 <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
+                <Button onClick={onReturnRequest} color="secondary">Request Return</Button>
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>
                 <Button onClick={onCloseStart}>Close</Button>
               </ButtonGroup>
@@ -457,20 +489,17 @@ export default function OrderDetails(props) {
                         {row.sequence}
                       </TableCell>
                       <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-                      <TableCell component="th" scope="row">
-                      {row.productId ?
-                        <a href={`http://www.badals.com/product/${row.productId}`} target="_blank">
 
+                        {row.productUrl ?
+                          <TableCell component="th" scope="row">
+                            <a href={`${row.productUrl}`} target="_blank">
+                              {row.productName}
+                            </a>
+                          </TableCell> : <TableCell component="th" scope="row">
                             {row.productName}
-                          </a>:
-                        <span>{row.productName}</span>
-                      }
-                        {row.productSku &&
-                          <a href={`http://www.amazon.com/dp/${row.productSku}`} target="_blank">
-                            <LaunchIcon/>
-                          </a>
+                          </TableCell>
                         }
-                        </TableCell>
+
                       <TableCell align="center">{row.quantity}</TableCell>
 
                       <TableCell align="center">{row.price}</TableCell>

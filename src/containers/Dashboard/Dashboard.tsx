@@ -35,6 +35,9 @@ const Col = styled(Column, props => ({
 const Dashboard = () => (
   <Grid fluid={true}>
     <Row>
+{/*      <Actions />*/}
+    </Row>
+    <Row>
       <Col md={5} lg={4} sm={6}>
         <RadialBarChart
           widgetTitle='Target'

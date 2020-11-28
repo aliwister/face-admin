@@ -16,6 +16,10 @@ export const adminAPI = axios.create({
   baseURL: process.env.REACT_APP_ADMIN_API,
   headers: headers
 });
+export const flowAPI = axios.create({
+  baseURL: process.env.REACT_APP_FLOW_API,
+  headers: headers
+});
 export const clearStore = () => {
     localStorage.removeItem('access_token');
     delete badalsAPI.defaults.headers.common.Authorization;
@@ -40,6 +44,14 @@ badalsAPI.interceptors.request.use(function (config) {
 });
 
 adminAPI.interceptors.request.use(function (config) {
+    const token = Cookies.get('token');
+    if(token) {
+        config.headers.Authorization = "Bearer " + token;
+    }
+    return config;
+});
+
+flowAPI.interceptors.request.use(function (config) {
     const token = Cookies.get('token');
     if(token) {
         config.headers.Authorization = "Bearer " + token;

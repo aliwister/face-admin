@@ -7,6 +7,7 @@ import {Styles} from "../ShipQueue";
 import Button from "@material-ui/core/Button";
 import {useUpdateFromDetrackMutation} from "../../../codegen/generated/_graphql";
 import { useAlert } from "react-alert";
+import {Tracking} from "../../../components/Tracking/Tracking";
 export function CustomerShipmentList({data, refetch}) {
 
 
@@ -42,7 +43,7 @@ export function CustomerShipmentList({data, refetch}) {
           },
           {
             Header: 'Tracking',
-            accessor: (row) => (<a href={`https://www.trackingmore.com/${row.shipmentMethod}-tracking.html?number=${row.trackingNum}`} target="_blank">{row.trackingNum}</a>)
+            accessor: (row) => (<Tracking trackingNum={row.trackingNum} label ={row.trackingNum} />)
           },
           {
             Header: 'Carrier',

@@ -255,6 +255,7 @@ export type LineItemInput = {
   cost: Maybe<Scalars['Float']>;
   subTotal: Maybe<Scalars['Float']>;
   url: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['String']>;
 };
 
 
@@ -341,6 +342,7 @@ export type Mutation = {
   acceptItem: Maybe<Message>;
   acceptPackage: Maybe<Pkg>;
   acceptShipment: Maybe<Shipment>;
+  addDiscount: Maybe<Message>;
   addI18n: Maybe<ProductI18n>;
   addItem: Maybe<Message>;
   addPayment: Maybe<Payment>;
@@ -428,6 +430,12 @@ export type MutationAcceptShipmentArgs = {
   trackingNum: Maybe<Scalars['String']>;
   payment: Maybe<PaymentInput>;
   invoiceLink: Maybe<Scalars['String']>;
+};
+
+
+export type MutationAddDiscountArgs = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
 };
 
 
@@ -1123,6 +1131,7 @@ export enum ProductType {
 export type Purchase = {
    __typename?: 'Purchase';
   id: Maybe<Scalars['ID']>;
+  ref: Maybe<Scalars['String']>;
   purchaseItems: Maybe<Array<Maybe<PurchaseItem>>>;
   currency: Maybe<Scalars['String']>;
   invoiceDate: Maybe<Scalars['LocalDate']>;
@@ -1132,6 +1141,10 @@ export type Purchase = {
   discountTotal: Maybe<Scalars['BigDecimal']>;
   total: Maybe<Scalars['BigDecimal']>;
   merchantObj: Maybe<Merchant>;
+  createdBy: Maybe<Scalars['String']>;
+  createdDate: Maybe<Scalars['String']>;
+  lastModifiedBy: Maybe<Scalars['String']>;
+  lastModifiedDate: Maybe<Scalars['String']>;
 };
 
 export type PurchaseInput = {
@@ -1745,6 +1758,20 @@ export type VariationOption = {
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type AddDiscountMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
+};
+
+
+export type AddDiscountMutation = (
+  { __typename?: 'Mutation' }
+  & { addDiscount: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
 export type CreateHashtagMutationVariables = {
   hashtag: Maybe<HashtagInput>;
 };
@@ -1933,7 +1960,7 @@ export type PurchaseQuery = (
   { __typename?: 'Query' }
   & { purchase: Maybe<(
     { __typename?: 'Purchase' }
-    & Pick<Purchase, 'id' | 'deliveryTotal' | 'currency' | 'invoiceDate' | 'subtotal' | 'taxesTotal' | 'discountTotal' | 'total'>
+    & Pick<Purchase, 'id' | 'deliveryTotal' | 'currency' | 'invoiceDate' | 'subtotal' | 'taxesTotal' | 'discountTotal' | 'total' | 'ref'>
     & { merchantObj: Maybe<(
       { __typename?: 'Merchant' }
       & Pick<Merchant, 'id' | 'name'>
@@ -2054,6 +2081,58 @@ export type UpdateFromDetrackMutation = (
 );
 
 
+export const AddDiscountDocument = gql`
+    mutation addDiscount($id: ID, $amount: BigDecimal) {
+  addDiscount(id: $id, amount: $amount) {
+    value
+  }
+}
+    `;
+export type AddDiscountMutationFn = ApolloReactCommon.MutationFunction<AddDiscountMutation, AddDiscountMutationVariables>;
+export type AddDiscountComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<AddDiscountMutation, AddDiscountMutationVariables>, 'mutation'>;
+
+    export const AddDiscountComponent = (props: AddDiscountComponentProps) => (
+      <ApolloReactComponents.Mutation<AddDiscountMutation, AddDiscountMutationVariables> mutation={AddDiscountDocument} {...props} />
+    );
+    
+export type AddDiscountProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<AddDiscountMutation, AddDiscountMutationVariables>
+    } & TChildProps;
+export function withAddDiscount<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AddDiscountMutation,
+  AddDiscountMutationVariables,
+  AddDiscountProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AddDiscountMutation, AddDiscountMutationVariables, AddDiscountProps<TChildProps, TDataName>>(AddDiscountDocument, {
+      alias: 'addDiscount',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useAddDiscountMutation__
+ *
+ * To run a mutation, you first call `useAddDiscountMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddDiscountMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addDiscountMutation, { data, loading, error }] = useAddDiscountMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      amount: // value for 'amount'
+ *   },
+ * });
+ */
+export function useAddDiscountMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddDiscountMutation, AddDiscountMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddDiscountMutation, AddDiscountMutationVariables>(AddDiscountDocument, baseOptions);
+      }
+export type AddDiscountMutationHookResult = ReturnType<typeof useAddDiscountMutation>;
+export type AddDiscountMutationResult = ApolloReactCommon.MutationResult<AddDiscountMutation>;
+export type AddDiscountMutationOptions = ApolloReactCommon.BaseMutationOptions<AddDiscountMutation, AddDiscountMutationVariables>;
 export const CreateHashtagDocument = gql`
     mutation createHashtag($hashtag: HashtagInput) {
   createHashtag(hashtag: $hashtag) {
@@ -2758,6 +2837,7 @@ export const PurchaseDocument = gql`
     taxesTotal
     discountTotal
     total
+    ref
     merchantObj {
       id
       name

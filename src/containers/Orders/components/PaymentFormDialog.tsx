@@ -33,9 +33,9 @@ export const PaymentFormDialog = ({open, onSubmit, onClose}) =>{
       <TextField variant="filled" size="small" type="text" placeholder="Auth Code" name="authCode" className={classes.textBox} inputRef={register({required: true, maxLength: 10})} />
       <FormControl variant="filled" size="small" className={classes.formControl}>
         <Select native name="method" inputRef={register({ required: true })}>
+          <option value="BMB">Bank Transfer</option>
           <option value="POS">POS</option>
           <option value="checkoutcom">CHECKOUTCOM</option>
-          <option value="BMB">Bank Transfer</option>
           <option value="CASH">CASH</option>
         </Select>
       </FormControl>

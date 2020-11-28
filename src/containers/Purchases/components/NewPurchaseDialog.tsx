@@ -23,7 +23,7 @@ export default function NewPurchaseDialog({onClose, open}) {
 
   const handleCreatePurchase = async () => {
     // @ts-ignore
-    const dto = {merchantId: merchant.id, currency: "omr"};
+    const dto = {merchantId: merchant.id, currency: "USD"};
     const {
       data: { createPurchase },
     }: any = await createPurchaseMutation({

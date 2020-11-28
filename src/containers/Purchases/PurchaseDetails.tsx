@@ -69,7 +69,8 @@ export default function PurchaseDetails(props) {
       taxesTotal: form.taxesTotal,
       discountTotal: form.discountTotal,
       merchantId: merchant['id'],
-      //ref: form.ref
+      ref: form.ref,
+      currency: form.currency.value
     }
 
     const purchaseItems = form.items.map(({pid, productId, description, price, quantity, ref}) => ({

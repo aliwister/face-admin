@@ -221,6 +221,7 @@ input LineItemInput {
   cost: Float
   subTotal: Float
   url: String
+  ref: String
 }
 
 scalar LocalDate
@@ -304,6 +305,7 @@ type Mutation {
   acceptItem(shipmentItemId: Long, packageId: Long, accepted: BigDecimal, rejected: BigDecimal): Message
   acceptPackage(pkg: PackageInput): Pkg
   acceptShipment(trackingNum: String, payment: PaymentInput, invoiceLink: String): Shipment
+  addDiscount(id: ID, amount: BigDecimal): Message
   addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
@@ -700,6 +702,7 @@ enum ProductType {
 
 type Purchase {
   id: ID
+  ref: String
   purchaseItems: [PurchaseItem]
   currency: String
   invoiceDate: LocalDate
@@ -709,6 +712,10 @@ type Purchase {
   discountTotal: BigDecimal
   total: BigDecimal
   merchantObj: Merchant
+  createdBy: String
+  createdDate: String
+  lastModifiedBy: String
+  lastModifiedDate: String
 }
 
 input PurchaseInput {

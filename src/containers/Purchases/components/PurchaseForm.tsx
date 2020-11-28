@@ -38,6 +38,8 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
       deliveryTotal: purchase.deliveryTotal,
       taxesTotal: purchase.taxesTotal,
       discountTotal: purchase.discountTotal,
+      ref: purchase.ref,
+      currency: {value: purchase.currency, label: purchase.currency}
     }});
   const { fields, append, remove} = useFieldArray(
     {
@@ -84,15 +86,13 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
       <Grid item md={3}>
         <TextField size="small" id="outlined-basic" label="Shipping Instructions" variant="outlined" value={purchase.shippingInstructions} />
       </Grid>
-      <Grid item md={2}>
-        <TextField size="small" id="outlined-basic" label="Ref" variant="outlined" value={purchase.id} />
-      </Grid>
+
       <Grid item md={3} style={{textAlign:'right'}}>
       <Button variant="contained" color="primary" size="large" onClick={()=> setNewpurchasedialog(true)}>
         New Purchase
       </Button>
       </Grid>
-    <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={purchase}/>
+    <TableForm register={register} control={control} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={purchase}/>
     <PurchaseQueue handleAdd={addToPurchase}/>
     </Grid>
   );

@@ -17,15 +17,18 @@ import {
   Paper,
   TableCell,
   Typography,
-  TableBody } from '@material-ui/core';
+  TableBody, DialogContent,
+} from '@material-ui/core';
+import Select from "react-select";
 import Image from "../../components/Image/Image";
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import {Link} from "react-router-dom";
-import {useFieldArray, useForm} from "react-hook-form";
+import {Controller, useFieldArray, useForm} from "react-hook-form";
 import {Input, ProductNameInput} from "./OrderForm.style";
+import {CURRENCIES, USERS} from "../Shipments/components/Constants";
 
 
 const useStyles = makeStyles(theme => ({
@@ -46,7 +49,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-export default function TableForm({register, fields, onSubmit, remove, watch, order }) {
+export default function TableForm({register, control, fields, onSubmit, remove, watch, order }) {
 
   const [total, setTotal] = useState(getTotal(order));
   const [subtotal, setSubtotal] = useState(getSubtotal(order));
@@ -79,6 +82,20 @@ export default function TableForm({register, fields, onSubmit, remove, watch, or
   return (
       <Grid item xs={12} md={12}>
         <form onSubmit={onSubmit}>
+          <Grid item md={4}>
+          <TextField
+            name={`ref`}
+            inputRef={register({})}
+            size="small" id="outlined-basic" label="Ref" variant="outlined"
+          />
+            <div>          <Controller
+              as={<Select options={CURRENCIES}/>}
+              rules={{ required: true }}
+              name="currency"
+              register={register}
+              control={control}
+            /></div>
+          </Grid>
           <TableContainer component={Paper}>
           <Table size="small">
             <TableHead>

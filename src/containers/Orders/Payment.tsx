@@ -92,13 +92,13 @@ export default function Payment({order, refetch}) {
     setB1(false);
     //console.log(formData);
     const {
-      data: { addRefund },
+      data: { refundPayment },
     }: any = await addRefundMutation({
       variables: {id: order.id, ...formData}
     });
-    if(addRefund)  {
+    if(refundPayment)  {
       handleClose();
-      alert.success("Payment added");
+      alert.success("Refund added");
       refetch();
     }
   }
@@ -169,7 +169,7 @@ export default function Payment({order, refetch}) {
           <Button variant="contained" color="primary" onClick={handlePaymentDialogOpen}>New Payment</Button>
 
           <PaymentFormDialog onSubmit={onSubmit} open={paymentDialog} onClose={handleClose}/>
-          <RefundFormDialog onSubmit={onRefundSubmit} open={refundDialog} onClose={handleClose} payment={activePayment}/>
+          <RefundFormDialog onSubmit={onRefundSubmit} open={refundDialog} onClose={handleClose} payment={activePayment} order={order}/>
 
         </OrderInfoPaper>
 {/*        <Snackbar open={snack} autoHideDuration={6000} onClose={()=>{setSnack(false)}}>
