@@ -45,6 +45,7 @@ import LaunchIcon from '@material-ui/icons/Launch';
 import {Shipments} from "./components/Shipments";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 import badalsAPI, {flowAPI} from "../../api/config";
+import {DiscountDialog} from "./components/DiscountDialog";
 
 
 
@@ -180,6 +181,7 @@ export default function OrderDetails(props) {
   const [editdialog, setEditdialog] = useState(false);
   const [canceldialog, setCanceldialog] = useState(false);
   const [closedialog, setClosedialog] = useState(false);
+  const [discount, setDiscountdialog] = useState(false);
   const [b2,setB2] = useState(true);
   const alert = useAlert();
 
@@ -217,12 +219,12 @@ export default function OrderDetails(props) {
 
   const onAddDiscount = async formData => {
     const {
-      data: { editOrder },
-    }: any = await editOrderMutation({
-      variables: {id: orderData.orderA.id, orderItems: [...formData.orderItems]}
+      data: { addDiscount },
+    }: any = await addDiscountMutation({
+      variables: {id: orderData.orderA.id, amount: formData.amount}
     });
-    if(editOrder)  {
-      alert.success(editOrder.id);
+    if(addDiscount)  {
+      alert.success(addDiscount.id);
       await refetch();
     }
   }
@@ -320,6 +322,7 @@ export default function OrderDetails(props) {
   }
   const onEditStart = () => setEditdialog(true);
   const onCancelStart = () => setCanceldialog(true);
+  const onAddDiscountStart = () => setDiscountdialog(true);
   const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);}
   const onCloseStart = () => {setClosedialog(true);}
 
@@ -328,6 +331,7 @@ export default function OrderDetails(props) {
       <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.orderItems} />
       <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
       <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
+      <DiscountDialog onSubmit={onAddDiscount} onClose={onCancelEdit} open={discount} title={"Discount Order"} />
       <Row>
         <Col lg={6} sm={6} xs={12} className='mb-30'>
           <OrderInfoPaper>
@@ -445,6 +449,7 @@ export default function OrderDetails(props) {
               <ButtonGroup size="large" variant="contained" color="primary" aria-label="large outlined primary button group">
                 <Button onClick={onSendSms} disabled={!contactbutton}>Send Payment SMS</Button>
                 <Button onClick={onEditStart}>Edit Order</Button>
+                <Button onClick={onAddDiscountStart}>Edit Order</Button>
                 <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
                 <Button onClick={onReturnRequest} color="secondary">Request Return</Button>
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>

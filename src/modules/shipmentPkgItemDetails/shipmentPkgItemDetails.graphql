@@ -1,0 +1,11 @@
+query pkgItemDetails($id: ID) {
+  pkgItemDetails(id:$id) {
+        id
+        sequence
+        quantity
+        description
+        shipmentId
+        productId
+        image
+  }
+}

@@ -23,6 +23,7 @@ import {SendToDetrackDialog} from "./components/SendToDetrackDialog";
 import EditPackage from "./Packages/EditPackage";
 
 import {adminAPI} from "../../api/config";
+import { useShipmentItemDetailsQuery, usePkgItemDetailsQuery} from "../../codegen/generated/_graphql";
 
 const ACCEPT_PACKAGE = gql`
   mutation acceptPackage($pkg: PackageInput) {
@@ -227,6 +228,9 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   const [acceptPackageMutation] = useMutation(ACCEPT_PACKAGE,{ context: { clientName: "adminLink" }});
   const [saveShipmentMutation] = useMutation(SAVE_SHIPMENT,{ context: { clientName: "adminLink" }});
   const [sendDetrackMutation]  = useMutation(SEND_TO_DETRACK,{ context: { clientName: "adminLink" }});
+
+
+
   const alert = useAlert();
   const classes = useStyles();
 
@@ -245,6 +249,9 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   };
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
+  const { data, loading, error, refetch } = useShipmentItemDetailsQuery({variables: {id: shipment.id}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = usePkgItemDetailsQuery({variables: {id: state.selectedPkgIndex}, fetchPolicy: "network-only",context: { clientName: "adminLink" }, skip: state.selectedPkgIndex < 0});
+
   const handleAcceptPackage = async (data) => {
 	  console.log(data);
 	  let dto = {
@@ -259,7 +266,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
     });
     if(acceptPackage)  {
       alert.success("Package added successfully");
-      refreshShipment({id:shipment.id})
+      refetch({id:shipment.id});
       dispatch({type:'ADD_PACKAGE_END'})
     }
   }
@@ -368,19 +375,22 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
         </SectionCard>
       </Grid>
       <Grid item md={8}>
-        <ShipmentItems state={state.shipment} dispatch={dispatch} label={"Shipment Items"} handleDeleteItem={handleRemoveFromShipment}/>
-        {state.pkg &&
-        <ShipmentItems state={state.pkg} dispatch={dispatch} label={"Package Items"} handleDeleteItem={handleRemoveFromPkg}/>
+        {data &&
+        <ShipmentItems state={data.shipmentItemDetails} dispatch={dispatch} label={"Shipment Items"}
+                       handleDeleteItem={handleRemoveFromShipment}/>
+        }
+        {state.pkg && dp &&
+        <ShipmentItems state={dp.pkgItemDetails} dispatch={dispatch} label={"Package Items"} handleDeleteItem={handleRemoveFromPkg}/>
         }
         {/*shipment.shipmentType === 'PURCHASE'*/}
         {(action == 'RECEIVE' ) &&
           <ReceivePackage state={state} dispatch={dispatch}/>
         }
         {(action == 'PREP' ) &&
-          <PrepPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
+          <PrepPackage state={state} dispatch={dispatch} refreshShipment={refetch}/>
         }
         {(action == 'EDIT' ) &&
-          <EditPackage state={state} dispatch={dispatch} refreshShipment={refreshShipment}/>
+          <EditPackage state={state} dispatch={dispatch} refreshShipment={refetch}/>
         }
       </Grid>
       <CreatePkgDialog onSubmit={handleAcceptPackage} handleClose={handleClose} open={state.pkgDialog} />

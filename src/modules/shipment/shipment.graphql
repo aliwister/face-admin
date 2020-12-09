@@ -1,0 +1,26 @@
+query shipment($id: ID) {
+  shipment(id:$id) {
+      id
+      actualShipCost
+      latestCancelDate
+      handlingInstructions
+      reference
+      trackingNum
+      trackingLink
+      shipmentMethod
+      shipmentType
+      shipmentStatus
+      customerFirstName
+      customerLastName
+      customerId
+      merchantId
+      pkgs {
+          id
+          length
+          width
+          height
+          weight
+          packageType
+      }
+  }
+}

@@ -1,0 +1,11 @@
+query shipmentItemDetails($id: ID) {
+  shipmentItemDetails(id:$id) {
+        id
+        sequence
+        quantity
+        description
+        shipmentId
+        productId
+        image
+  }
+}

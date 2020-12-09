@@ -25,6 +25,7 @@ import {Link, useParams} from "react-router-dom";
 import EditShipment from "./EditShipment";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Grid from "@material-ui/core/Grid";
+import { useShipmentQuery } from 'codegen/generated/_graphql';
 
 const MERCHANTS = gql`
 query merchants {
@@ -35,52 +36,6 @@ query merchants {
 }
 `;
 
-const SHIPMENT = gql`
-query shipment($id: ID) {
-  shipment(id: $id) {
-      id
-      actualShipCost
-      latestCancelDate
-      handlingInstructions
-      reference
-      trackingNum
-      trackingLink
-      shipmentMethod
-      shipmentType
-      shipmentStatus
-      customerFirstName
-      customerLastName
-      customerId
-      merchantId
-      pkgs {
-        id
-        packageType
-        length
-        width
-        height
-        weight
-        shipmentItems {
-          id
-          sequence
-          quantity
-          description
-          shipmentId
-          productId
-          image
-        }
-      }
-      shipmentItems {
-        id
-        sequence
-        quantity
-        description
-        shipmentId
-        productId
-        image
-      }
-  }
-}
-`;
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -96,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 export default function ShipmentDetails(props) {
   let { slug, action } = useParams();
   console.log(action);
-  const { data:dp, loading:lp, error:ep, refetch:rp } = useQuery(SHIPMENT, {variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = useShipmentQuery({variables: {id: slug}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS,{fetchPolicy: "network-only", context: { clientName: "shopLink" }});
 
   const alert = useAlert();

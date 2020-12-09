@@ -1253,6 +1253,7 @@ export type Query = {
   pas: Maybe<Product>;
   pasUk: Maybe<Product>;
   payments: Maybe<Array<Maybe<Payment>>>;
+  pkgItemDetails: Maybe<Array<Maybe<ShipmentItemDetails>>>;
   prepQueue: Maybe<Array<Maybe<PrepQueue>>>;
   pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
   product: Product;
@@ -1268,6 +1269,7 @@ export type Query = {
   shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
   shipQueueByCustomerId: Maybe<Array<Maybe<ShipQueue>>>;
   shipment: Maybe<Shipment>;
+  shipmentItemDetails: Maybe<Array<Maybe<ShipmentItemDetails>>>;
   shipmentItemsByTrackingNums: Maybe<Array<Maybe<ShipmentItem>>>;
   shipmentItemsCountByTrackingNums: Maybe<Array<Maybe<ShipmentItemSummary>>>;
   shipmentList: Maybe<Array<Maybe<ShipmentList>>>;
@@ -1411,6 +1413,11 @@ export type QueryPaymentsArgs = {
 };
 
 
+export type QueryPkgItemDetailsArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
 export type QueryPrepQueueArgs = {
   shipmentId: Maybe<Scalars['Long']>;
   keyword?: Maybe<Scalars['String']>;
@@ -1475,6 +1482,11 @@ export type QueryShipQueueByCustomerIdArgs = {
 
 
 export type QueryShipmentArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryShipmentItemDetailsArgs = {
   id: Maybe<Scalars['ID']>;
 };
 
@@ -1599,6 +1611,17 @@ export type ShipmentItem = {
   purchaseShipments: Maybe<Array<Maybe<PurchaseShipment>>>;
   from: Maybe<Scalars['Long']>;
   price: Maybe<Scalars['BigDecimal']>;
+};
+
+export type ShipmentItemDetails = {
+   __typename?: 'ShipmentItemDetails';
+  id: Maybe<Scalars['ID']>;
+  sequence: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  description: Maybe<Scalars['String']>;
+  shipmentId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  image: Maybe<Scalars['String']>;
 };
 
 export type ShipmentItemInput = {
@@ -2040,6 +2063,49 @@ export type SetShipmentStatusMutation = (
     { __typename?: 'Message' }
     & Pick<Message, 'value'>
   )> }
+);
+
+export type ShipmentQueryVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type ShipmentQuery = (
+  { __typename?: 'Query' }
+  & { shipment: Maybe<(
+    { __typename?: 'Shipment' }
+    & Pick<Shipment, 'id' | 'actualShipCost' | 'latestCancelDate' | 'handlingInstructions' | 'reference' | 'trackingNum' | 'trackingLink' | 'shipmentMethod' | 'shipmentType' | 'shipmentStatus' | 'customerFirstName' | 'customerLastName' | 'customerId' | 'merchantId'>
+    & { pkgs: Maybe<Array<Maybe<(
+      { __typename?: 'Pkg' }
+      & Pick<Pkg, 'id' | 'length' | 'width' | 'height' | 'weight' | 'packageType'>
+    )>>> }
+  )> }
+);
+
+export type ShipmentItemDetailsQueryVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type ShipmentItemDetailsQuery = (
+  { __typename?: 'Query' }
+  & { shipmentItemDetails: Maybe<Array<Maybe<(
+    { __typename?: 'ShipmentItemDetails' }
+    & Pick<ShipmentItemDetails, 'id' | 'sequence' | 'quantity' | 'description' | 'shipmentId' | 'productId' | 'image'>
+  )>>> }
+);
+
+export type PkgItemDetailsQueryVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type PkgItemDetailsQuery = (
+  { __typename?: 'Query' }
+  & { pkgItemDetails: Maybe<Array<Maybe<(
+    { __typename?: 'ShipmentItemDetails' }
+    & Pick<ShipmentItemDetails, 'id' | 'sequence' | 'quantity' | 'description' | 'shipmentId' | 'productId' | 'image'>
+  )>>> }
 );
 
 export type TransactionsQueryVariables = {
@@ -3171,6 +3237,195 @@ export function useSetShipmentStatusMutation(baseOptions?: ApolloReactHooks.Muta
 export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipmentStatusMutation>;
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
+export const ShipmentDocument = gql`
+    query shipment($id: ID) {
+  shipment(id: $id) {
+    id
+    actualShipCost
+    latestCancelDate
+    handlingInstructions
+    reference
+    trackingNum
+    trackingLink
+    shipmentMethod
+    shipmentType
+    shipmentStatus
+    customerFirstName
+    customerLastName
+    customerId
+    merchantId
+    pkgs {
+      id
+      length
+      width
+      height
+      weight
+      packageType
+    }
+  }
+}
+    `;
+export type ShipmentComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ShipmentQuery, ShipmentQueryVariables>, 'query'>;
+
+    export const ShipmentComponent = (props: ShipmentComponentProps) => (
+      <ApolloReactComponents.Query<ShipmentQuery, ShipmentQueryVariables> query={ShipmentDocument} {...props} />
+    );
+    
+export type ShipmentProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ShipmentQuery, ShipmentQueryVariables>
+    } & TChildProps;
+export function withShipment<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ShipmentQuery,
+  ShipmentQueryVariables,
+  ShipmentProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ShipmentQuery, ShipmentQueryVariables, ShipmentProps<TChildProps, TDataName>>(ShipmentDocument, {
+      alias: 'shipment',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useShipmentQuery__
+ *
+ * To run a query within a React component, call `useShipmentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShipmentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShipmentQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useShipmentQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ShipmentQuery, ShipmentQueryVariables>) {
+        return ApolloReactHooks.useQuery<ShipmentQuery, ShipmentQueryVariables>(ShipmentDocument, baseOptions);
+      }
+export function useShipmentLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ShipmentQuery, ShipmentQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<ShipmentQuery, ShipmentQueryVariables>(ShipmentDocument, baseOptions);
+        }
+export type ShipmentQueryHookResult = ReturnType<typeof useShipmentQuery>;
+export type ShipmentLazyQueryHookResult = ReturnType<typeof useShipmentLazyQuery>;
+export type ShipmentQueryResult = ApolloReactCommon.QueryResult<ShipmentQuery, ShipmentQueryVariables>;
+export const ShipmentItemDetailsDocument = gql`
+    query shipmentItemDetails($id: ID) {
+  shipmentItemDetails(id: $id) {
+    id
+    sequence
+    quantity
+    description
+    shipmentId
+    productId
+    image
+  }
+}
+    `;
+export type ShipmentItemDetailsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>, 'query'>;
+
+    export const ShipmentItemDetailsComponent = (props: ShipmentItemDetailsComponentProps) => (
+      <ApolloReactComponents.Query<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables> query={ShipmentItemDetailsDocument} {...props} />
+    );
+    
+export type ShipmentItemDetailsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>
+    } & TChildProps;
+export function withShipmentItemDetails<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ShipmentItemDetailsQuery,
+  ShipmentItemDetailsQueryVariables,
+  ShipmentItemDetailsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables, ShipmentItemDetailsProps<TChildProps, TDataName>>(ShipmentItemDetailsDocument, {
+      alias: 'shipmentItemDetails',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useShipmentItemDetailsQuery__
+ *
+ * To run a query within a React component, call `useShipmentItemDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShipmentItemDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShipmentItemDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useShipmentItemDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>) {
+        return ApolloReactHooks.useQuery<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>(ShipmentItemDetailsDocument, baseOptions);
+      }
+export function useShipmentItemDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>(ShipmentItemDetailsDocument, baseOptions);
+        }
+export type ShipmentItemDetailsQueryHookResult = ReturnType<typeof useShipmentItemDetailsQuery>;
+export type ShipmentItemDetailsLazyQueryHookResult = ReturnType<typeof useShipmentItemDetailsLazyQuery>;
+export type ShipmentItemDetailsQueryResult = ApolloReactCommon.QueryResult<ShipmentItemDetailsQuery, ShipmentItemDetailsQueryVariables>;
+export const PkgItemDetailsDocument = gql`
+    query pkgItemDetails($id: ID) {
+  pkgItemDetails(id: $id) {
+    id
+    sequence
+    quantity
+    description
+    shipmentId
+    productId
+    image
+  }
+}
+    `;
+export type PkgItemDetailsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>, 'query'>;
+
+    export const PkgItemDetailsComponent = (props: PkgItemDetailsComponentProps) => (
+      <ApolloReactComponents.Query<PkgItemDetailsQuery, PkgItemDetailsQueryVariables> query={PkgItemDetailsDocument} {...props} />
+    );
+    
+export type PkgItemDetailsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>
+    } & TChildProps;
+export function withPkgItemDetails<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  PkgItemDetailsQuery,
+  PkgItemDetailsQueryVariables,
+  PkgItemDetailsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, PkgItemDetailsQuery, PkgItemDetailsQueryVariables, PkgItemDetailsProps<TChildProps, TDataName>>(PkgItemDetailsDocument, {
+      alias: 'pkgItemDetails',
+      ...operationOptions
+    });
+};
+
+/**
+ * __usePkgItemDetailsQuery__
+ *
+ * To run a query within a React component, call `usePkgItemDetailsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePkgItemDetailsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePkgItemDetailsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function usePkgItemDetailsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>) {
+        return ApolloReactHooks.useQuery<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>(PkgItemDetailsDocument, baseOptions);
+      }
+export function usePkgItemDetailsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>(PkgItemDetailsDocument, baseOptions);
+        }
+export type PkgItemDetailsQueryHookResult = ReturnType<typeof usePkgItemDetailsQuery>;
+export type PkgItemDetailsLazyQueryHookResult = ReturnType<typeof usePkgItemDetailsLazyQuery>;
+export type PkgItemDetailsQueryResult = ApolloReactCommon.QueryResult<PkgItemDetailsQuery, PkgItemDetailsQueryVariables>;
 export const TransactionsDocument = gql`
     query transactions($paymentMethods: [String], $offset: Int, $limit: Int, $maxAmount: String, $from: Date = null, $to: Date = null, $customerId: Long = null, $accountCode: String = null, $unsettledOnly: Boolean = false) {
   transactions(paymentMethods: $paymentMethods, offset: $offset, limit: $limit, maxAmount: $maxAmount, from: $from, to: $to, customerId: $customerId, accountCode: $accountCode, unsettledOnly: $unsettledOnly) {

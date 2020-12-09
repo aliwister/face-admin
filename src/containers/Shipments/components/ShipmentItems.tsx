@@ -36,7 +36,7 @@ Product
             </TableRow>
           </TableHead>
           <TableBody>
-            {state.shipmentItems && state.shipmentItems.map((a,b) => (
+            {state && state.map((a,b) => (
               <TableRow>
                 <TableCell>{a.id}</TableCell>
                 <TableCell>{a.sequence}</TableCell>
