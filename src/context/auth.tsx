@@ -80,8 +80,12 @@ const AuthProvider = (props: any) => {
           });
   }
   function signout(cb) {
+    console.log("signout");
     //makeAuthenticated(false);
-      Cookies.remove('token', { path: '' });
+
+    Cookies.set('token', '', {expires: 1});
+    Cookies.remove('token');
+    Cookies.remove('authorities');
     //setting
     makeAuthenticated(false);
     setToken("");

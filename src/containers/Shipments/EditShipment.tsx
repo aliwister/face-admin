@@ -266,7 +266,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
     });
     if(acceptPackage)  {
       alert.success("Package added successfully");
-      refetch({id:shipment.id});
+      refreshShipment({id:shipment.id});
       dispatch({type:'ADD_PACKAGE_END'})
     }
   }

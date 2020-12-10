@@ -1,5 +1,5 @@
-mutation addDiscount( $id: ID, $amount: BigDecimal) {
-  addDiscount(id: $id, amount: $amount) {
+mutation addDiscount( $id: ID, $amount: BigDecimal, $couponName: String) {
+  addDiscount(id: $id, amount: $amount, couponName: $couponName) {
     value
   }
 }

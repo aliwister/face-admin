@@ -221,7 +221,7 @@ export default function OrderDetails(props) {
     const {
       data: { addDiscount },
     }: any = await addDiscountMutation({
-      variables: {id: orderData.orderA.id, amount: formData.amount}
+      variables: {id: orderData.orderA.id, amount: formData.amount, couponName: formData.couponName}
     });
     if(addDiscount)  {
       alert.success(addDiscount.id);
@@ -323,7 +323,7 @@ export default function OrderDetails(props) {
   const onEditStart = () => setEditdialog(true);
   const onCancelStart = () => setCanceldialog(true);
   const onAddDiscountStart = () => setDiscountdialog(true);
-  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);}
+  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);setDiscountdialog(false);}
   const onCloseStart = () => {setClosedialog(true);}
 
   return (
@@ -423,7 +423,7 @@ export default function OrderDetails(props) {
                   <TableCell align="left">Discount</TableCell>
                   <TableCell align="left"></TableCell>
                   <TableCell align="left">OMR {orderData.orderA.discountsTotal}</TableCell>
-                  <TableCell align="right"></TableCell>
+                  <TableCell align="right">{orderData.orderA.couponName}</TableCell>
                 </TableRow>}
                 <TableRow>
                   <TableCell component="th" scope="row">
@@ -449,7 +449,7 @@ export default function OrderDetails(props) {
               <ButtonGroup size="large" variant="contained" color="primary" aria-label="large outlined primary button group">
                 <Button onClick={onSendSms} disabled={!contactbutton}>Send Payment SMS</Button>
                 <Button onClick={onEditStart}>Edit Order</Button>
-                <Button onClick={onAddDiscountStart}>Edit Order</Button>
+                <Button onClick={onAddDiscountStart}>Add Discount</Button>
                 <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
                 <Button onClick={onReturnRequest} color="secondary">Request Return</Button>
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>

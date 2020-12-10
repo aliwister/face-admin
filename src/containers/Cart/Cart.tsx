@@ -28,6 +28,7 @@ import {Alert} from "@material-ui/lab";
 import {useFindByKeywordQuery, useHashtagsQuery, useCustomerQuery} from "../../codegen/generated/_graphql";
 import {SearchResults} from "./SearchResults";
 import TableForm from "../OrderForm/TableForm";
+import {Link} from "react-router-dom";
 
 const CREATE_CART = gql`
   mutation createCart($cart: CheckoutCartInput) {
@@ -197,10 +198,7 @@ export default function Cart() {
           Find
         </Button>
 
-        {secureKey &&
-        <Alert severity="success">https://checkout.badals.com/checkout/start?token={secureKey}</Alert>
 
-        }
 
         <Typography variant="h6">Cart Items</Typography>
         <TextField id="outlined-basic" label="Product Name" variant="outlined" value={keyword} onChange={(e) => setKeyword(e.target.value)}/>
@@ -212,7 +210,12 @@ export default function Cart() {
         </div>
         <Typography variant="h6">Cart Items</Typography>
         <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={cart} control={control}/>
-        <br/>
+        {secureKey &&
+        <a color="inherit" href={`https://checkout.badals.com/checkout/start?token=${secureKey}`} target="_blank">
+          https://checkout.badals.com/checkout/start?token={secureKey}
+        </a>
+
+        }
 {/*        <Button variant="contained" color="primary" size="large" onClick={onSaveCart}>
           Save Cart
         </Button>*/}

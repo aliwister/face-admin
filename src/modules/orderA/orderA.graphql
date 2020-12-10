@@ -11,6 +11,7 @@
       orderState
       deliveryTotal
       discountsTotal
+      couponName
       deliveryDate
       cartId
       customer {

@@ -436,6 +436,7 @@ export type MutationAcceptShipmentArgs = {
 export type MutationAddDiscountArgs = {
   id: Maybe<Scalars['ID']>;
   amount: Maybe<Scalars['BigDecimal']>;
+  couponName: Maybe<Scalars['String']>;
 };
 
 
@@ -813,6 +814,7 @@ export type Order = {
   total: Maybe<Scalars['BigDecimal']>;
   deliveryTotal: Maybe<Scalars['BigDecimal']>;
   discountsTotal: Maybe<Scalars['BigDecimal']>;
+  couponName: Maybe<Scalars['String']>;
   subtotal: Maybe<Scalars['BigDecimal']>;
   carrier: Maybe<Scalars['String']>;
   paymentMethod: Maybe<Scalars['String']>;
@@ -1235,7 +1237,6 @@ export type Query = {
   getProductBySku: Maybe<Product>;
   hashtags: Maybe<HashtagResponse>;
   hashtagsWithProducts: Maybe<HashtagResponse>;
-  /** shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem] */
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
   me: Maybe<Customer>;
@@ -1784,6 +1785,7 @@ export type VariationOption = {
 export type AddDiscountMutationVariables = {
   id: Maybe<Scalars['ID']>;
   amount: Maybe<Scalars['BigDecimal']>;
+  couponName: Maybe<Scalars['String']>;
 };
 
 
@@ -1957,7 +1959,7 @@ export type OrderAQuery = (
   { __typename?: 'Query' }
   & { orderA: Maybe<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'deliveryDate' | 'cartId' | 'currency' | 'balance' | 'carrier'>
+    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'couponName' | 'deliveryDate' | 'cartId' | 'currency' | 'balance' | 'carrier'>
     & { customer: (
       { __typename?: 'Customer' }
       & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
@@ -2148,8 +2150,8 @@ export type UpdateFromDetrackMutation = (
 
 
 export const AddDiscountDocument = gql`
-    mutation addDiscount($id: ID, $amount: BigDecimal) {
-  addDiscount(id: $id, amount: $amount) {
+    mutation addDiscount($id: ID, $amount: BigDecimal, $couponName: String) {
+  addDiscount(id: $id, amount: $amount, couponName: $couponName) {
     value
   }
 }
@@ -2190,6 +2192,7 @@ export function withAddDiscount<TProps, TChildProps = {}, TDataName extends stri
  *   variables: {
  *      id: // value for 'id'
  *      amount: // value for 'amount'
+ *      couponName: // value for 'couponName'
  *   },
  * });
  */
@@ -2803,6 +2806,7 @@ export const OrderADocument = gql`
     orderState
     deliveryTotal
     discountsTotal
+    couponName
     deliveryDate
     cartId
     customer {

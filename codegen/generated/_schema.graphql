@@ -305,7 +305,7 @@ type Mutation {
   acceptItem(shipmentItemId: Long, packageId: Long, accepted: BigDecimal, rejected: BigDecimal): Message
   acceptPackage(pkg: PackageInput): Pkg
   acceptShipment(trackingNum: String, payment: PaymentInput, invoiceLink: String): Shipment
-  addDiscount(id: ID, amount: BigDecimal): Message
+  addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
   addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
@@ -393,6 +393,7 @@ type Order {
   total: BigDecimal
   deliveryTotal: BigDecimal
   discountsTotal: BigDecimal
+  couponName: String
   subtotal: BigDecimal
   carrier: String
   paymentMethod: String
@@ -801,8 +802,6 @@ type Query {
   getProductBySku(sku: String, isParent: Boolean = false): Product
   hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
   hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
-
-  """shipmentItems(shipmentId: Long, isPackaged: boolean): [ShipmentItem]"""
   inventory: [Inventory]
 
   """getAddress(addressId: Int): Address"""
@@ -822,6 +821,7 @@ type Query {
   pas(sku: String): Product
   pasUk(sku: String): Product
   payments(orderId: ID): [Payment]
+  pkgItemDetails(id: ID): [ShipmentItemDetails]
   prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
   pricingRequests: [PricingRequest]
   product(slug: String!, cookie: String = ""): Product!
@@ -837,6 +837,7 @@ type Query {
   shipQueue: [ShipQueue]
   shipQueueByCustomerId(customerId: Long): [ShipQueue]
   shipment(id: ID): Shipment
+  shipmentItemDetails(id: ID): [ShipmentItemDetails]
   shipmentItemsByTrackingNums(trackingNums: [String], showClosed: Boolean): [ShipmentItem]
   shipmentItemsCountByTrackingNums(trackingNums: [String]): [ShipmentItemSummary]
   shipmentList(viewName: ShipmentListView): [ShipmentList]
@@ -914,6 +915,16 @@ type ShipmentItem {
   purchaseShipments: [PurchaseShipment]
   from: Long
   price: BigDecimal
+}
+
+type ShipmentItemDetails {
+  id: ID
+  sequence: Int
+  quantity: BigDecimal
+  description: String
+  shipmentId: Long
+  productId: Long
+  image: String
 }
 
 input ShipmentItemInput {

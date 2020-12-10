@@ -23,7 +23,8 @@ const useStyles = makeStyles(theme => ({
 export const DiscountDialog = ({open, onSubmit, onClose, title}) =>{
   const alert = useAlert();
   const { register, handleSubmit, errors } = useForm({defaultValues: {
-    amount: 1
+    amount: 1,
+    couponName: 'COURTESY'
   }});
 
   const classes = useStyles();
@@ -47,16 +48,13 @@ export const DiscountDialog = ({open, onSubmit, onClose, title}) =>{
       <DialogContent>
       <TextField variant="filled" size="small" placeholder="Amount" name="amount" className={classes.textBox} inputRef={register({required: true, max: 1500, min:0, maxLength: 5})} />
       <br/>
-        <DialogContent>
-          <TextField
-            id="outlined-multiline-static"
-            label="Multiline"
-            multiline
-            rows={4}
-            name="reason"
-            variant="outlined"
-            inputRef={register({ required: true })}/>
-        </DialogContent>
+        <FormControl variant="filled" size="small" className={classes.formControl}>
+          <Select native name="couponName" inputRef={register({ required: true })}>
+            <option value="VOLUME">VOLUME</option>
+            <option value="COURTESY">COURTESY</option>
+            <option value="SORRY">SORRY</option>
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button variant="contained" color="primary" type="submit" size="large">Add</Button>
