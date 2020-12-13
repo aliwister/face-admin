@@ -8,6 +8,7 @@ import {Controller, useForm} from "react-hook-form";
 import {PACKAGE_TYPES, SHIPMENT_METHODS, SHIPMENT_STATUS, SHIPMENT_TYPES} from "./Constants";
 import Select from "react-select";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import Loader from "../../../components/Loader/Loader";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -21,9 +22,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const AddTrackingDialog = ({show, onClose, onSubmit, events}) => {
+export const AddTrackingDialog = ({show, onClose, onSubmit, events, defaults}) => {
   const classes = useStyles();
-  const { register, handleSubmit, errors, control } = useForm();
+  const { register, handleSubmit, errors, control } = useForm({defaultValues: defaults});
   return (
   <Dialog open={show} onClose={onClose} aria-labelledby="form-dialog-title" fullWidth={true}
           maxWidth="md" style={{height:500}}>
@@ -42,7 +43,7 @@ export const AddTrackingDialog = ({show, onClose, onSubmit, events}) => {
                                                      name="trackingEvent"
                                                      register={register}
                                                      control={control}
-                                                     defaultValue=""
+
       /></div>
         <br/>
         <div>
@@ -52,7 +53,7 @@ export const AddTrackingDialog = ({show, onClose, onSubmit, events}) => {
           name="shipmentStatus"
           register={register}
           control={control}
-          defaultValue=""
+
         /></div>
         <br/><div>
         <Controller
@@ -80,7 +81,7 @@ export const AddTrackingDialog = ({show, onClose, onSubmit, events}) => {
           Cancel
         </Button>
         <Button type="submit" color="primary">
-          Accept
+          Add
         </Button>
       </DialogActions>
     </form>

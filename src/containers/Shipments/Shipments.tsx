@@ -287,7 +287,7 @@ export default function Shipments() {
 
   return (
     <>
-      <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} />
+      <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} defaults={{}} />
       <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} />
       <ImportAmazonCsvDialog show={importcsvdialog} onClose={handleClose} />
       <Grid container spacing={1}>

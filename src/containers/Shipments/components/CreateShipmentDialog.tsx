@@ -7,13 +7,17 @@ import React from "react";
 import {Controller, useForm} from "react-hook-form";
 import {PACKAGE_TYPES, SHIPMENT_METHODS, SHIPMENT_TYPES} from "./Constants";
 import Select from "react-select";
+import Loader from "../../../components/Loader/Loader";
 
-export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
-  const { register, handleSubmit, errors, control } = useForm();
+export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants, defaults}) => {
+  console.log(defaults);
+  const { register, handleSubmit, errors, control } = useForm({
+    defaultValues: defaults
+  });
   return (
   <Dialog open={show} onClose={onClose} aria-labelledby="form-dialog-title">
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle id="form-dialog-title">Accept Shipment</DialogTitle>
+      <DialogTitle id="form-dialog-title">Create Import Shipment</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Shipment Info
@@ -25,7 +29,7 @@ export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
             name="shipmentType"
             register={register}
             control={control}
-            defaultValue=""
+
           />
         </div>
         <div>
@@ -35,7 +39,7 @@ export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
           name="shipmentMethod"
           register={register}
           control={control}
-          defaultValue=""
+
         />
         </div>
         <div><Controller as={<Select
@@ -47,7 +51,7 @@ export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
                          name="merchant"
                          register={register}
                          control={control}
-                         defaultValue=""
+
         /></div>
         <div><TextField variant="outlined" fullWidth type="text" placeholder="Tracking #" name="trackingNum"
                         inputRef={register({required: true})} /></div>
@@ -62,9 +66,9 @@ export const CreateShipmentDialog = ({show, onClose, onSubmit, merchants}) => {
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button type="submit" color="primary">
-          Accept
-        </Button>
+        {defaults.loading?<Loader/>: <Button type="submit" color="primary">
+          Create
+        </Button>}
       </DialogActions>
     </form>
   </Dialog>

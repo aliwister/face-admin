@@ -133,6 +133,7 @@ export default function ImportQueue() {
   const { data: cntdata, loading: cntloading, error: cnterror, refetch: cntrefetch } = useQuery(SHIPMENT_ITEMS_COUNT, { context: { clientName: "adminLink" }, fetchPolicy: "network-only"});
   const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
   const { data:events, loading:eLoading} = useQuery(TRACKING_EVENTS, {context: { clientName: "adminLink" }});
+
   const { register, handleSubmit, errors } = useForm();
 
 
@@ -145,6 +146,16 @@ export default function ImportQueue() {
   const [showClosed, setShowclosed] = useState(false);
   const [checkedId, setCheckedId] = useState([]);
   const [trackingNums, setTrackingnums] = useState("");
+  const [defaults, setDefaults] = useState({
+    shipmentType: {value: 'PURCHASE', label: 'PURCHASE'},
+    shipmentMethod: {value: 'Fedex', label: 'Fedex'},
+    shipmentStatus: {value: 'IN_TRANSIT', label: 'IN_TRANSIT'},
+    trackingEvent: {id: 1101, value: 'Dispatched to Badals'},
+    trackingNum: null,
+    merchant: {id: 6, name: 'Access USA'},
+    details: "Sent via Fedex to Muscat, Oman",
+    loading: false,
+  });
 
   const alert = useAlert();
   const classes = useStyles();
@@ -175,23 +186,37 @@ export default function ImportQueue() {
     }: any = await createShipmentMutation({
       variables: { ...dto },
     });
+    setDefaults({...defaults,loading: false})
     if(createShipment)  {
       alert.success(createShipment.id);
+      setDefaults({
+         ...defaults,
+          trackingNum: formData.trackingNum
+      });
+      handleOpenAddTrackingEventDialog();
     }
   }
 
   const addTrackingEvent = async (formData) => {
     console.log('handling issue',formData);
+    if(defaults.trackingNum)
+      return runTrackingEventMutation(formData, [defaults.trackingNum]);
+
     const s = data.shipmentItemsByTrackingNums.filter(e => ~checkedId.indexOf(e.id)).map(({__typename, id, ...props}) => ({...props, from: id}));
     console.log(s);
     const trackingNumsSplit = trackingNums.split(/\r?\n/);
-    let dto = {
-       shipmentStatus: formData.shipmentStatus.value,
-       trackingEvent: formData.trackingEvent.id,
-       details: formData.details,
+    return runTrackingEventMutation(formData, trackingNums);
+  }
 
-       trackingNums: trackingNumsSplit,
-       eventDate: formData.eventDate
+  const runTrackingEventMutation = async(formData, trackingNums) => {
+    setDefaults({...defaults,loading: true});
+    let dto = {
+      shipmentStatus: formData.shipmentStatus.value,
+      trackingEvent: formData.trackingEvent.id,
+      details: formData.details,
+
+      trackingNums: trackingNums,
+      eventDate: formData.eventDate
       //description: state.item.description
     }
     const {
@@ -199,14 +224,15 @@ export default function ImportQueue() {
     }: any = await addTrackingEventMutation({
       variables: { ...dto },
     });
+
     if(addTrackingEvent)  {
       alert.success(addTrackingEvent.value);
     }
+    setDefaults({...defaults,trackingNum: null})
   }
 
-
-
   const handleCreate = (item) => {
+
     setCreate(true);
   };
 
@@ -261,6 +287,38 @@ export default function ImportQueue() {
 
   function handleOpenAddTrackingEventDialog() {
     setAdd(true)
+  }
+
+  function handleCreateMyUS() {
+    // @ts-ignore
+    setDefaults({
+      ...defaults,
+      merchant: {id: 6, name: 'Access USA'},
+      shipmentMethod: {value: 'Fedex', label: 'Fedex'},
+      details: "Sent via Fedex to Muscat, Oman"
+    });
+    setCreate(true);
+  }
+  function handleCreateAMForward() {
+    // @ts-ignore
+    setDefaults({
+      ...defaults,
+      merchant: {id: 7, name: 'AMForward'},
+      shipmentMethod: {value: 'DHL', label: 'DHL'},
+      details: "Sent via DHL to Muscat, Oman"
+    });
+    setCreate(true);
+  }
+
+  function handleCreateStackry() {
+    // @ts-ignore
+    setDefaults({
+      ...defaults,
+      merchant: {id: 31, name: 'Stackry'},
+      shipmentMethod: {value: 'Fedex', label: 'Fedex'},
+      details: "Sent via Fedex to Muscat, Oman"
+    });
+    setCreate(true);
   }
 
   return (
@@ -386,12 +444,18 @@ export default function ImportQueue() {
           </TableBody>
         </Table>
       </SectionCard>
-      <Button variant="contained" color="secondary" size="small"  disabled={checkedId.length < 1} onClick={handleCreate}>
-        Create Shipment
+      <Button variant="contained" color="secondary" size="small"  disabled={checkedId.length < 1} onClick={handleCreateMyUS}>
+        Create MyUS Shipment
+      </Button>
+      <Button variant="contained" color="secondary" size="small"  disabled={checkedId.length < 1} onClick={handleCreateAMForward}>
+        Create AMForward Shipment
+      </Button>
+      <Button variant="contained" color="secondary" size="small"  disabled={checkedId.length < 1} onClick={handleCreateStackry}>
+        Create Stackry Shipment
       </Button>
 
-      {merchants && <CreateShipmentDialog onSubmit={onCreateShipment} merchants={merchants} show={createShipmentDialog} onClose={onClose}/>}
-      {events    && <AddTrackingDialog    onSubmit={addTrackingEvent} events={events}       show={addTrackingDialog}    onClose={onClose}/>}
+      {merchants && createShipmentDialog && <CreateShipmentDialog onSubmit={onCreateShipment} merchants={merchants} show={createShipmentDialog} onClose={onClose} defaults={defaults} />}
+      {events    && addTrackingDialog && <AddTrackingDialog    onSubmit={addTrackingEvent} events={events}       show={addTrackingDialog}    onClose={onClose} defaults={defaults} />}
     </>
   );
 }
