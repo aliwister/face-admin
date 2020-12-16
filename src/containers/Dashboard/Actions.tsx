@@ -6,18 +6,21 @@ import {ActionReasonDialog} from "../Orders/components/ActionReasonDialog";
 import {ActionDialog} from "./components/ActionDialog";
 import Button from "../../components/Button/Button";
 
-const returnFlowState = (data) =>
-  <table>
-  <tr>
-    <td>orderId</td><td>{data.orderId && <b>{data.orderId}</b>}</td>
-  </tr>
-    <tr><td>reason</td><td>{data.reason && <b>{data.reason}</b>}</td></tr>
-    <tr><td>instructions</td><td>{data.instructions && <b>{data.instructions}</b>}</td></tr>
-    <tr><td>onUs</td><td>{data.onUs && <b>{data.onUs}</b>}</td></tr>
-    <tr><td>toVendor</td><td>{data.toVendor && <b>{data.toVendor}</b>}</td></tr>
-    <tr><td>replacement</td><td>{data.replacement && <b>{data.replacement}</b>}</td>
-  </tr>
-  </table>;
+const returnFlowState = (data) => (
+    <table>
+
+        {
+          Object.keys(data).map((key: string) => (
+            <tr>
+              <td>{key}</td>
+              <td>{typeof data[key] === "boolean"? (data[key])?"True":"False":data[key]}</td>
+            </tr>
+          ))
+        }
+
+    </table>
+);
+
 
 export const Actions = ({type}) => {
   const [loading, setLoading] = useState(true);

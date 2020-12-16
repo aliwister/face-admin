@@ -211,7 +211,22 @@ export default function OrderDetails(props) {
         "type": "returnWorkflow",
         "externalId": externalId,
         "activate": true,
-        "stateVariables": {"orderId":slug, "requestData": {"orderId":slug, "reason": formData.reason.value, instructions: formData.instructions, onUs: formData.onUs, toVendor: formData.toVendor, replacement: formData.replacement}}
+        "stateVariables": {
+          "orderId":slug,
+          "requestData": {
+            orderId:slug,
+            reason: formData.reason.value,
+            instructions: formData.instructions,
+            onUs: formData.onUs,
+            toVendor: formData.toVendor,
+            replacement: formData.replacement,
+            sequence: a.sequence,
+            productName: a.productName,
+            productId: a.productId,
+            sku: a.productSku,
+            quantity: a.quantity
+          }
+        }
       };
       flowAPI.put("/workflow-instance", testData)
         .then(res => {

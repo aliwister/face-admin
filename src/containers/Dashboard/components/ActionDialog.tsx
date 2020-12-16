@@ -5,7 +5,6 @@ import Button from "@material-ui/core/Button";
 import React, {useEffect, useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import {flowAPI} from "../../../api/config";
-import {APPROVE_STEP, CURRENCIES} from "../../Shipments/components/Constants";
 import Select from "react-select";
 import { useAlert } from "react-alert";
 
