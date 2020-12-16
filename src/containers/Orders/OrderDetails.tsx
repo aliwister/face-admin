@@ -37,7 +37,6 @@ import {
 import Typography from "@material-ui/core/Typography";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Checkbox from "@material-ui/core/Checkbox";
-import {EditOrderDialog} from "./EditOrderDialog";
 import TableFooter from "@material-ui/core/TableFooter";
 import {ActionReasonDialog} from "./components/ActionReasonDialog";
 import {useAddDiscountMutation, useOrderAQuery} from "../../codegen/generated/_graphql";
@@ -46,6 +45,8 @@ import {Shipments} from "./components/Shipments";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 import badalsAPI, {flowAPI} from "../../api/config";
 import {DiscountDialog} from "./components/DiscountDialog";
+import {EditOrderDialog} from "./components/EditOrderDialog";
+import {ReturnDialog} from "./components/ReturnDialog";
 
 
 
@@ -65,8 +66,8 @@ mutation getAdminFile($filename: String) {
 }
 `;
 const EDIT_ORDER = gql`
-mutation editOrder($id: ID, $orderItems: [OrderItemInput]) {
-  editOrder(id:$id, orderItems:$orderItems) {
+mutation editOrder($id: ID, $orderItems: [OrderItemInput], $reason: String) {
+  editOrder(id:$id, orderItems:$orderItems, reason: $reason) {
     id
   }
 }
@@ -179,6 +180,7 @@ export default function OrderDetails(props) {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [editdialog, setEditdialog] = useState(false);
+  const [returndialog, setReturndialog] = useState(false);
   const [canceldialog, setCanceldialog] = useState(false);
   const [closedialog, setClosedialog] = useState(false);
   const [discount, setDiscountdialog] = useState(false);
@@ -198,23 +200,24 @@ export default function OrderDetails(props) {
     }
   }
 
-  const onReturnRequest = async data => {
+  const onReturnRequest = async formData => {
 
-    let testData = {
-      "type": "returnWorkflow",
-      "externalId": "132123",
-      "activate": true,
-      "stateVariables": {"requestData": {"orderId":123}}
-    };
+    console.log(formData);
 
-    return flowAPI.put("/workflow-instance", testData)
-      .then(res => {
-        console.log(res);
-      });
-/*    return flowAPI.get("/workflow-executor")
-      .then(res => {
-        console.log(res);
-      });*/
+
+    formData.orderItems.filter(function(el) { return el.quantity > 0 }).forEach(function(a,b) {
+      let externalId = `${slug}-${a.sequence}`;
+      let testData = {
+        "type": "returnWorkflow",
+        "externalId": externalId,
+        "activate": true,
+        "stateVariables": {"orderId":slug, "requestData": {"orderId":slug, "reason": formData.reason.value, instructions: formData.instructions, onUs: formData.onUs, toVendor: formData.toVendor, replacement: formData.replacement}}
+      };
+      flowAPI.put("/workflow-instance", testData)
+        .then(res => {
+          alert.success(res.statusText);
+        });
+    });
   }
 
   const onAddDiscount = async formData => {
@@ -232,7 +235,7 @@ export default function OrderDetails(props) {
     const {
       data: { editOrder },
     }: any = await editOrderMutation({
-      variables: {id: orderData.orderA.id, orderItems: [...formData.orderItems]}
+      variables: {id: orderData.orderA.id, orderItems: [...formData.orderItems], reason: formData.reason}
     });
     if(editOrder)  {
       alert.success(editOrder.id);
@@ -321,14 +324,16 @@ export default function OrderDetails(props) {
     }
   }
   const onEditStart = () => setEditdialog(true);
+  const onReturnStart = () => setReturndialog(true);
   const onCancelStart = () => setCanceldialog(true);
   const onAddDiscountStart = () => setDiscountdialog(true);
-  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);setDiscountdialog(false);}
+  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);setDiscountdialog(false); setReturndialog(false);}
   const onCloseStart = () => {setClosedialog(true);}
 
   return (
     <Grid fluid={true}>
       <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.orderItems} />
+      <ReturnDialog onSubmit={onReturnRequest} onClose={onCancelEdit} open={returndialog} orderItems={orderData.orderA.orderItems} />
       <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
       <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
       <DiscountDialog onSubmit={onAddDiscount} onClose={onCancelEdit} open={discount} title={"Discount Order"} />
@@ -451,7 +456,7 @@ export default function OrderDetails(props) {
                 <Button onClick={onEditStart}>Edit Order</Button>
                 <Button onClick={onAddDiscountStart}>Add Discount</Button>
                 <Button onClick={onSendOrderCreateEmail} disabled={!b2} color="secondary">Send Order Confirmation</Button>
-                <Button onClick={onReturnRequest} color="secondary">Request Return</Button>
+                <Button onClick={onReturnStart} color="secondary">Request Return</Button>
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>
                 <Button onClick={onCloseStart}>Close</Button>
               </ButtonGroup>

@@ -17,6 +17,7 @@ import {
   UserIcon,
   DeliveryIcon,
 } from '../../components/AllSvgIcon';
+import {Actions} from "./Actions";
 
 const Col = styled(Column, props => ({
   '@media only screen and (max-width: 574px)': {
@@ -35,9 +36,9 @@ const Col = styled(Column, props => ({
 const Dashboard = () => (
   <Grid fluid={true}>
     <Row>
-{/*      <Actions />*/}
+      <Actions type={"returnWorkflow"}/>
     </Row>
-    <Row>
+{/*    <Row>
       <Col md={5} lg={4} sm={6}>
         <RadialBarChart
           widgetTitle='Target'
@@ -244,7 +245,7 @@ const Dashboard = () => (
           totalText='Total Client'
         />
       </Col>
-    </Row>
+    </Row>*/}
   </Grid>
 );
 

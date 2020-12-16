@@ -13,6 +13,26 @@ export const SHIPMENT_METHODS = [
   {value: 'Badals Express', label: 'Badals Express'},
 ];
 
+export const RETURN_REASONS = [
+  {value: 'WRONG', label: 'Wrong item received'},
+  {value: 'UNWANTED', label: 'No Longer Needed'},
+  {value: 'DUPLICATE', label: 'Duplicate Order made by customer'},
+  {value: 'DAMAGE', label: 'Item damaged, cracked, broken'},
+  {value: 'DEFECT', label: 'Defective not working'},
+  {value: 'LATE', label: 'Item arrived too late'},
+];
+
+
+export const EDIT_REASONS = [
+  {value: 'Wrong item ordered', label: 'Wrong item ordered'},
+  {value: 'No Longer Needed', label: 'No Longer Needed'},
+  {value: 'Duplicate', label: 'Duplicate'},
+  {value: 'Damaged/Broken', label: 'Damaged/Broken'},
+  {value: 'Defective not working', label: 'Defective not working'},
+  {value: 'Arriving too late', label: 'Arriving too late'},
+  {value: 'Cancelled by Seller', label: 'Cancelled by Seller'},
+];
+
 export const SHIPMENT_STATUS = [
   {value: 'PENDING', label: 'PENDING'},
   {value: 'IN_TRANSIT', label: 'IN_TRANSIT'},

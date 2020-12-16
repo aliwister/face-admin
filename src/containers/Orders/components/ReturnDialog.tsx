@@ -10,18 +10,28 @@ import {
   TableRow
 } from "@material-ui/core";
 import Checkbox from "@material-ui/core/Checkbox";
-import Image from "../../components/Image/Image";
+import Image from "../../../components/Image/Image";
 import React from "react";
 import TextField from "@material-ui/core/TextField";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import TableFooter from "@material-ui/core/TableFooter";
+import {RETURN_REASONS} from "../../Shipments/components/Constants";
+import Select from "react-select";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+
+const useStyles = makeStyles(theme => ({
+  dialogPaper: {
+    minHeight: '80vh',
+    maxHeight: '80vh',
+  },
+}));
 
 
-export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
+export const ReturnDialog = ({open, orderItems, onSubmit, onClose}) => {
   const { register, handleSubmit, errors, control } = useForm();
-
+  const classes = useStyles();
   const handleSubmitEdit = (data) => {
     console.log(data);
     onClose();
@@ -29,10 +39,29 @@ export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
+    <Dialog  classes={{ paper : classes.dialogPaper}} open={open} onClose={onClose} aria-labelledby="form-dialog-title"
+            maxWidth={"md"}
+            fullWidth={true}>
       <form onSubmit={handleSubmit(handleSubmitEdit)}>
-      <DialogTitle id="form-dialog-title">Edit Order</DialogTitle>
-      <DialogContent>
+      <DialogTitle id="form-dialog-title">Request Return</DialogTitle>
+      <DialogContent style={{'minHeight':'60vh'}}>
+        <div><Controller
+          as={<Select options={RETURN_REASONS}/>}
+          rules={{ required: true }}
+          name="reason"
+          label="Reason"
+          register={register}
+          control={control}
+        /></div>
+
+        <div><input type="checkbox" name="onUs" ref={register} />Our responsibility</div>
+        <div><input type="checkbox" name="replacement" ref={register} />Request replacement</div>
+        <div><input type="checkbox" name="toVendor" ref={register} />Direct customer to vendor return</div>
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="Instructions" name="instructions" multiline
+                        rows="4"
+                        inputRef={register({required: true})} /></div>
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="ID" name="id"
+                        inputRef={register()} /></div>
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
@@ -44,6 +73,7 @@ export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
           </TableRow>
         </TableHead>
         <TableBody>
+
           {orderItems && orderItems.map((row,i) => (
               <TableRow key={row.sequence}>
                 <TableCell component="th" scope="row">
@@ -55,7 +85,8 @@ export const EditOrderDialog = ({open, orderItems, onSubmit, onClose}) => {
 
                 <TableCell align="left">{row.productName}</TableCell>
                 <TableCell align="center">
-                  <TextField type="number" placeholder="Quantity" name={`orderItems[${i}].quantity`} inputRef={register} defaultValue={row.quantity}/>
+                  <TextField type="number" placeholder="Quantity" name={`orderItems[${i}].quantity`} inputRef={register} defaultValue={0}/>
+                  OF {row.quantity}
                 </TableCell>
 
                 <TableCell align="center">
