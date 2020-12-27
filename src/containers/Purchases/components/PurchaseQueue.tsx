@@ -24,6 +24,7 @@ import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import {Link} from "react-router-dom";
 import {usePurchaseQueueQuery} from "../../../codegen/generated/_graphql";
+import {MerchantURL} from "../../../components/MerchantURL/MerchantURL";
 
 
 const UPDATE_PURCHASE = gql`
@@ -92,15 +93,9 @@ export default function PurchaseQueue({handleAdd}) {
                   <TableRow key={q.id}>
                     <TableCell align="right">{q.id}</TableCell>
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-                    {q.url ?
-                        <TableCell component="th" scope="row">
-                          <a href={`${q.url}`} target="_blank">
-                            {q.productName} <small>{q.attributes}</small>
-                          </a>
-                        </TableCell> : <TableCell component="th" scope="row">
-                          {q.productName}<small>{q.attributes}</small>
-                        </TableCell>
-                    }
+                    <TableCell component="th" scope="row">
+                      <MerchantURL merchantId={q.merchantId} sku={q.sku} url={q.url} name={q.productName}/>
+                    </TableCell>
                     <TableCell align="right">{q.quantity}</TableCell>
                     <TableCell align="right">{q.price} / {Math.round(q.price * 260)/100}</TableCell>
                     <TableCell align="right">

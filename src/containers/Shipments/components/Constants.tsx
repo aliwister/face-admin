@@ -31,6 +31,8 @@ export const EDIT_REASONS = [
   {value: 'Defective not working', label: 'Defective not working'},
   {value: 'Arriving too late', label: 'Arriving too late'},
   {value: 'Cancelled by Seller', label: 'Cancelled by Seller'},
+  {value: 'Voltage incompatible', label: 'Voltage incompatible'},
+  {value: 'Violates customs or Badals.com policies', label: 'Violates customs or Badals.com policies'},
 ];
 
 export const SHIPMENT_STATUS = [

@@ -148,7 +148,6 @@ type Customer {
   addresses: [Address]
 }
 
-"""java.util.Date implementation"""
 scalar Date
 
 type Gallery {
@@ -366,6 +365,7 @@ type Mutation {
   setAccountingCode(paymentIds: [Long], code: String): Message
   setCart(secureKey: String, items: [CartItemInput]): Cart
   setDial(dial: String, ref: Long): Message
+  setEstimatedShipDate(id: Long, date: Date): Message
   setHashtags(hashtags: [String], ref: Long): Message
   setOrderState(id: ID, state: OrderState): Order
   setProcessedDate(paymentIds: [Long], date: Date): Message
@@ -417,6 +417,7 @@ type OrderItem {
   productUrl: String
   productSku: String
   productId: Long
+  productMerchantId: Long
   po: Long
 }
 
@@ -767,6 +768,7 @@ type PurchaseQueue {
   productId: Long
   orderId: Long
   attributes: String
+  merchantId: Long
 }
 
 type PurchaseResponse {
@@ -1016,6 +1018,7 @@ type ShipQueue {
   done: BigDecimal
   todo: BigDecimal
   carrier: String
+  estimatedShipDate: String
 }
 
 type SortQueue {

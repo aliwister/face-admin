@@ -47,6 +47,7 @@ import badalsAPI, {flowAPI} from "../../api/config";
 import {DiscountDialog} from "./components/DiscountDialog";
 import {EditOrderDialog} from "./components/EditOrderDialog";
 import {ReturnDialog} from "./components/ReturnDialog";
+import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 
 
 
@@ -514,17 +515,9 @@ export default function OrderDetails(props) {
                         {row.sequence}
                       </TableCell>
                       <TableCell align="left"><Image url={row.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
-
-                        {row.productUrl ?
-                          <TableCell component="th" scope="row">
-                            <a href={`${row.productUrl}`} target="_blank">
-                              {row.productName}
-                            </a>
-                          </TableCell> : <TableCell component="th" scope="row">
-                            {row.productName}
-                          </TableCell>
-                        }
-
+                      <TableCell component="th" scope="row">
+                        <MerchantURL merchantId={row.productMerchantId} sku={row.productSku} url={row.productUrl} name={row.productName}/>
+                      </TableCell>
                       <TableCell align="center">{row.quantity}</TableCell>
 
                       <TableCell align="center">{row.price}</TableCell>

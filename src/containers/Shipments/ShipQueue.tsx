@@ -25,6 +25,7 @@ query shipQueue {
     done
     todo
     carrier
+    estimatedShipDate
   }
 }
 `;
@@ -79,7 +80,7 @@ export default function ShipQueue() {
   return (
      <>
       <Grid container xs={12} md={12} spacing={1}>
-        <ShipQueueTable data={data.shipQueue} loading={loading}/>
+        <ShipQueueTable data={data.shipQueue} loading={loading} refetch={refetch}/>
       </Grid>
      </>
   );

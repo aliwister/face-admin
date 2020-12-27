@@ -1,0 +1,5 @@
+mutation setEstimatedShipDate($id: Long, $date:Date) {
+  setEstimatedShipDate(id: $id, date: $date) {
+    value
+  }
+}

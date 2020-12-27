@@ -89,7 +89,7 @@ export const CustomerShipmentDetailsForm = ({shipment, onSubmit}) => {
         action={<></>}
       />
       {data &&
-      <ShipQueueTable data={data.shipQueueByCustomerId} loading={loading}/>
+      <ShipQueueTable data={data.shipQueueByCustomerId} loading={loading} refetch={refetch}/>
       }
     </SectionCard>
       </>

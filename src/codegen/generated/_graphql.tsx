@@ -18,7 +18,6 @@ export type Scalars = {
   LocalDate: any;
   /** Built-in java.math.BigDecimal */
   BigDecimal: any;
-  /** java.util.Date implementation */
   Date: any;
   LocalDateTime: any;
 };
@@ -400,6 +399,7 @@ export type Mutation = {
   setAccountingCode: Maybe<Message>;
   setCart: Maybe<Cart>;
   setDial: Maybe<Message>;
+  setEstimatedShipDate: Maybe<Message>;
   setHashtags: Maybe<Message>;
   setOrderState: Maybe<Order>;
   setProcessedDate: Maybe<Message>;
@@ -741,6 +741,12 @@ export type MutationSetDialArgs = {
 };
 
 
+export type MutationSetEstimatedShipDateArgs = {
+  id: Maybe<Scalars['Long']>;
+  date: Maybe<Scalars['Date']>;
+};
+
+
 export type MutationSetHashtagsArgs = {
   hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
   ref: Maybe<Scalars['Long']>;
@@ -839,6 +845,7 @@ export type OrderItem = {
   productUrl: Maybe<Scalars['String']>;
   productSku: Maybe<Scalars['String']>;
   productId: Maybe<Scalars['Long']>;
+  productMerchantId: Maybe<Scalars['Long']>;
   po: Maybe<Scalars['Long']>;
 };
 
@@ -1199,6 +1206,7 @@ export type PurchaseQueue = {
   productId: Maybe<Scalars['Long']>;
   orderId: Maybe<Scalars['Long']>;
   attributes: Maybe<Scalars['String']>;
+  merchantId: Maybe<Scalars['Long']>;
 };
 
 export type PurchaseResponse = {
@@ -1719,6 +1727,7 @@ export type ShipQueue = {
   done: Maybe<Scalars['BigDecimal']>;
   todo: Maybe<Scalars['BigDecimal']>;
   carrier: Maybe<Scalars['String']>;
+  estimatedShipDate: Maybe<Scalars['String']>;
 };
 
 export type SortQueue = {
@@ -1968,7 +1977,7 @@ export type OrderAQuery = (
       & Pick<Address, 'firstName' | 'lastName' | 'line1' | 'line2' | 'city' | 'mobile'>
     ), orderItems: Maybe<Array<Maybe<(
       { __typename?: 'OrderItem' }
-      & Pick<OrderItem, 'id' | 'sequence' | 'productId' | 'productSku' | 'productUrl' | 'productName' | 'price' | 'quantity' | 'image' | 'lineTotal' | 'po'>
+      & Pick<OrderItem, 'id' | 'sequence' | 'productId' | 'productSku' | 'productUrl' | 'productName' | 'productMerchantId' | 'price' | 'quantity' | 'image' | 'lineTotal' | 'po'>
     )>>>, payments: Maybe<Array<Maybe<(
       { __typename?: 'Payment' }
       & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate'>
@@ -2007,7 +2016,7 @@ export type PurchaseQueueQuery = (
   { __typename?: 'Query' }
   & { purchaseQueue: Maybe<Array<Maybe<(
     { __typename?: 'PurchaseQueue' }
-    & Pick<PurchaseQueue, 'id' | 'productName' | 'quantity' | 'price' | 'image' | 'sku' | 'cost' | 'orderId' | 'productId' | 'attributes' | 'url'>
+    & Pick<PurchaseQueue, 'id' | 'productName' | 'quantity' | 'price' | 'image' | 'sku' | 'cost' | 'orderId' | 'productId' | 'attributes' | 'merchantId' | 'url'>
   )>>> }
 );
 
@@ -2034,6 +2043,20 @@ export type SetAccountingCodeMutationVariables = {
 export type SetAccountingCodeMutation = (
   { __typename?: 'Mutation' }
   & { setAccountingCode: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
+export type SetEstimatedShipDateMutationVariables = {
+  id: Maybe<Scalars['Long']>;
+  date: Maybe<Scalars['Date']>;
+};
+
+
+export type SetEstimatedShipDateMutation = (
+  { __typename?: 'Mutation' }
+  & { setEstimatedShipDate: Maybe<(
     { __typename?: 'Message' }
     & Pick<Message, 'value'>
   )> }
@@ -2831,6 +2854,7 @@ export const OrderADocument = gql`
       productSku
       productUrl
       productName
+      productMerchantId
       price
       quantity
       image
@@ -2985,6 +3009,7 @@ export const PurchaseQueueDocument = gql`
     orderId
     productId
     attributes
+    merchantId
     url
   }
 }
@@ -3137,6 +3162,58 @@ export function useSetAccountingCodeMutation(baseOptions?: ApolloReactHooks.Muta
 export type SetAccountingCodeMutationHookResult = ReturnType<typeof useSetAccountingCodeMutation>;
 export type SetAccountingCodeMutationResult = ApolloReactCommon.MutationResult<SetAccountingCodeMutation>;
 export type SetAccountingCodeMutationOptions = ApolloReactCommon.BaseMutationOptions<SetAccountingCodeMutation, SetAccountingCodeMutationVariables>;
+export const SetEstimatedShipDateDocument = gql`
+    mutation setEstimatedShipDate($id: Long, $date: Date) {
+  setEstimatedShipDate(id: $id, date: $date) {
+    value
+  }
+}
+    `;
+export type SetEstimatedShipDateMutationFn = ApolloReactCommon.MutationFunction<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>;
+export type SetEstimatedShipDateComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>, 'mutation'>;
+
+    export const SetEstimatedShipDateComponent = (props: SetEstimatedShipDateComponentProps) => (
+      <ApolloReactComponents.Mutation<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables> mutation={SetEstimatedShipDateDocument} {...props} />
+    );
+    
+export type SetEstimatedShipDateProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>
+    } & TChildProps;
+export function withSetEstimatedShipDate<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SetEstimatedShipDateMutation,
+  SetEstimatedShipDateMutationVariables,
+  SetEstimatedShipDateProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables, SetEstimatedShipDateProps<TChildProps, TDataName>>(SetEstimatedShipDateDocument, {
+      alias: 'setEstimatedShipDate',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSetEstimatedShipDateMutation__
+ *
+ * To run a mutation, you first call `useSetEstimatedShipDateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetEstimatedShipDateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setEstimatedShipDateMutation, { data, loading, error }] = useSetEstimatedShipDateMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      date: // value for 'date'
+ *   },
+ * });
+ */
+export function useSetEstimatedShipDateMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>) {
+        return ApolloReactHooks.useMutation<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>(SetEstimatedShipDateDocument, baseOptions);
+      }
+export type SetEstimatedShipDateMutationHookResult = ReturnType<typeof useSetEstimatedShipDateMutation>;
+export type SetEstimatedShipDateMutationResult = ApolloReactCommon.MutationResult<SetEstimatedShipDateMutation>;
+export type SetEstimatedShipDateMutationOptions = ApolloReactCommon.BaseMutationOptions<SetEstimatedShipDateMutation, SetEstimatedShipDateMutationVariables>;
 export const SetSettlementDateDocument = gql`
     mutation setSettlementDate($paymentIds: [Long], $date: Date) {
   setSettlementDate(paymentIds: $paymentIds, date: $date) {
