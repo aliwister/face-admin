@@ -18,7 +18,7 @@ export const MerchantURL = ({merchantId, sku, url, name}) => {
           {name}
         </a>
         :
-        <span>{buildUrl()?<a href={buildUrl()}>{name}</a>:<span>name</span>}</span>
+        <span>{buildUrl()?<a href={buildUrl()} target="_blank">{name}</a>:<span>name</span>}</span>
       }
     </>
   )
