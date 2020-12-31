@@ -6,7 +6,7 @@ export const MerchantURL = ({merchantId, sku, url, name}) => {
     if (merchantId == 1)
       return `https://www.amazon.com/dp/${sku}`;
     if (merchantId == 2)
-      return `https://www.amazon.com/dp/${sku}`;
+      return `https://www.ebay.com/itm/${sku}`;
     if (merchantId == 5)
       return `https://www.amazon.co.uk/dp/${sku}`;
   }
