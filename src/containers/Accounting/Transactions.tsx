@@ -404,7 +404,7 @@ export default function Transactions() {
                     <TableCell component="th" scope="row">
                       {row.id}
                     </TableCell>
-                    <TableCell align="left"><Link to={`order-details/${row.orderReference}`}>{row.orderReference}</Link></TableCell>
+                    <TableCell align="left"><Link to={`order-details/${row.orderReference}`} target={"_blank"}>{row.orderReference}</Link></TableCell>
                     <TableCell align="left"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                     <TableCell align="left">{row.amount}</TableCell>
                     <TableCell align="left">{row.paymentMethod}</TableCell>
