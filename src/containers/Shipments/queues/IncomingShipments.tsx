@@ -38,7 +38,11 @@ export function IncomingShipments({data}) {
           {
             Header: 'Arrived Pkgs',
             accessor: 'arrivedPkgs',
-          }
+          },
+          {
+            Header: 'Status',
+            accessor: 'status',
+          },
         ],
       },
     ],

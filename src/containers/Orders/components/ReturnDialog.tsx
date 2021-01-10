@@ -53,7 +53,8 @@ export const ReturnDialog = ({open, orderItems, onSubmit, onClose}) => {
           register={register}
           control={control}
         /></div>
-
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="Ticket URL" name="ticketUrl"
+                   inputRef={register()} /></div>
         <div><input type="checkbox" name="onUs" ref={register} />Our responsibility</div>
         <div><input type="checkbox" name="replacement" ref={register} />Request replacement</div>
         <div><input type="checkbox" name="toVendor" ref={register} />Direct customer to vendor return</div>

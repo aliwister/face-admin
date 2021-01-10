@@ -1,14 +1,17 @@
 import {flowAPI} from "../../api/config";
 import React, {useEffect, useState} from "react";
 import Loader from "../../components/Loader/Loader";
-import {DialogContent, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
-import {ActionReasonDialog} from "../Orders/components/ActionReasonDialog";
+import {Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 import {ActionDialog} from "./components/ActionDialog";
 import Button from "../../components/Button/Button";
+import ExpansionPanel from "@material-ui/core/ExpansionPanel";
+import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
+import Typography from "@material-ui/core/Typography";
+import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import {AssignDialog} from "./components/AssignDialog";
 
 const returnFlowState = (data) => (
     <table>
-
         {
           Object.keys(data).map((key: string) => (
             <tr>
@@ -17,10 +20,8 @@ const returnFlowState = (data) => (
             </tr>
           ))
         }
-
     </table>
 );
-
 
 export const Actions = ({type}) => {
   const [loading, setLoading] = useState(true);
@@ -28,32 +29,39 @@ export const Actions = ({type}) => {
   const [active, setActive] = useState(null);
 
   const [actionDialog, setAction] = useState(false);
+  const [assignDialog, setAssign] = useState(false);
+
 
   useEffect(() => {
     flowAPI.get("/workflow-instance", {params: {type: type, include: "currentStateVariables"}}).then(res => {
       setLoading(false);
       setTickets(res.data);
     });
-  }, []);
+  }, [!active]);
 
   if(loading)
     return <Loader/>;
-
 
   const onActionStart = (id) => {
     setActive(id);
     setAction(true);
   }
 
+  const onAssignStart = (id) => {
+    setActive(id);
+    setAssign(true);
+  }
+
   const onClose = () => {
     setAction(false);
-    }
+    setAssign(false);
+    setActive(null);
+  }
 
-
-  ;
   return(
     <>
-      {actionDialog && <ActionDialog item={active.id} open={actionDialog} onClose={onClose} state={active.state} type={active.type}/>}
+      {actionDialog && <ActionDialog item={active.id} open={actionDialog} onClose={onClose} step={active.state} type={active.type}/>}
+      {assignDialog && <AssignDialog item={active.id} open={assignDialog} onClose={onClose} step={active.state} type={active.type} state={active.stateVariables.requestData}/>}
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
@@ -86,10 +94,20 @@ export const Actions = ({type}) => {
                 {row.created}
               </TableCell>
               <TableCell component="th" scope="row">
-                {returnFlowState(row.stateVariables.requestData)}
+                <ExpansionPanel>
+                  <ExpansionPanelSummary>
+                    <Typography>Details</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    {returnFlowState(row.stateVariables.requestData)}
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
               </TableCell>
               <TableCell component="th" scope="row" align="right">
                 <Button onClick={() => onActionStart(row)}>Action</Button>
+              </TableCell>
+              <TableCell component="th" scope="row" align="right">
+                <Button onClick={() => onAssignStart(row)}>Assign</Button>
               </TableCell>
             </TableRow>
           ))}

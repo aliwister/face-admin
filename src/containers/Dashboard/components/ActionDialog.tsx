@@ -7,14 +7,18 @@ import {Controller, useForm} from "react-hook-form";
 import {flowAPI} from "../../../api/config";
 import Select from "react-select";
 import { useAlert } from "react-alert";
+import {LabelForm} from "./LabelForm";
 
-export const ActionDialog = ({item, open, onClose, state, type}) => {
+export const ActionDialog = ({item, open, onClose, step, type}) => {
   const { register, handleSubmit, control, errors } = useForm({
     defaultValues: {
       id: item
     }
   });
   const [loading, setLoading] = useState(true);
+
+
+
   const [transitions, setTransitions] = useState([]);
   const alert = useAlert();
   useEffect(() => {
@@ -24,7 +28,7 @@ export const ActionDialog = ({item, open, onClose, state, type}) => {
 /*      console.log(state);
       console.log(res.data[0].states.filter((el) => el.id == state));
       console.log(res.data[0].states.filter((el) => el.id == state)[0]);*/
-      res.data[0].states.filter((el) => el.id == state)[0].transitions.map((x) => {
+      res.data[0].states.filter((el) => el.id == step)[0].transitions.map((x) => {
           options.push({value: x, label: x});
         }
       );
@@ -33,25 +37,40 @@ export const ActionDialog = ({item, open, onClose, state, type}) => {
   }, []);
 
   const onSubmitDialog = (formData) => {
-      let testData = {
-        "state": formData.state.value,
-        "nextActivationTime": new Date(),
-        "stateVariables": {"comments": formData.comments}
-      };
-      flowAPI.put(`/workflow-instance/id/${formData.id}`, testData)
-        .then(res => {
-          alert.success(res.statusText);
-        });
+    let testData = {
+      "state": formData.state.value,
+      "nextActivationTime": new Date(),
+      "actionDescription": formData.comments,
+      "stateVariables": {
+        "label": {}
+      }
+    };
+    if(step === "generateLabels") {
+      testData.stateVariables = {
+        ...testData.stateVariables,
+        "label": {
+          trackingNum: formData.comments,
+          shippingCompany: formData.shipmentMethod
+        }
+      }
+    }
+    flowAPI.put(`/workflow-instance/id/${item}`, testData)
+      .then(res => {
+        alert.success(res.statusText);
+        onClose();
+
+      });
 
   }
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
+      {step}
       <form onSubmit={handleSubmit(onSubmitDialog)}>
-        <DialogTitle id="form-dialog-title">Accept Item</DialogTitle>
-        <DialogContent>
+        <DialogTitle id="form-dialog-title">Take Action</DialogTitle>
+        <DialogContent style={{height: "250px", width: "250px"}}>
           <DialogContentText>
-            Package Info
+            Action
           </DialogContentText>
           <div>   {transitions &&       <Controller
             as={<Select options={transitions}/>}
@@ -60,9 +79,15 @@ export const ActionDialog = ({item, open, onClose, state, type}) => {
             register={register}
             control={control}
           />}</div>
-          <div><TextField variant="outlined" fullWidth type="text" placeholder="ID" name="id"
-                          inputRef={register()} /></div>
+{/*          <div><TextField variant="outlined" fullWidth type="text" placeholder="ID" name="id"
+                          inputRef={register()} /></div>*/}
+
+          {step === "generateLabels" && <LabelForm register={register} control={control} />}
+
+
           <div><TextField fullWidth placeholder="Comments" name="comments" inputRef={register({required: true})} /></div>
+
+
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

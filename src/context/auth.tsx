@@ -9,6 +9,7 @@ type AuthProps = {
   authenticate: Function;
   signout: Function;
   token: String;
+  username: String;
 };
 
 export const AuthContext = React.createContext({} as AuthProps);
@@ -59,12 +60,21 @@ const isValidFinance = () => {
   return false;
 };
 
+const getUsername = () => {
+    const token = Cookies.get('username');
+    if(token && token.indexOf("@") > -1) {
+        return token;
+    }
+    return false;
+};
+
 const AuthProvider = (props: any) => {
   const [isAuthenticated, makeAuthenticated] = React.useState(isValidToken());
   const [isAdmin, makeAdmin] = React.useState(isValidAdmin());
   const [isMerchant, makeMerchant] = React.useState(isValidMerchant());
   const [isFinance, makeFinance] = React.useState(isValidFinance());
   const [token, setToken] = React.useState("");
+  const [username, setUsername] = React.useState(getUsername());
 
   async function authenticate({username, password}, cb) {
       return badalsAPI.post(`/authenticate`, {"username": username, "password": password, "rememberMe": true})
@@ -76,7 +86,9 @@ const AuthProvider = (props: any) => {
               setToken(res.data.id_token);
               Cookies.set('token', res.data.id_token, {expires: 1});
               Cookies.set('authorities', res.data.authorities, {expires: 1});
+              Cookies.set('username', username, {expires: 1});
               makeAuthenticated(true);
+              setUsername(username);
           });
   }
   function signout(cb) {
@@ -100,7 +112,8 @@ const AuthProvider = (props: any) => {
         isFinance,
         authenticate,
         signout,
-        token
+        token,
+        username
       }}
     >
       <>{props.children}</>

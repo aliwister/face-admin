@@ -225,7 +225,9 @@ export default function OrderDetails(props) {
             productName: a.productName,
             productId: a.productId,
             sku: a.productSku,
-            quantity: a.quantity
+            quantity: a.quantity,
+            ticketUrl: formData.ticketUrl,
+            po: a.po
           }
         }
       };
@@ -322,7 +324,6 @@ export default function OrderDetails(props) {
     }
   }
 
-
   if (error) {
     return <div>Error! {error.message}</div>;
   }
@@ -330,7 +331,6 @@ export default function OrderDetails(props) {
     return <div>Loading </div>
 
   function handleCheckbox(event) {
-
     let value = event.target.value;
     console.log('handleCheckbox',value)
     if (!checkedId.includes(value)) {
@@ -339,6 +339,7 @@ export default function OrderDetails(props) {
       setCheckedId(prevState => prevState.filter(id => id !== value));
     }
   }
+
   const onEditStart = () => setEditdialog(true);
   const onReturnStart = () => setReturndialog(true);
   const onCancelStart = () => setCanceldialog(true);
@@ -476,7 +477,6 @@ export default function OrderDetails(props) {
                 <Button onClick={onCancelStart} color="secondary">Cancel Order</Button>
                 <Button onClick={onCloseStart}>Close</Button>
               </ButtonGroup>
-
             </div>
           </Paper>
         </Col>
@@ -502,7 +502,6 @@ export default function OrderDetails(props) {
                   {orderData.orderA.orderItems.map(row => (
                     <TableRow key={row.sequence}>
                       <TableCell align="left">
-
                         <Checkbox
                           name={row.id}
                           checked={checkedId.includes(row.id)}
@@ -519,19 +518,16 @@ export default function OrderDetails(props) {
                         <MerchantURL merchantId={row.productMerchantId} sku={row.productSku} url={row.productUrl} name={row.productName}/>
                       </TableCell>
                       <TableCell align="center">{row.quantity}</TableCell>
-
                       <TableCell align="center">{row.price}</TableCell>
                       <TableCell align="right">OMR {row.lineTotal}</TableCell>
                       <TableCell align="right">
                         {row.po &&
                         <Link to={`/purchase-details/${row.po}`}>{row.po}</Link>
                         }
-
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-
               )}
               <TableFooter>
                 <Button onClick={sendVoltageEmail}>Send Voltage Email</Button>
