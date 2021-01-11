@@ -10,6 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {AssignDialog} from "./components/AssignDialog";
 import {Tracking} from "../../components/Tracking/Tracking";
+import {Link} from "react-router-dom";
 
 const returnFlowState = (data) => (
     <table>
@@ -38,8 +39,8 @@ const returnReplacementOrderState = (data) => (
     <table>
 
             <tr>
-              <td>Track</td>
-              <td><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></td>
+              <td>Replacement Order</td>
+              <td><Link to={`${data.ref}`}> {data.ref} </Link></td>
             </tr>
 
     </table>
