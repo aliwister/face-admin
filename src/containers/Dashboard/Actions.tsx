@@ -9,6 +9,7 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {AssignDialog} from "./components/AssignDialog";
+import {Tracking} from "../../components/Tracking/Tracking";
 
 const returnFlowState = (data) => (
     <table>
@@ -20,6 +21,27 @@ const returnFlowState = (data) => (
             </tr>
           ))
         }
+    </table>
+);
+const returnLabelState = (data) => (
+    <table>
+
+            <tr>
+              <td>Track</td>
+              <td><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></td>
+            </tr>
+
+    </table>
+);
+
+const returnReplacementOrderState = (data) => (
+    <table>
+
+            <tr>
+              <td>Track</td>
+              <td><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></td>
+            </tr>
+
     </table>
 );
 
@@ -102,6 +124,24 @@ export const Actions = ({type}) => {
                     {returnFlowState(row.stateVariables.requestData)}
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
+                {row.stateVariables.label && Object.keys(row.stateVariables.label).length && returnLabelState(row.stateVariables.label) &&
+                <ExpansionPanel>
+                  <ExpansionPanelSummary>
+                    <Typography>Shipping Info</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    {returnLabelState(row.stateVariables.label)}
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>}
+                {row.stateVariables.replacement && Object.keys(row.stateVariables.replacement).length &&
+                <ExpansionPanel>
+                  <ExpansionPanelSummary>
+                    <Typography>Replacement Order </Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    {returnReplacementOrderState(row.stateVariables.replacement)}
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>}
               </TableCell>
               <TableCell component="th" scope="row" align="right">
                 <Button onClick={() => onActionStart(row)}>Action</Button>

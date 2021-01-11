@@ -42,15 +42,24 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
       "nextActivationTime": new Date(),
       "actionDescription": formData.comments,
       "stateVariables": {
-        "label": {}
+        "label": {},
+        "replacement": {}
       }
     };
     if(step === "generateLabels") {
       testData.stateVariables = {
         ...testData.stateVariables,
         "label": {
-          trackingNum: formData.comments,
-          shippingCompany: formData.shipmentMethod
+          trackingNum: formData.trackingNum,
+          carrier: formData.shipmentMethod.value,
+        }
+      }
+    }
+    if(step === "createReplacementOrder") {
+      testData.stateVariables = {
+        ...testData.stateVariables,
+        "replacement": {
+          ref: formData.replacementOrderNum
         }
       }
     }
@@ -83,6 +92,7 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
                           inputRef={register()} /></div>*/}
 
           {step === "generateLabels" && <LabelForm register={register} control={control} />}
+          {step === "createReplacementOrder" && <LabelForm register={register} control={control} />}
 
 
           <div><TextField fullWidth placeholder="Comments" name="comments" inputRef={register({required: true})} /></div>

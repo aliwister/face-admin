@@ -73,6 +73,7 @@ export const ReturnDialog = ({open, orderItems, onSubmit, onClose}) => {
             <TableCell align="left">SKU</TableCell>
             <TableCell align="left">Quantity</TableCell>
             <TableCell align="right">Price</TableCell>
+            <TableCell align="right">PO</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -102,7 +103,12 @@ export const ReturnDialog = ({open, orderItems, onSubmit, onClose}) => {
 
                 <TableCell align="center">
                   <TextField inputProps={{step: 0.1}} type="number" placeholder="Price" name={`orderItems[${i}].price`} inputRef={register} defaultValue={row.price} disabled={true}/>
+
                 </TableCell>
+                <TableCell align="center">
+                  <TextField name={`orderItems[${i}].po`} inputRef={register} defaultValue={row.po} disabled={true}/>
+                </TableCell>
+
 
               </TableRow>
             ))}

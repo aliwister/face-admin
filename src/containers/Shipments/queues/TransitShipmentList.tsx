@@ -51,7 +51,7 @@ export function TransitShipmentList({data, refetch}) {
           },
           {
             Header: 'Tracking',
-            accessor: (row) => (<Tracking trackingNum={row.trackingNum} label ={row.trackingNum} />)
+            accessor: (row) => (<Tracking trackingNum={row.trackingNum} label ={row.trackingNum}  carrier={row.shipmentMethod}/>)
           },
           {
             Header: 'Name',

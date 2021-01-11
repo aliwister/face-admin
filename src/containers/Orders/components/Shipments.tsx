@@ -53,7 +53,7 @@ export const Shipments = ({shipments, onGetAdminFile}) =>{
                 <Link to={`/shipment-details/${s.id}/EDIT`}>{s.id}</Link><br/>
               </Typography>
               <Typography className={classes.heading}>
-                <Tracking trackingNum = {s.shipment.trackingNum} label = {`Track ${s.shipment.carrier} ${s.shipment.trackingNum}`} />
+                <Tracking trackingNum = {s.shipment.trackingNum} label = {`Track ${s.shipment.carrier} ${s.shipment.trackingNum}`} carrier={s.shipment.carrier} />
 
               </Typography>
               <Typography variant="h4">

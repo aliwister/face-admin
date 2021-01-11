@@ -211,6 +211,7 @@ export default function OrderDetails(props) {
       let testData = {
         "type": "returnWorkflow",
         "externalId": externalId,
+        "businessKey": slug,
         "activate": true,
         "stateVariables": {
           "orderId":slug,
