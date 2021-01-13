@@ -38,6 +38,9 @@ const Dashboard = () => (
     <Row>
       <Actions type={"returnWorkflow"}/>
     </Row>
+    <Row>
+      <Actions type={"refundWorkflow"}/>
+    </Row>
 {/*    <Row>
       <Col md={5} lg={4} sm={6}>
         <RadialBarChart

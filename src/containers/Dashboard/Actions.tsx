@@ -31,6 +31,18 @@ const returnLabelState = (data) => (
               <td>Track</td>
               <td><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></td>
             </tr>
+      {data.labelFile && <tr>
+        <td>labelFile</td>
+        <td>{data.labelFile}</td>
+      </tr>}
+      {data.weight && <tr>
+        <td>weight</td>
+        <td>{data.weight}</td>
+      </tr>}
+      {data.returnFee && <tr>
+        <td>returnFee</td>
+        <td>{data.returnFee}</td>
+      </tr>}
 
     </table>
 );
@@ -40,7 +52,7 @@ const returnReplacementOrderState = (data) => (
 
             <tr>
               <td>Replacement Order</td>
-              <td><Link to={`${data.ref}`}> {data.ref} </Link></td>
+              <td><Link to={`order-details/${data.ref}`}> {data.ref} </Link></td>
             </tr>
 
     </table>
@@ -91,6 +103,7 @@ export const Actions = ({type}) => {
             <TableCell>#</TableCell>
             <TableCell>Type</TableCell>
             <TableCell>State</TableCell>
+            <TableCell>Bus Key</TableCell>
             <TableCell>External ID</TableCell>
             <TableCell>Created</TableCell>
             <TableCell>State Vars</TableCell>
@@ -109,6 +122,9 @@ export const Actions = ({type}) => {
               </TableCell>
               <TableCell component="th" scope="row">
                 {row.state}
+              </TableCell>
+              <TableCell component="th" scope="row">
+                {row.businessKey}
               </TableCell>
               <TableCell component="th" scope="row">
                 {row.externalId}

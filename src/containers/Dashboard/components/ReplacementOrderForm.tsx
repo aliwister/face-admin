@@ -9,7 +9,7 @@ import Select from "react-select";
 import { useAlert } from "react-alert";
 import {SHIPMENT_METHODS} from "../../Shipments/components/Constants";
 
-export const LabelForm = ({register, control}) =>  (
+export const ReplacementOrderForm = ({register, control}) =>  (
 <>
           <div>
             <TextField variant="outlined" fullWidth type="text" placeholder="Replacement Order #" name="replacementOrderNum"

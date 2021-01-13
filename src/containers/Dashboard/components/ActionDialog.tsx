@@ -8,6 +8,7 @@ import {flowAPI} from "../../../api/config";
 import Select from "react-select";
 import { useAlert } from "react-alert";
 import {LabelForm} from "./LabelForm";
+import {ReplacementOrderForm} from "./ReplacementOrderForm";
 
 export const ActionDialog = ({item, open, onClose, step, type}) => {
   const { register, handleSubmit, control, errors } = useForm({
@@ -40,23 +41,26 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
     let testData = {
       "state": formData.state.value,
       "nextActivationTime": new Date(),
-      "actionDescription": formData.comments,
-      "stateVariables": {
-        "label": {},
-        "replacement": {}
-      }
+      "actionDescription": formData.comments
     };
     if(step === "generateLabels") {
+      // @ts-ignore
       testData.stateVariables = {
+        // @ts-ignore
         ...testData.stateVariables,
         "label": {
           trackingNum: formData.trackingNum,
-          carrier: formData.shipmentMethod.value,
+          carrier: formData.carrier.value,
+          labelFile: formData.labelFile,
+          weight: formData.weight,
+          returnFee: formData.returnFee,
         }
       }
     }
     if(step === "createReplacementOrder") {
+      // @ts-ignore
       testData.stateVariables = {
+        // @ts-ignore
         ...testData.stateVariables,
         "replacement": {
           ref: formData.replacementOrderNum
@@ -92,7 +96,7 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
                           inputRef={register()} /></div>*/}
 
           {step === "generateLabels" && <LabelForm register={register} control={control} />}
-          {step === "createReplacementOrder" && <LabelForm register={register} control={control} />}
+          {step === "createReplacementOrder" && <ReplacementOrderForm register={register} control={control} />}
 
 
           <div><TextField fullWidth placeholder="Comments" name="comments" inputRef={register({required: true})} /></div>

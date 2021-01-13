@@ -18,11 +18,20 @@ export const LabelForm = ({register, control}) =>  (
             <Controller
               as={<Select options={SHIPMENT_METHODS}/>}
               rules={{ required: true }}
-              name="shipmentMethod"
+              name="carrier"
               register={register}
               control={control}
 
             /></div>
-
+  <div>
+    <TextField variant="outlined" fullWidth type="text" placeholder="Label File" name="labelFile"
+               inputRef={register()} /></div>
+  <div><input type="checkbox" name="ourLabel" ref={register} />Our Label?</div>
+  <div>
+    <TextField variant="outlined" fullWidth type="text" placeholder="Weight (KG)" name="weight"
+               inputRef={register()} /></div>
+  <div>
+    <TextField variant="outlined" fullWidth type="text" placeholder="Return Fee (OMR)" name="returnFee"
+               inputRef={register()} /></div>
 </>
   )
