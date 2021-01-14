@@ -48,6 +48,7 @@ import {DiscountDialog} from "./components/DiscountDialog";
 import {EditOrderDialog} from "./components/EditOrderDialog";
 import {ReturnDialog} from "./components/ReturnDialog";
 import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
+import AuditHistory from "./AuditHistory";
 
 
 
@@ -216,7 +217,6 @@ export default function OrderDetails(props) {
         "stateVariables": {
           "orderId":slug,
           "requestData": {
-            orderId:slug,
             reason: formData.reason.value,
             instructions: formData.instructions,
             onUs: formData.onUs,
@@ -467,7 +467,6 @@ export default function OrderDetails(props) {
       <Row>
         <Col lg={12} sm={12} xs={12} className='mb-30'>
           <Paper>
-            <Typography variant="caption">Payment</Typography>
             <div>
               <ButtonGroup size="large" variant="contained" color="primary" aria-label="large outlined primary button group">
                 <Button onClick={onSendSms} disabled={!contactbutton}>Send Payment SMS</Button>
@@ -536,6 +535,11 @@ export default function OrderDetails(props) {
             </Table>
           </TableContainer>
 
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          {orderData.orderA && <AuditHistory id={orderData.orderA.id}/>}
         </Col>
       </Row>
       <Row>

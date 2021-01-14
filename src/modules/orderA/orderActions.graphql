@@ -1,0 +1,12 @@
+  query orderActions($orderId: ID) {
+    orderActions(orderId: $orderId) {
+      id
+      action
+      object
+      objectId
+      state
+      comment
+      createdDate
+      createdBy
+    }
+  }

@@ -22,6 +22,18 @@ export type Scalars = {
   LocalDateTime: any;
 };
 
+export type Action = {
+   __typename?: 'Action';
+  id: Maybe<Scalars['Long']>;
+  action: Maybe<Scalars['String']>;
+  object: Maybe<Scalars['String']>;
+  objectId: Maybe<Scalars['String']>;
+  state: Maybe<Scalars['String']>;
+  comment: Maybe<Scalars['String']>;
+  createdDate: Maybe<Scalars['Date']>;
+  createdBy: Maybe<Scalars['String']>;
+};
+
 export type AddProductInput = {
   id: Maybe<Scalars['Long']>;
   sku: Maybe<Scalars['String']>;
@@ -1253,6 +1265,7 @@ export type Query = {
   merchants: Maybe<Array<Maybe<Merchant>>>;
   mws: Maybe<Product>;
   orderA: Maybe<Order>;
+  orderActions: Maybe<Array<Maybe<Action>>>;
   /** getOrders(): [Orders] */
   orderConfirmation: Maybe<Order>;
   orders: Maybe<Array<Maybe<Order>>>;
@@ -1375,6 +1388,11 @@ export type QueryMwsArgs = {
 
 export type QueryOrderAArgs = {
   id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryOrderActionsArgs = {
+  orderId: Maybe<Scalars['ID']>;
 };
 
 
@@ -1649,7 +1667,7 @@ export type ShipmentItemSummary = {
    __typename?: 'ShipmentItemSummary';
   id: Maybe<Scalars['Int']>;
   trackingNum: Maybe<Scalars['String']>;
-  total: Maybe<Scalars['Long']>;
+  total: Maybe<Scalars['BigDecimal']>;
   status: Maybe<Scalars['String']>;
   processed: Maybe<Scalars['Long']>;
   reference: Maybe<Scalars['String']>;
@@ -1983,6 +2001,19 @@ export type OrderAQuery = (
       & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate'>
     )>>> }
   )> }
+);
+
+export type OrderActionsQueryVariables = {
+  orderId: Maybe<Scalars['ID']>;
+};
+
+
+export type OrderActionsQuery = (
+  { __typename?: 'Query' }
+  & { orderActions: Maybe<Array<Maybe<(
+    { __typename?: 'Action' }
+    & Pick<Action, 'id' | 'action' | 'object' | 'objectId' | 'state' | 'comment' | 'createdDate' | 'createdBy'>
+  )>>> }
 );
 
 export type PurchaseQueryVariables = {
@@ -2920,6 +2951,65 @@ export function useOrderALazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookO
 export type OrderAQueryHookResult = ReturnType<typeof useOrderAQuery>;
 export type OrderALazyQueryHookResult = ReturnType<typeof useOrderALazyQuery>;
 export type OrderAQueryResult = ApolloReactCommon.QueryResult<OrderAQuery, OrderAQueryVariables>;
+export const OrderActionsDocument = gql`
+    query orderActions($orderId: ID) {
+  orderActions(orderId: $orderId) {
+    id
+    action
+    object
+    objectId
+    state
+    comment
+    createdDate
+    createdBy
+  }
+}
+    `;
+export type OrderActionsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<OrderActionsQuery, OrderActionsQueryVariables>, 'query'>;
+
+    export const OrderActionsComponent = (props: OrderActionsComponentProps) => (
+      <ApolloReactComponents.Query<OrderActionsQuery, OrderActionsQueryVariables> query={OrderActionsDocument} {...props} />
+    );
+    
+export type OrderActionsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<OrderActionsQuery, OrderActionsQueryVariables>
+    } & TChildProps;
+export function withOrderActions<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  OrderActionsQuery,
+  OrderActionsQueryVariables,
+  OrderActionsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, OrderActionsQuery, OrderActionsQueryVariables, OrderActionsProps<TChildProps, TDataName>>(OrderActionsDocument, {
+      alias: 'orderActions',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useOrderActionsQuery__
+ *
+ * To run a query within a React component, call `useOrderActionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderActionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderActionsQuery({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderActionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OrderActionsQuery, OrderActionsQueryVariables>) {
+        return ApolloReactHooks.useQuery<OrderActionsQuery, OrderActionsQueryVariables>(OrderActionsDocument, baseOptions);
+      }
+export function useOrderActionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OrderActionsQuery, OrderActionsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<OrderActionsQuery, OrderActionsQueryVariables>(OrderActionsDocument, baseOptions);
+        }
+export type OrderActionsQueryHookResult = ReturnType<typeof useOrderActionsQuery>;
+export type OrderActionsLazyQueryHookResult = ReturnType<typeof useOrderActionsLazyQuery>;
+export type OrderActionsQueryResult = ApolloReactCommon.QueryResult<OrderActionsQuery, OrderActionsQueryVariables>;
 export const PurchaseDocument = gql`
     query purchase($id: ID) {
   purchase(id: $id) {

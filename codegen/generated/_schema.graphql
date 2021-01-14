@@ -1,3 +1,14 @@
+type Action {
+  id: Long
+  action: String
+  object: String
+  objectId: String
+  state: String
+  comment: String
+  createdDate: Date
+  createdBy: String
+}
+
 input AddProductInput {
   id: Long
   sku: String
@@ -813,6 +824,7 @@ type Query {
   merchants: [Merchant]
   mws(sku: String): Product
   orderA(id: ID): Order
+  orderActions(orderId: ID): [Action]
 
   """getOrders(): [Orders]"""
   orderConfirmation(ref: String, key: String): Order
@@ -944,7 +956,7 @@ input ShipmentItemInput {
 type ShipmentItemSummary {
   id: Int
   trackingNum: String
-  total: Long
+  total: BigDecimal
   status: String
   processed: Long
   reference: String
