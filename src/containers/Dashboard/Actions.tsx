@@ -11,6 +11,7 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import {AssignDialog} from "./components/AssignDialog";
 import {Tracking} from "../../components/Tracking/Tracking";
 import {Link} from "react-router-dom";
+import Chip from "@material-ui/core/Chip";
 
 const returnFlowState = (data) => (
     <table>
@@ -52,7 +53,7 @@ const returnReplacementOrderState = (data) => (
 
             <tr>
               <td>Replacement Order</td>
-              <td><Link to={`order-details/${data.ref}`}> {data.ref} </Link></td>
+              <td><Link to={`order-details/${data.ref}`} target="_blank"> {data.ref} </Link></td>
             </tr>
 
     </table>
@@ -121,10 +122,10 @@ export const Actions = ({type}) => {
                 {row.type}
               </TableCell>
               <TableCell component="th" scope="row">
-                {row.state}
+                <Chip label={row.state} color="primary"/>
               </TableCell>
               <TableCell component="th" scope="row">
-                {row.businessKey}
+                <Link to={`order-details/${row.businessKey}`} target="_blank"> {row.businessKey} </Link>
               </TableCell>
               <TableCell component="th" scope="row">
                 {row.externalId}
