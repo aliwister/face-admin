@@ -16,7 +16,7 @@ import Chip from "@material-ui/core/Chip";
 
 const summarize = (data, type) => {
   if(type==="returnWorkflow")
-    return <><Chip label={data.reason} color="secondary"/> {data.quantity}x {data.productName.substr(0,40)} </>;
+    return <><Chip label={data.reason} color="secondary"/> {data.quantity}x {data.productName.substr(0,25)} </>;
   if(type==="refundWorkflow")
     return <>Details</>;
 }
@@ -27,7 +27,9 @@ const returnFlowState = (data) => (
           Object.keys(data).map((key: string) => (
             <tr>
               <td>{key}</td>
-              <td>{typeof data[key] === "boolean"? (data[key])?"True":"False":data[key]}</td>
+              {typeof data[key] === "string" && data[key].startsWith("http")?
+                <td><a href ={data[key]} target="_blank">{data[key]}</a></td>:
+              <td>{typeof data[key] === "boolean"? (data[key])?"True":"False":data[key]}</td>}
             </tr>
           ))
         }
