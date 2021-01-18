@@ -33,13 +33,11 @@ const returnFlowState = (data) => (
         }
     </table>
 );
-const returnLabelState = (data) => (
+const returnLabelSummaryState = (data) => (
+  <><Chip label={data.carrier} /><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></>
+);
+const returnLabelDetailsState = (data) => (
     <table>
-
-            <tr>
-              <td>Track</td>
-              <td><Tracking trackingNum={data.trackingNum} label ={data.trackingNum} carrier={data.carrier} /></td>
-            </tr>
       {data.labelFile && <tr>
         <td>labelFile</td>
         <td>{data.labelFile}</td>
@@ -57,14 +55,7 @@ const returnLabelState = (data) => (
 );
 
 const returnReplacementOrderState = (data) => (
-    <table>
-
-            <tr>
-              <td>Replacement Order</td>
-              <td><Link to={`order-details/${data.ref}`} target="_blank"> {data.ref} </Link></td>
-            </tr>
-
-    </table>
+    <Link to={`/order-details/${data.ref}`} target="_blank"> {data.ref} </Link>
 );
 
 interface ActionsProps {
@@ -163,13 +154,13 @@ export const Actions = (props) => {
                     {returnFlowState(row.stateVariables.requestData)}
                   </ExpansionPanelDetails>
                 </ExpansionPanel>
-                {row.stateVariables.label && Object.keys(row.stateVariables.label).length && returnLabelState(row.stateVariables.label) &&
+                {row.stateVariables.label && Object.keys(row.stateVariables.label).length && returnLabelSummaryState(row.stateVariables.label) &&
                 <ExpansionPanel>
                   <ExpansionPanelSummary>
-                    <Typography>Shipping Info</Typography>
+                    <Typography>Return Info {returnLabelSummaryState(row.stateVariables.label)}</Typography>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
-                    {returnLabelState(row.stateVariables.label)}
+                    {returnLabelDetailsState(row.stateVariables.label)}
                   </ExpansionPanelDetails>
                 </ExpansionPanel>}
                 {row.stateVariables.replacement && Object.keys(row.stateVariables.replacement).length &&
