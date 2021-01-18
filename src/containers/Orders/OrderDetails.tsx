@@ -49,6 +49,7 @@ import {EditOrderDialog} from "./components/EditOrderDialog";
 import {ReturnDialog} from "./components/ReturnDialog";
 import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 import AuditHistory from "./AuditHistory";
+import {Actions} from "../Dashboard/Actions";
 
 
 
@@ -539,14 +540,20 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          {orderData.orderA && <AuditHistory id={orderData.orderA.id}/>}
+          <Shipments shipments={dShip} onGetAdminFile={onGetAdminFile}/>
         </Col>
       </Row>
       <Row>
         <Col md={12}>
-          <Shipments shipments={dShip} onGetAdminFile={onGetAdminFile}/>
+          {orderData.orderA && <Actions businessKey={orderData.orderA.reference}/>}
         </Col>
       </Row>
+      <Row>
+        <Col md={12}>
+          {orderData.orderA && <AuditHistory id={orderData.orderA.id}/>}
+        </Col>
+      </Row>
+
     </Grid>
   );
 }

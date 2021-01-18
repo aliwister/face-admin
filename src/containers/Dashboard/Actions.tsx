@@ -13,6 +13,14 @@ import {Tracking} from "../../components/Tracking/Tracking";
 import {Link} from "react-router-dom";
 import Chip from "@material-ui/core/Chip";
 
+
+const summarize = (data, type) => {
+  if(type==="returnWorkflow")
+    return <><Chip label={data.reason} color="secondary"/> {data.quantity}x {data.productName.substr(0,40)} </>;
+  if(type==="refundWorkflow")
+    return <>Details</>;
+}
+
 const returnFlowState = (data) => (
     <table>
         {
@@ -59,7 +67,13 @@ const returnReplacementOrderState = (data) => (
     </table>
 );
 
-export const Actions = ({type}) => {
+interface ActionsProps {
+  type?: string,
+  businessKey?: string
+}
+
+
+export const Actions = (props) => {
   const [loading, setLoading] = useState(true);
   const [tickets, setTickets] = useState([]);
   const [active, setActive] = useState(null);
@@ -69,7 +83,14 @@ export const Actions = ({type}) => {
 
 
   useEffect(() => {
-    flowAPI.get("/workflow-instance", {params: {type: type, include: "currentStateVariables"}}).then(res => {
+    let params = {};
+    if(props.type)
+      params['type'] = props.type;
+    if(props.businessKey)
+      params['businessKey'] = props.businessKey;
+    params['include'] = "currentStateVariables";
+
+    flowAPI.get("/workflow-instance", {params}).then(res => {
       setLoading(false);
       setTickets(res.data);
     });
@@ -105,7 +126,7 @@ export const Actions = ({type}) => {
             <TableCell>Type</TableCell>
             <TableCell>State</TableCell>
             <TableCell>Bus Key</TableCell>
-            <TableCell>External ID</TableCell>
+{/*            <TableCell>External ID</TableCell>*/}
             <TableCell>Created</TableCell>
             <TableCell>State Vars</TableCell>
             <TableCell align="right">Action</TableCell>
@@ -127,16 +148,16 @@ export const Actions = ({type}) => {
               <TableCell component="th" scope="row">
                 <Link to={`order-details/${row.businessKey}`} target="_blank"> {row.businessKey} </Link>
               </TableCell>
-              <TableCell component="th" scope="row">
+{/*              <TableCell component="th" scope="row">
                 {row.externalId}
-              </TableCell>
+              </TableCell>*/}
               <TableCell component="th" scope="row">
                 {row.created}
               </TableCell>
               <TableCell component="th" scope="row">
                 <ExpansionPanel>
                   <ExpansionPanelSummary>
-                    <Typography>Details</Typography>
+                    <Typography>{summarize(row.stateVariables.requestData, row.type)}</Typography>
                   </ExpansionPanelSummary>
                   <ExpansionPanelDetails>
                     {returnFlowState(row.stateVariables.requestData)}
@@ -154,11 +175,8 @@ export const Actions = ({type}) => {
                 {row.stateVariables.replacement && Object.keys(row.stateVariables.replacement).length &&
                 <ExpansionPanel>
                   <ExpansionPanelSummary>
-                    <Typography>Replacement Order </Typography>
+                    <Typography>Replacement Order {returnReplacementOrderState(row.stateVariables.replacement)}</Typography>
                   </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    {returnReplacementOrderState(row.stateVariables.replacement)}
-                  </ExpansionPanelDetails>
                 </ExpansionPanel>}
               </TableCell>
               <TableCell component="th" scope="row" align="right">
