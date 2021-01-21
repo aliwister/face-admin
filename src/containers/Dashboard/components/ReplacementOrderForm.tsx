@@ -11,8 +11,9 @@ import {SHIPMENT_METHODS} from "../../Shipments/components/Constants";
 
 export const ReplacementOrderForm = ({register, control}) =>  (
 <>
-          <div>
-            <TextField variant="outlined" fullWidth type="text" placeholder="Replacement Order #" name="replacementOrderNum"
-                          inputRef={register()} /></div>
+  <div>
+    <TextField variant="outlined" fullWidth type="text" placeholder="Replacement Order #" name="replacementOrderNum"
+                  inputRef={register()} />
+  </div>
 </>
   );

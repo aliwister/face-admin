@@ -1,4 +1,4 @@
-import {Dialog, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
+import {Chip, Dialog, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
@@ -9,6 +9,9 @@ import Select from "react-select";
 import { useAlert } from "react-alert";
 import {LabelForm} from "./LabelForm";
 import {ReplacementOrderForm} from "./ReplacementOrderForm";
+import {AuthContext} from "../../../context/auth";
+import {USERS_ALL} from "../../Shipments/components/Constants";
+import {ToStoreForm} from "./ToStoreForm";
 
 export const ActionDialog = ({item, open, onClose, step, type}) => {
   const { register, handleSubmit, control, errors } = useForm({
@@ -18,7 +21,7 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
   });
   const [loading, setLoading] = useState(true);
 
-
+  const { username } = React.useContext(AuthContext);
 
   const [transitions, setTransitions] = useState([]);
   const alert = useAlert();
@@ -38,10 +41,16 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
   }, []);
 
   const onSubmitDialog = (formData) => {
+    const by = USERS_ALL.find(i => i.value === username);
+    if( !by ) {
+      alert.error("Unknown User " + username + " Must add it to USERS_ALL in Constants.tsx");
+      return;
+    }
+
     let testData = {
       "state": formData.state.value,
       "nextActivationTime": new Date(),
-      "actionDescription": formData.comments
+      "actionDescription": formData.comments + " by " + by.label
     };
     if(step === "generateLabels") {
       // @ts-ignore
@@ -67,6 +76,17 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
         }
       }
     }
+    if(step === "toStore") {
+      // @ts-ignore
+      testData.stateVariables = {
+        // @ts-ignore
+        ...testData.stateVariables,
+        "toStore": {
+          receivedBy: formData.username.value,
+          date: formData.date
+        }
+      }
+    }
     flowAPI.put(`/workflow-instance/id/${item}`, testData)
       .then(res => {
         alert.success(res.statusText);
@@ -78,7 +98,7 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
 
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
-      {step}
+
       <form onSubmit={handleSubmit(onSubmitDialog)}>
         <DialogTitle id="form-dialog-title">Take Action</DialogTitle>
         <DialogContent style={{height: "250px", width: "250px"}}>
@@ -94,13 +114,10 @@ export const ActionDialog = ({item, open, onClose, step, type}) => {
           />}</div>
 {/*          <div><TextField variant="outlined" fullWidth type="text" placeholder="ID" name="id"
                           inputRef={register()} /></div>*/}
-
           {step === "generateLabels" && <LabelForm register={register} control={control} />}
           {step === "createReplacementOrder" && <ReplacementOrderForm register={register} control={control} />}
-
-
+          {step === "toStore" && <ToStoreForm register={register} control={control} />}
           <div><TextField fullWidth placeholder="Comments" name="comments" inputRef={register({required: true})} /></div>
-
 
         </DialogContent>
         <DialogActions>

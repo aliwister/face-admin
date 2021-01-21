@@ -1,4 +1,4 @@
-import {Dialog, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
+import {Chip, Dialog, DialogContent, DialogContentText, DialogTitle, Grid} from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
@@ -32,62 +32,28 @@ export const AssignDialog = ({item, open, onClose, step, state, type}) => {
     setUser(!isUser);
   }
 
-  /*
-              orderId:slug,
-            reason: formData.reason.value,
-            instructions: formData.instructions,
-            onUs: formData.onUs,
-            toVendor: formData.toVendor,
-            replacement: formData.replacement,
-            sequence: a.sequence,
-            productName: a.productName,
-            productId: a.productId,
-            sku: a.productSku,
-            quantity: a.quantity
-            */
+  const onSubmitDialog = (formData) => {
+    const by = USERS_ALL.find(i => i.value === username);
+    if( !by ) {
+      alert.error("Unknown User " + username + " Must add it to USERS_ALL in Constants.tsx");
+      return;
+    }
 
-  const onSubmitDialog = async (formData) => {
-
-
-    const payload = {
-      orderId: state.orderId,
-      reason: state.reason,
-      instructions: state.productName,
-      productId: state.productId,
-      productName: state.quantity,
-      quantity: state.quantity,
-      sku: `${state.sku}`,
-      po: `${state.po}`,
-      onUS: `${state.onUs}`,
-      toVendor: `${state.toVendor}`,
-      isReplacement: `${state.replacement}`,
-      assigned: formData.username.value,
-      requested:username,
-      comments: formData.comments,
+    let testData = {
+      "state": step,
+      "actionDescription": formData.comments + " assigned by " + by.label,
+      "stateVariables": {
+        "assignedTo": formData.username.value
+      }
     };
-/*    const data = JSON.stringify(payload);
-    console.log(data);*/
-    const config = {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      url: 'https://hooks.slack.com/workflows/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',
-      withCredentials: false,
-     transformRequest: [(data, headers) => {
-        delete headers["Authorization"]
-        return data
-      }],
-      data : JSON.stringify(payload)
-    };
-    // @ts-ignore
-     axios(config)
-      .then(function (response) {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch(function (error) {
-        console.log(error);
+
+    flowAPI.put(`/workflow-instance/id/${item}`, testData)
+      .then(res => {
+        alert.success(res.statusText);
+        onClose();
+
       });
+
   }
 
   return (
@@ -97,26 +63,7 @@ export const AssignDialog = ({item, open, onClose, step, state, type}) => {
         <DialogTitle id="form-dialog-title">Assign Work</DialogTitle>
         <DialogContent style={{height: "250px", width: "250px"}}>
           <DialogContentText>
-            Assign will trigger the corresponding workflow on Slack
           </DialogContentText>
-{/*          <div>
-            <Radio
-              checked={isUser===false}
-              value="role"
-              onChange={handleChange}
-              name="radio-button-demo"
-              inputProps={{ 'aria-label': 'A' }}
-            />
-            Role
-            <Radio
-              checked={isUser===true}
-              value="user"
-              onChange={handleChange}
-              name="radio-button-demo"
-              inputProps={{ 'aria-label': 'B' }}
-            />
-            User
-          </div>*/}
 
           <div>{isUser? <Controller
             as={<Select options={USERS_ALL}/>}
@@ -131,8 +78,7 @@ export const AssignDialog = ({item, open, onClose, step, state, type}) => {
             register={register}
             control={control}
           />}</div>
-{/*          <div><TextField variant="outlined" fullWidth type="text" placeholder="ID" name="id"
-                          inputRef={register()} /></div>*/}
+
           <div><TextField fullWidth placeholder="Comments" name="comments" inputRef={register({required: true})} /></div>
         </DialogContent>
         <DialogActions>

@@ -1,23 +1,8 @@
 import React from 'react';
 import { styled } from 'baseui';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
-import RadialBarChart from '../../components/Widgets/RadialBarChart/RadialBarChart';
-import LineChart from '../../components/Widgets/LineChart/LineChart';
-import ColumnChart from '../../components/Widgets/ColumnChart/ColumnChart';
-import DonutChart from '../../components/Widgets/DonutChart/DonutChart';
-import GraphChart from '../../components/Widgets/GraphChart/GraphChart';
-import GradiantGraphChart from '../../components/Widgets/GradiantGraphChart/GradiantGraphChart';
-import MapWidget from '../../components/Widgets/MapWidget/MapWidget';
-import StickerCard from '../../components/Widgets/StickerCard/StickerCard';
-import {
-  Revenue,
-  Refund,
-  CoinIcon,
-  CartIconBig,
-  UserIcon,
-  DeliveryIcon,
-} from '../../components/AllSvgIcon';
-import {Actions} from "./Actions";
+
+import {WorkItems} from "./WorkItems";
 
 const Col = styled(Column, props => ({
   '@media only screen and (max-width: 574px)': {
@@ -35,11 +20,13 @@ const Col = styled(Column, props => ({
 
 const Dashboard = () => (
   <Grid fluid={true}>
+    <h3>Returns</h3>
     <Row>
-      <Actions type={"returnWorkflow"}/>
+      <WorkItems type={"returnWorkflow"}/>
     </Row>
+    <h3>Refunds</h3>
     <Row>
-      <Actions type={"refundWorkflow"}/>
+      <WorkItems type={"refundWorkflow"}/>
     </Row>
 {/*    <Row>
       <Col md={5} lg={4} sm={6}>

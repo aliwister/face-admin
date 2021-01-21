@@ -12,13 +12,33 @@ import {AssignDialog} from "./components/AssignDialog";
 import {Tracking} from "../../components/Tracking/Tracking";
 import {Link} from "react-router-dom";
 import Chip from "@material-ui/core/Chip";
-
+import BuildIcon from '@material-ui/icons/Build';
+import HistoryIcon from '@material-ui/icons/History';
+import IconButton from "@material-ui/core/IconButton";
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import {HistoryDialog} from "./components/HistoryDialog";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import {USERS_ALL} from "../Shipments/components/Constants";
+import Avatar from "@material-ui/core/Avatar";
+import TimeAgo from 'react-timeago';
 
 const summarize = (data, type) => {
   if(type==="returnWorkflow")
     return <><Chip label={data.reason} color="secondary"/> {data.quantity}x {data.productName.substr(0,25)} </>;
   if(type==="refundWorkflow")
     return <>Details</>;
+}
+
+const getUser = (email) => {
+  const by = USERS_ALL.find(i => i.value === email);
+  if (by)
+    return       <Chip
+      avatar={<Avatar>{by.label.substring(0,1)}</Avatar>}
+      label={by.label}
+      variant="outlined"
+      color="secondary"
+    />
+  return "";
 }
 
 const returnFlowState = (data) => (
@@ -60,19 +80,20 @@ const returnReplacementOrderState = (data) => (
     <Link to={`/order-details/${data.ref}`} target="_blank"> {data.ref} </Link>
 );
 
-interface ActionsProps {
+interface WorkItemProps {
   type?: string,
   businessKey?: string
 }
 
 
-export const Actions = (props) => {
+export const WorkItems = (props) => {
   const [loading, setLoading] = useState(true);
   const [tickets, setTickets] = useState([]);
   const [active, setActive] = useState(null);
 
   const [actionDialog, setAction] = useState(false);
   const [assignDialog, setAssign] = useState(false);
+  const [historyDialog, setHistory] = useState(false);
 
 
   useEffect(() => {
@@ -101,10 +122,15 @@ export const Actions = (props) => {
     setActive(id);
     setAssign(true);
   }
+  const onHistoryStart = (id) => {
+    setActive(id);
+    setHistory(true);
+  }
 
   const onClose = () => {
     setAction(false);
     setAssign(false);
+    setHistory(false);
     setActive(null);
   }
 
@@ -112,17 +138,18 @@ export const Actions = (props) => {
     <>
       {actionDialog && <ActionDialog item={active.id} open={actionDialog} onClose={onClose} step={active.state} type={active.type}/>}
       {assignDialog && <AssignDialog item={active.id} open={assignDialog} onClose={onClose} step={active.state} type={active.type} state={active.stateVariables.requestData}/>}
+      {historyDialog && <HistoryDialog item={active.id} open={historyDialog} onClose={onClose} />}
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
-            <TableCell>Type</TableCell>
+            <TableCell>Assigned To</TableCell>
             <TableCell>State</TableCell>
             <TableCell>Bus Key</TableCell>
 {/*            <TableCell>External ID</TableCell>*/}
             <TableCell>Created</TableCell>
             <TableCell>State Vars</TableCell>
-            <TableCell align="right">Action</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -133,7 +160,7 @@ export const Actions = (props) => {
                 {row.id}
               </TableCell>
               <TableCell component="th" scope="row">
-                {row.type}
+                {getUser(row.stateVariables.assignedTo)}
               </TableCell>
               <TableCell component="th" scope="row">
                 <Chip label={row.state} color="primary"/>
@@ -145,7 +172,7 @@ export const Actions = (props) => {
                 {row.externalId}
               </TableCell>*/}
               <TableCell component="th" scope="row">
-                {row.created}
+                <TimeAgo date={row.created} />
               </TableCell>
               <TableCell component="th" scope="row">
                 <ExpansionPanel>
@@ -173,11 +200,15 @@ export const Actions = (props) => {
                 </ExpansionPanel>}
               </TableCell>
               <TableCell component="th" scope="row" align="right">
-                <Button onClick={() => onActionStart(row)}>Action</Button>
+                <ButtonGroup color="primary" aria-label="outlined primary button group">
+                  <IconButton size="medium" onClick={() => onActionStart(row)} disabled={row.state === 'done'}><BuildIcon /></IconButton>
+                  <IconButton size="medium" onClick={() => onAssignStart(row)}  disabled={row.state === 'done'}><AssignmentIndIcon /></IconButton>
+                  <IconButton size="medium" onClick={() => onHistoryStart(row)}><HistoryIcon /></IconButton>
+                </ButtonGroup>
               </TableCell>
-              <TableCell component="th" scope="row" align="right">
+{/*              <TableCell component="th" scope="row" align="right">
                 <Button onClick={() => onAssignStart(row)}>Assign</Button>
-              </TableCell>
+              </TableCell>*/}
             </TableRow>
           ))}
         </TableBody>

@@ -49,7 +49,7 @@ import {EditOrderDialog} from "./components/EditOrderDialog";
 import {ReturnDialog} from "./components/ReturnDialog";
 import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 import AuditHistory from "./AuditHistory";
-import {Actions} from "../Dashboard/Actions";
+import {WorkItems} from "../Dashboard/WorkItems";
 
 
 
@@ -203,6 +203,8 @@ export default function OrderDetails(props) {
     }
   }
 
+
+
   const onReturnRequest = async formData => {
 
     console.log(formData);
@@ -311,7 +313,32 @@ export default function OrderDetails(props) {
     });
     if(sendProductLevelEmail)  {
       alert.success(sendProductLevelEmail.value);
-      await refetch();
+
+      orderData.orderA.orderItems.filter(function(el) { return checkedId.includes(el.id) }).forEach(function(a,b) {
+        let externalId = `${slug}-${a.sequence}-APP`;
+        let testData = {
+          "type": "approvalWorkflow",
+          "externalId": externalId,
+          "businessKey": slug,
+          "activate": true,
+          "stateVariables": {
+            "requestData": {
+              type: "VOLTAGE",
+              sequence: a.sequence,
+              productName: a.productName,
+              productId: a.productId,
+              sku: a.productSku,
+              quantity: a.quantity,
+            }
+          }
+        };
+        flowAPI.put("/workflow-instance", testData)
+          .then(res => {
+            alert.success(res.statusText);
+          });
+      });
+
+      //await refetch();
     }
   }
   const onSendOrderCreateEmail = async () => {
@@ -545,7 +572,7 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          {orderData.orderA && <Actions businessKey={orderData.orderA.reference}/>}
+          {orderData.orderA && <WorkItems businessKey={orderData.orderA.reference}/>}
         </Col>
       </Row>
       <Row>
