@@ -7,31 +7,32 @@ import {Controller, useForm} from "react-hook-form";
 import {flowAPI} from "../../../api/config";
 import Select from "react-select";
 import { useAlert } from "react-alert";
-import {SHIPMENT_METHODS} from "../../Shipments/components/Constants";
+import {SHIPMENT_METHODS, USERS_ALL} from "../../Shipments/components/Constants";
 
 export const ToStoreForm = ({register, control}) =>  (
 <>
-          <div>
-            <TextField variant="outlined" fullWidth type="text" placeholder="Tracking #" name="trackingNum"
-                          inputRef={register()} /></div>
-          <div>
-            <Controller
-              as={<Select options={SHIPMENT_METHODS}/>}
-              rules={{ required: true }}
-              name="carrier"
-              register={register}
-              control={control}
 
-            /></div>
-  <div>
-    <TextField variant="outlined" fullWidth type="text" placeholder="Label File" name="labelFile"
-               inputRef={register()} /></div>
-  <div><input type="checkbox" name="ourLabel" ref={register} />Our Label?</div>
-  <div>
-    <TextField variant="outlined" fullWidth type="text" placeholder="Weight (KG)" name="weight"
-               inputRef={register()} /></div>
-  <div>
-    <TextField variant="outlined" fullWidth type="text" placeholder="Return Fee (OMR)" name="returnFee"
-               inputRef={register()} /></div>
+          <div>
+            <label>Received By</label>
+            <Controller
+                as={<Select options={USERS_ALL}/>}
+                rules={{ required: true }}
+                name="username"
+                register={register}
+                control={control}
+              />
+          </div>
+      <div>
+        <TextField
+          id="date"
+          label="Date"
+          type="date"
+          name="date"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputRef={register({required: true})}
+        />
+      </div>
 </>
   )

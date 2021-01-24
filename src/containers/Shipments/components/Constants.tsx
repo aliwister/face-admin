@@ -82,10 +82,10 @@ export const ROLES = [
 ];
 export const USERS_ALL = [
   {value: 'ali@badals.com', label: 'Ali'},
+  {value: 'aliwister@gmail.com', label: 'Ali'},
   {value: 'shabib@badals.com', label: 'Shabib'},
   {value: 'faljulandani662@gmail.com', label: 'Fatma'},
   {value: 'humaidaljabri6@gmail.com', label: 'Humaid'},
   {value: 'sooor363@gmail.com', label: 'Salah'},
-  {value: 'work.nishanth@gmail.com', label: 'Nishanth'},
-  {value: 'masoooma.ali@gmail.com', label: 'Masooma'}
+  {value: 'azeez@badals.com', label: 'Nishanth'}
 ];
