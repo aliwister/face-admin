@@ -283,6 +283,7 @@ const AddProduct: React.FC<Props> = props => {
         if(weightInLbs > 20)
           weightMult = 4;
 
+        priceInOmr *= 1.05; // Add customs
         priceInOmr += weightInLbs*weightMult*conversion['usd'] + 2;
         break;
       case 'oman':

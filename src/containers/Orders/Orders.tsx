@@ -13,7 +13,17 @@ import {
 } from './Orders.style';
 import NoResult from '../../components/NoResult/NoResult';
 import { Link } from 'react-router-dom';
-import {Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField
+} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
@@ -21,6 +31,7 @@ import {LoadOrderForm} from "./components/LoadOrderForm";
 import  Select from "react-select";
 import {theme} from "../../theme";
 import {ORDER_STATES} from "./components/Constants";
+import {useForm} from "react-hook-form";
 
 const GET_ORDERS = gql`
   query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String) {
@@ -92,6 +103,10 @@ export default function Orders() {
   const alert = useAlert();
   const classes = useStyles();
 
+  const { register, handleSubmit, errors, control } = useForm({
+    defaultValues: {}
+  });
+
   const arrayToObject = (array,prop) =>
     array.map(t => t[prop]);
 
@@ -120,6 +135,18 @@ export default function Orders() {
       });
     } else {
       refetch({ state: [], limit:10, searchText:"" });
+    }
+  }
+  function handleSearch(data) {
+    const searchText = data.search;
+    if (searchText && searchText.length) {
+      refetch({
+        state: arrayToObject(status, 'value'),
+        limit: 15, //limit.length ? limit[0].value : null,
+        searchText: searchText,
+      });
+    } else {
+      refetch({ state: [], limit:10, searchText:searchText });
     }
   }
   function loadMore() {
@@ -183,6 +210,10 @@ export default function Orders() {
           options={ORDER_STATES}
           isMulti={true}
         />
+        <form onSubmit={handleSubmit(handleSearch)}>
+          <TextField name="search" inputRef={register({required: true, minLength: 2, maxLength: 12})} style={{width:'320px'}}></TextField>
+          <Button size="medium" variant="contained" color="primary" type="submit" >Go</Button>
+        </form>
       </Grid>
       <Grid  item  md={4} >
       </Grid>
