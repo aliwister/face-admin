@@ -50,9 +50,11 @@ export const DiscountDialog = ({open, onSubmit, onClose, title}) =>{
       <br/>
         <FormControl variant="filled" size="small" className={classes.formControl}>
           <Select native name="couponName" inputRef={register({ required: true })}>
-            <option value="VOLUME">VOLUME</option>
-            <option value="COURTESY">COURTESY</option>
-            <option value="SORRY">SORRY</option>
+            <option value="VOLUME">Volume</option>
+            <option value="DELIVERY">Delivery</option>
+            <option value="COURTESY">Courtesy</option>
+            <option value="SORRY">Sorry</option>
+            <option value="RETURN">Credit for Return</option>
           </Select>
         </FormControl>
       </DialogContent>
