@@ -87,7 +87,8 @@ function reducer(state, action) {
         pkg: {
           ...action.payload.pkg
         },
-        selectedPkgIndex: action.payload.index
+        selectedPkgIndex: action.payload.index,
+        selectedPkgId: action.payload.selectedPkgId
       }
     case 'SELECT_ACCEPT_ITEM_START':
       return {
@@ -245,12 +246,13 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
     printLabelDialog: false,
     item: null,
     selectedPkgIndex: -1,
+    selectedPkgId: -1,
     sendDetrackDialog: false
   };
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const { data, loading, error, refetch } = useShipmentItemDetailsQuery({variables: {id: shipment.id}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
-  const { data:dp, loading:lp, error:ep, refetch:rp } = usePkgItemDetailsQuery({variables: {id: shipment.pkgs[state.selectedPkgIndex].id}, fetchPolicy: "network-only",context: { clientName: "adminLink" }, skip: state.selectedPkgIndex < 0});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = usePkgItemDetailsQuery({variables: {id: state.selectedPkgId}, fetchPolicy: "network-only",context: { clientName: "adminLink" }, skip: state.selectedPkgIndex < 0});
 
   const handleAcceptPackage = async (data) => {
 	  console.log(data);
@@ -311,7 +313,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
     }
   }
   const handleListItemClick = (event, index) => {
-    dispatch({type: 'SELECT_PACKAGE', payload: {index: index, pkg: shipment.pkgs[index]}})
+    dispatch({type: 'SELECT_PACKAGE', payload: {index: index, selectedPkgId: shipment.pkgs[index].id, pkg: shipment.pkgs[index]}})
   };
   const handleClose = () => dispatch({type: 'ADD_PACKAGE_CANCEL'});
   const handleAcceptPackageDialog = () => dispatch({type: 'ADD_PACKAGE_START'});
