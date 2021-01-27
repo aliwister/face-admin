@@ -22,6 +22,7 @@ import {USERS_ALL} from "../Shipments/components/Constants";
 import Avatar from "@material-ui/core/Avatar";
 import TimeAgo from 'react-timeago';
 import FormControlLabel from "@material-ui/core/FormControlLabel";
+import {AuthContext} from "../../context/auth";
 
 const summarize = (data, type) => {
   if(type==="returnWorkflow")
@@ -97,7 +98,9 @@ export const WorkItems = (props) => {
   const [historyDialog, setHistory] = useState(false);
 
   const [showDone, setShowdone] = useState(props.showDone);
+  const [showMine, setShowmine] = useState(props.showMine);
 
+  const { username } = React.useContext(AuthContext);
 
   useEffect(() => {
     let params = {};
@@ -145,9 +148,15 @@ export const WorkItems = (props) => {
 
       <FormControlLabel
         control={
-          <Checkbox value={showDone} onChange={() => setShowdone(!showDone)} />
+          <Checkbox checked={showDone} onChange={() => setShowdone(!showDone)} />
         }
         label="Show Done"
+      />
+      <FormControlLabel
+        control={
+          <Checkbox checked={showMine} onChange={() => setShowmine(!showMine)} />
+        }
+        label="Show Mine"
       />
       <Table size="small" aria-label="a dense table">
         <TableHead>
@@ -166,6 +175,7 @@ export const WorkItems = (props) => {
 
           {tickets && tickets.map((row,i) => (
             <>{(row.state !== "done" || showDone) &&
+              <>{(row.stateVariables.assignedTo === username || !showMine) &&
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
                 {row.id}
@@ -220,7 +230,7 @@ export const WorkItems = (props) => {
 {/*              <TableCell component="th" scope="row" align="right">
                 <Button onClick={() => onAssignStart(row)}>Assign</Button>
               </TableCell>*/}
-            </TableRow>}</>
+            </TableRow>}</>}</>
           ))}
         </TableBody>
       </Table>

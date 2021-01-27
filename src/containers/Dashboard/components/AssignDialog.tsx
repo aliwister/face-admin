@@ -41,7 +41,7 @@ export const AssignDialog = ({item, open, onClose, step, state, type}) => {
 
     let testData = {
       "state": step,
-      "actionDescription": formData.comments + " assigned by " + by.label,
+      "actionDescription": formData.comments + " assigned to " + formData.username.label + "  by " + by.label,
       "stateVariables": {
         "assignedTo": formData.username.value
       }
