@@ -572,7 +572,7 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          {orderData.orderA && <WorkItems businessKey={orderData.orderA.reference}/>}
+          {orderData.orderA && <WorkItems businessKey={orderData.orderA.reference} showDone={true}/>}
         </Col>
       </Row>
       <Row>

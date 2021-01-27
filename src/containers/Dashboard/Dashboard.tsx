@@ -22,11 +22,11 @@ const Dashboard = () => (
   <Grid fluid={true}>
     <h3>Returns</h3>
     <Row>
-      <WorkItems type={"returnWorkflow"}/>
+      <WorkItems type={"returnWorkflow"} showDone={false}/>
     </Row>
     <h3>Refunds</h3>
     <Row>
-      <WorkItems type={"refundWorkflow"}/>
+      <WorkItems type={"refundWorkflow"} showDone={false}/>
     </Row>
 {/*    <Row>
       <Col md={5} lg={4} sm={6}>

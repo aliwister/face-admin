@@ -1,7 +1,7 @@
 import {flowAPI} from "../../api/config";
 import React, {useEffect, useState} from "react";
 import Loader from "../../components/Loader/Loader";
-import {Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
+import {Checkbox, Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 import {ActionDialog} from "./components/ActionDialog";
 import Button from "../../components/Button/Button";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
@@ -21,6 +21,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import {USERS_ALL} from "../Shipments/components/Constants";
 import Avatar from "@material-ui/core/Avatar";
 import TimeAgo from 'react-timeago';
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 const summarize = (data, type) => {
   if(type==="returnWorkflow")
@@ -95,6 +96,8 @@ export const WorkItems = (props) => {
   const [assignDialog, setAssign] = useState(false);
   const [historyDialog, setHistory] = useState(false);
 
+  const [showDone, setShowdone] = useState(props.showDone);
+
 
   useEffect(() => {
     let params = {};
@@ -139,6 +142,13 @@ export const WorkItems = (props) => {
       {actionDialog && <ActionDialog item={active.id} open={actionDialog} onClose={onClose} step={active.state} type={active.type}/>}
       {assignDialog && <AssignDialog item={active.id} open={assignDialog} onClose={onClose} step={active.state} type={active.type} state={active.stateVariables.requestData}/>}
       {historyDialog && <HistoryDialog item={active.id} open={historyDialog} onClose={onClose} />}
+
+      <FormControlLabel
+        control={
+          <Checkbox value={showDone} onChange={() => setShowdone(!showDone)} />
+        }
+        label="Show Done"
+      />
       <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
@@ -155,6 +165,7 @@ export const WorkItems = (props) => {
         <TableBody>
 
           {tickets && tickets.map((row,i) => (
+            <>{(row.state !== "done" || showDone) &&
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
                 {row.id}
@@ -209,7 +220,7 @@ export const WorkItems = (props) => {
 {/*              <TableCell component="th" scope="row" align="right">
                 <Button onClick={() => onAssignStart(row)}>Assign</Button>
               </TableCell>*/}
-            </TableRow>
+            </TableRow>}</>
           ))}
         </TableBody>
       </Table>
