@@ -156,7 +156,7 @@ export const WorkItems = (props) => {
         control={
           <Checkbox checked={showMine} onChange={() => setShowmine(!showMine)} />
         }
-        label="Show Mine"
+        label="Show Mine Only"
       />
       <Table size="small" aria-label="a dense table">
         <TableHead>

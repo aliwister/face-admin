@@ -250,7 +250,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const { data, loading, error, refetch } = useShipmentItemDetailsQuery({variables: {id: shipment.id}, fetchPolicy: "network-only",context: { clientName: "adminLink" }});
-  const { data:dp, loading:lp, error:ep, refetch:rp } = usePkgItemDetailsQuery({variables: {id: state.selectedPkgIndex}, fetchPolicy: "network-only",context: { clientName: "adminLink" }, skip: state.selectedPkgIndex < 0});
+  const { data:dp, loading:lp, error:ep, refetch:rp } = usePkgItemDetailsQuery({variables: {id: shipment.pkgs[state.selectedPkgIndex].id}, fetchPolicy: "network-only",context: { clientName: "adminLink" }, skip: state.selectedPkgIndex < 0});
 
   const handleAcceptPackage = async (data) => {
 	  console.log(data);
