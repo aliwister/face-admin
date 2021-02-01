@@ -8,6 +8,7 @@ import Button from "@material-ui/core/Button";
 import {Controller, useForm} from "react-hook-form";
 import CardHeader from "@material-ui/core/CardHeader";
 import Select from "react-select";
+var _ = require('lodash');
 
 const useStyles = makeStyles(theme => ({
   table: {
@@ -27,10 +28,17 @@ const useStyles = makeStyles(theme => ({
 
 export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => {
   console.log(shipment);
+  console.log(shipment.merchantId)
+  console.log(merchants.filter(obj => {
+    console.log(obj.id)
+    return obj.id == shipment.merchantId
+  }));
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
       ...shipment,
-      merchant: merchants[0]
+      merchant: merchants.filter(obj => {
+        return obj.id == shipment.merchantId
+      })[0]
     }
   });
 
@@ -38,7 +46,18 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
   const classes = useStyles();
 
   function onSubmitForm(data) {
-    onSubmit(data);
+    let shipmentInput = _.pick(shipment, [
+      'id',
+      'reference',
+      'trackingNum',
+      'shipmentMethod',
+      'shipmentType',
+      'shipmentStatus',
+      'merchantId',
+      'pkgCount',
+      'handlingInstructions']);
+    //console.log(_.assign({},shipmentInput, data));
+    onSubmit(_.assign({},shipmentInput, data));
   }
 
   return (
@@ -59,7 +78,7 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
         <Grid item md={6}>
           <Controller
             as={<Select
-                  options={merchants.merchants}
+                  options={merchants}
                   getOptionLabel={(option: any) => option.name}
                   getOptionValue={(option: any) => option.id}
                 />}

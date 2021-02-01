@@ -333,7 +333,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
       variables: { shipment: dto },
     });
     if(saveShipment)  {
-      alert.success(saveShipment.id);
+      alert.success("Shipment "+saveShipment.id+" saved successfully");
       refreshShipment({id:shipment.id})
     }
   }
@@ -350,7 +350,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
 		  <Grid item md={4}>
         <SendToDetrackDialog onSubmit={handleDetrackSubmit} onClose={handleDetrackCancel} open={state.sendDetrackDialog} />
         {(shipment.shipmentType === 'PURCHASE') &&
-          <PurchaseShipmentDetailsForm merchants={merchants} shipment={state.shipment} onSubmit={handleSaveShipment}/>
+          <PurchaseShipmentDetailsForm merchants={merchants.merchants} shipment={state.shipment} onSubmit={handleSaveShipment}/>
         }
         {(shipment.shipmentType === 'CUSTOMER') &&
           <CustomerShipmentDetailsForm shipment={state.shipment} onSubmit={handleSaveShipment}/>
