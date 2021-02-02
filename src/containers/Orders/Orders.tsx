@@ -32,6 +32,7 @@ import  Select from "react-select";
 import {theme} from "../../theme";
 import {ORDER_STATES} from "./components/Constants";
 import {useForm} from "react-hook-form";
+import TimeAgo from 'react-timeago';
 
 const GET_ORDERS = gql`
   query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String) {
@@ -52,6 +53,7 @@ const GET_ORDERS = gql`
       discountsTotal
       deliveryDate
       cartId
+      balance
       deliveryAddress {
           firstName
           lastName
@@ -228,8 +230,9 @@ export default function Orders() {
                 <TableCell>ID</TableCell>
                 <TableCell align="left">Ref</TableCell>
                 <TableCell align="left">Name</TableCell>
-                <TableCell align="right">Amount</TableCell>
-                <TableCell align="center">Payment</TableCell>
+                <TableCell align="right">Order Total</TableCell>
+                <TableCell align="center">Balance</TableCell>
+                <TableCell align="center">Paid Via</TableCell>
                 <TableCell align="center">Date</TableCell>
                 <TableCell align="center">Status</TableCell>
               </TableRow>
@@ -258,10 +261,11 @@ export default function Orders() {
                     <TableCell align="left">{row.reference}</TableCell>
 
                     <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
-                    <TableCell align="right">OMR {row.total}</TableCell>
+                    <TableCell align="right"><sup>OMR</sup> {row.total}</TableCell>
+                    <TableCell align="right">{row.balance}</TableCell>
 
                     <TableCell align="center">{row.paymentMethod}</TableCell>
-                    <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
+                    <TableCell align="right"> <TimeAgo date={row.createdDate} /></TableCell>
                     <TableCell align="right">
                       {row.orderState}
                     </TableCell>
