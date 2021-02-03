@@ -261,7 +261,7 @@ export default function Orders() {
                     <TableCell align="left">{row.reference}</TableCell>
 
                     <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
-                    <TableCell align="right"><sup>OMR</sup> {row.total}</TableCell>
+                    <TableCell align="right">{row.total} <sup>OMR</sup> </TableCell>
                     <TableCell align="right">{row.balance}</TableCell>
 
                     <TableCell align="center">{row.paymentMethod}</TableCell>

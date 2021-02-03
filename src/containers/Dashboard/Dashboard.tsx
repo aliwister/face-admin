@@ -20,6 +20,11 @@ const Col = styled(Column, props => ({
 
 const Dashboard = () => (
   <Grid fluid={true}>
+    <Row>
+      <iframe
+        src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23ffffff&amp;ctz=Asia%2FDubai&amp;src=YmFkYWxzLmNvbV9ocDFucDAzM2k2bmFvaGc3c2tpZ3U2c3Azc0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t&amp;src=ZW4ub20jaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&amp;src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&amp;src=ZW4uaXNsYW1pYyNob2xpZGF5QGdyb3VwLnYuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&amp;color=%230B8043&amp;color=%23F4511E&amp;color=%23B39DDB&amp;color=%23F6BF26"
+        width="800" height="600" frameBorder="0" scrolling="no"></iframe>
+    </Row>
     <h3>Returns</h3>
     <Row>
       <WorkItems type={"returnWorkflow"} showDone={false} showMine={true}/>
