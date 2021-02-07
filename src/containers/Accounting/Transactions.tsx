@@ -380,7 +380,7 @@ export default function Transactions() {
                 <TableCell align="center">Auth Code</TableCell>
                 <TableCell align="center">Processed Date</TableCell>
                 <TableCell align="center">Settlement Date</TableCell>
-                <TableCell align="center">Account</TableCell>
+                <TableCell align="left">Customer Name</TableCell>
               </TableRow>
             </TableHead>
             {data && data.transactions.items.length && (
@@ -413,7 +413,7 @@ export default function Transactions() {
                     <TableCell align="center">{row.processedDate}</TableCell>
                     <TableCell align="center"><Moment format='Do MMM YYYY'>{row.settlementDate}</Moment></TableCell>
                     <TableCell align="left">
-                      {row.account}
+                      {row.customer}
                     </TableCell>
                   </TableRow>
                 ))}
