@@ -15,10 +15,10 @@ export type Scalars = {
   Float: number;
   /** Long type */
   Long: any;
+  Date: any;
   LocalDate: any;
   /** Built-in java.math.BigDecimal */
   BigDecimal: any;
-  Date: any;
   LocalDateTime: any;
 };
 
@@ -96,6 +96,11 @@ export type Attribute = {
   value: Maybe<Scalars['String']>;
 };
 
+export type AttributeInput = {
+  name: Maybe<Scalars['String']>;
+  value: Maybe<Scalars['String']>;
+};
+
 
 export type Cart = {
    __typename?: 'Cart';
@@ -166,6 +171,50 @@ export type CheckoutSession = {
    __typename?: 'CheckoutSession';
   redirectUrl: Maybe<Scalars['String']>;
   secureKey: Maybe<Scalars['String']>;
+};
+
+export type ChildProduct = {
+   __typename?: 'ChildProduct';
+  id: Maybe<Scalars['ID']>;
+  slug: Maybe<Scalars['String']>;
+  /** Must be Unique */
+  image: Maybe<Scalars['String']>;
+  /** Main image */
+  priceObj: Maybe<Price>;
+  /** null For Parent */
+  costObj: Maybe<Price>;
+  /** null For Parent */
+  salePriceObj: Maybe<Price>;
+  /** null For Parent */
+  weight: Maybe<Scalars['BigDecimal']>;
+  availability: Maybe<Scalars['Int']>;
+  /** In hours */
+  quantity: Maybe<Scalars['BigDecimal']>;
+  discountInPercent: Maybe<Scalars['Int']>;
+  gallery: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Ordered */
+  variationAttributes: Maybe<Array<Maybe<Attribute>>>;
+};
+
+export type ChildProductInput = {
+  id: Maybe<Scalars['ID']>;
+  isDirty: Maybe<Scalars['Boolean']>;
+  /** For new product doesn't matter */
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  availability: Maybe<Scalars['Int']>;
+  /** In hours */
+  priceObj: Maybe<PriceInput>;
+  costObj: Maybe<PriceInput>;
+  salePriceObj: Maybe<PriceInput>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  gallery: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Ordered */
+  image: Maybe<Scalars['String']>;
+  /** Main image */
+  variationAttributes: Maybe<Array<Maybe<AttributeInput>>>;
+  active: Maybe<Scalars['Boolean']>;
 };
 
 export enum Condition {
@@ -360,7 +409,7 @@ export type Mutation = {
   addToElastic: Maybe<Message>;
   addToPricingQ: Maybe<Message>;
   addTrackingEvent: Maybe<Message>;
-  approveProduct: Maybe<Product>;
+  approveProduct: Maybe<Message>;
   cancelOrder: Maybe<Order>;
   cancelPurchase: Maybe<Purchase>;
   closeOrder: Maybe<Order>;
@@ -388,11 +437,13 @@ export type Mutation = {
    */
   createShipment: Maybe<Shipment>;
   createStub: Maybe<MerchantProduct>;
+  deleteProduct: Maybe<Message>;
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
   getAdminFile: Maybe<PresignedUrl>;
   getAdminImageUploadUrl: Maybe<PresignedUrl>;
   getImageUploadUrl: Maybe<PresignedUrl>;
+  getPartnerImageUploadUrl: Maybe<PresignedUrl>;
   getUploadUrl: Maybe<PresignedUrl>;
   importProducts: Maybe<Message>;
   indexProduct: Maybe<Attribute>;
@@ -403,6 +454,7 @@ export type Mutation = {
   refundPayment: Maybe<Payment>;
   removeItem: Maybe<Message>;
   resetPassword: Maybe<Scalars['String']>;
+  savePartnerProduct: Maybe<ProductEnvelope>;
   saveShipment: Maybe<Shipment>;
   sendOrderLevelEmail: Maybe<Message>;
   sendPaymentSms: Maybe<Message>;
@@ -413,7 +465,7 @@ export type Mutation = {
   setDial: Maybe<Message>;
   setEstimatedShipDate: Maybe<Message>;
   setHashtags: Maybe<Message>;
-  setOrderState: Maybe<Order>;
+  setOrderState: Maybe<Message>;
   setProcessedDate: Maybe<Message>;
   setPurchaseState: Maybe<Purchase>;
   setSettlementDate: Maybe<Message>;
@@ -611,6 +663,11 @@ export type MutationCreateStubArgs = {
 };
 
 
+export type MutationDeleteProductArgs = {
+  id: Maybe<Scalars['Long']>;
+};
+
+
 export type MutationDiscountOrderArgs = {
   id: Maybe<Scalars['ID']>;
 };
@@ -637,6 +694,12 @@ export type MutationGetAdminImageUploadUrlArgs = {
 
 
 export type MutationGetImageUploadUrlArgs = {
+  filename: Maybe<Scalars['String']>;
+  contentType: Maybe<Scalars['String']>;
+};
+
+
+export type MutationGetPartnerImageUploadUrlArgs = {
   filename: Maybe<Scalars['String']>;
   contentType: Maybe<Scalars['String']>;
 };
@@ -691,12 +754,20 @@ export type MutationRefundPaymentArgs = {
 
 
 export type MutationRemoveItemArgs = {
+  shipmentId: Maybe<Scalars['ID']>;
   shipmentItemId: Maybe<Scalars['Long']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
 };
 
 
 export type MutationResetPasswordArgs = {
   email: Maybe<Scalars['String']>;
+};
+
+
+export type MutationSavePartnerProductArgs = {
+  product: Maybe<PartnerProductInput>;
 };
 
 
@@ -766,8 +837,7 @@ export type MutationSetHashtagsArgs = {
 
 
 export type MutationSetOrderStateArgs = {
-  id: Maybe<Scalars['ID']>;
-  state: Maybe<OrderState>;
+  value: Maybe<OrderState>;
 };
 
 
@@ -796,7 +866,10 @@ export type MutationSetShipmentStatusArgs = {
 
 
 export type MutationUnpackItemArgs = {
+  shipmentId: Maybe<Scalars['ID']>;
   shipmentItemId: Maybe<Scalars['Long']>;
+  description: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
 };
 
 
@@ -847,7 +920,7 @@ export type OrderItem = {
   orderId: Maybe<Scalars['Long']>;
   sequence: Maybe<Scalars['Int']>;
   productName: Maybe<Scalars['String']>;
-  quantity: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
   price: Maybe<Scalars['BigDecimal']>;
   comment: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
@@ -940,6 +1013,76 @@ export type PackagingContentInput = {
   quantity: Maybe<Scalars['BigDecimal']>;
 };
 
+export type PartnerProduct = {
+   __typename?: 'PartnerProduct';
+  id: Maybe<Scalars['ID']>;
+  /** Auto generated */
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['String']>;
+  slug: Maybe<Scalars['String']>;
+  /** Must be Unique */
+  brand: Maybe<Scalars['String']>;
+  /** The English value */
+  name: Maybe<Scalars['String']>;
+  /** The English value */
+  image: Maybe<Scalars['String']>;
+  /** Main image */
+  priceObj: Maybe<Price>;
+  costObj: Maybe<Price>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  variationType: Maybe<Scalars['String']>;
+  /** SIMPLE, CHILD, PARENT */
+  unit: Maybe<Scalars['String']>;
+  availability: Maybe<Scalars['Int']>;
+  /** In hours */
+  salePriceObj: Maybe<Price>;
+  quantity: Maybe<Scalars['BigDecimal']>;
+  discountInPercent: Maybe<Scalars['Int']>;
+  options: Maybe<Array<Maybe<VariationOption>>>;
+  langs: Maybe<Array<Maybe<ProductI18n>>>;
+  gallery: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Ordered */
+  children: Maybe<Array<Maybe<ChildProduct>>>;
+};
+
+export type PartnerProductInput = {
+  id: Maybe<Scalars['ID']>;
+  /** Auto generated */
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  model: Maybe<Scalars['String']>;
+  hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Hashtags */
+  slug: Maybe<Scalars['String']>;
+  /** Must be Unique */
+  brand: Maybe<Scalars['String']>;
+  /** The English value */
+  name: Maybe<Scalars['String']>;
+  /** The English value */
+  image: Maybe<Scalars['String']>;
+  /** Main image */
+  priceObj: Maybe<PriceInput>;
+  /** null For Parent */
+  costObj: Maybe<PriceInput>;
+  /** null For Parent */
+  salePriceObj: Maybe<PriceInput>;
+  /** null For Parent */
+  weight: Maybe<Scalars['BigDecimal']>;
+  /** KG */
+  variationType: Maybe<Scalars['String']>;
+  /** SIMPLE, CHILD, PARENT */
+  unit: Maybe<Scalars['String']>;
+  availability: Maybe<Scalars['Int']>;
+  /** In hours */
+  quantity: Maybe<Scalars['BigDecimal']>;
+  gallery: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Ordered */
+  children: Maybe<Array<Maybe<ChildProductInput>>>;
+  langs: Maybe<Array<Maybe<ProductI18nInput>>>;
+  options: Maybe<Array<Maybe<VariationOptionInput>>>;
+};
+
 export type Payment = {
    __typename?: 'Payment';
   id: Maybe<Scalars['ID']>;
@@ -1002,7 +1145,14 @@ export type PresignedUrl = {
    __typename?: 'PresignedUrl';
   uploadUrl: Maybe<Scalars['String']>;
   imageUrl: Maybe<Scalars['String']>;
+  saveUrl: Maybe<Scalars['String']>;
   status: Maybe<Scalars['String']>;
+};
+
+export type Price = {
+   __typename?: 'Price';
+  amount: Maybe<Scalars['BigDecimal']>;
+  currency: Maybe<Scalars['String']>;
 };
 
 export type PriceInput = {
@@ -1053,7 +1203,6 @@ export type Product = {
   discountInPercent: Maybe<Scalars['Float']>;
   slug: Maybe<Scalars['String']>;
   categories: Maybe<Array<Maybe<Category>>>;
-  type: Maybe<ProductType>;
   author: Maybe<Scalars['String']>;
   unit: Maybe<Scalars['String']>;
   description: Maybe<Scalars['String']>;
@@ -1066,6 +1215,13 @@ export type Product = {
   inStock: Maybe<Scalars['Boolean']>;
   hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
   dial: Maybe<Scalars['String']>;
+};
+
+export type ProductEnvelope = {
+   __typename?: 'ProductEnvelope';
+  message: Maybe<Scalars['String']>;
+  product: Maybe<PartnerProduct>;
+  code: Maybe<Scalars['Int']>;
 };
 
 export enum ProductGroup {
@@ -1093,6 +1249,8 @@ export type ProductI18n = {
   description: Maybe<Scalars['String']>;
   model: Maybe<Scalars['String']>;
   features: Maybe<Array<Maybe<Scalars['String']>>>;
+  brand: Maybe<Scalars['String']>;
+  lang: Maybe<Scalars['String']>;
 };
 
 export type ProductI18nInput = {
@@ -1100,6 +1258,7 @@ export type ProductI18nInput = {
   description: Maybe<Scalars['String']>;
   model: Maybe<Scalars['String']>;
   features: Maybe<Array<Maybe<Scalars['String']>>>;
+  brand: Maybe<Scalars['String']>;
   lang: Maybe<Scalars['String']>;
 };
 
@@ -1142,12 +1301,6 @@ export type ProductResponse = {
   total: Scalars['Int'];
   hasMore: Scalars['Boolean'];
 };
-
-export enum ProductType {
-  ChildrenBooks = 'CHILDREN_BOOKS',
-  TeenBooks = 'TEEN_BOOKS',
-  AdultBooks = 'ADULT_BOOKS'
-}
 
 export type Purchase = {
    __typename?: 'Purchase';
@@ -1245,6 +1398,7 @@ export type PurchaseShipmentInput = {
 
 export type Query = {
    __typename?: 'Query';
+  auditActivity: Maybe<Array<Maybe<Action>>>;
   categories: Array<Category>;
   category: Category;
   customer: Maybe<Customer>;
@@ -1255,6 +1409,7 @@ export type Query = {
   getCart: Maybe<Cart>;
   getProductByDial: Maybe<Product>;
   getProductBySku: Maybe<Product>;
+  hashtagList: Maybe<Array<Maybe<Hashtag>>>;
   hashtags: Maybe<HashtagResponse>;
   hashtagsWithProducts: Maybe<HashtagResponse>;
   inventory: Maybe<Array<Maybe<Inventory>>>;
@@ -1265,13 +1420,14 @@ export type Query = {
   merchants: Maybe<Array<Maybe<Merchant>>>;
   mws: Maybe<Product>;
   orderA: Maybe<Order>;
-  orderActions: Maybe<Array<Maybe<Action>>>;
   /** getOrders(): [Orders] */
   orderConfirmation: Maybe<Order>;
   orders: Maybe<Array<Maybe<Order>>>;
   ordersA: Maybe<OrderResponse>;
   outstandingQueue: Maybe<Array<Maybe<OutstandingQueue>>>;
   parentOf: Maybe<Scalars['String']>;
+  partnerProduct: Maybe<PartnerProduct>;
+  partnerProducts: Maybe<MerchantProductResponse>;
   pas: Maybe<Product>;
   pasUk: Maybe<Product>;
   payments: Maybe<Array<Maybe<Payment>>>;
@@ -1304,6 +1460,14 @@ export type Query = {
   transactions: Maybe<PaymentResponse>;
   unshippedPurchases: Maybe<Array<Maybe<PurchaseQueue>>>;
   unshippedQueue: Maybe<Array<Maybe<UnshippedQueue>>>;
+  variationOptions: Maybe<VariationOption>;
+  variations: Maybe<Array<Maybe<VariationOption>>>;
+};
+
+
+export type QueryAuditActivityArgs = {
+  id: Maybe<Scalars['ID']>;
+  type: Maybe<Scalars['String']>;
 };
 
 
@@ -1391,11 +1555,6 @@ export type QueryOrderAArgs = {
 };
 
 
-export type QueryOrderActionsArgs = {
-  orderId: Maybe<Scalars['ID']>;
-};
-
-
 export type QueryOrderConfirmationArgs = {
   ref: Maybe<Scalars['String']>;
   key: Maybe<Scalars['String']>;
@@ -1422,6 +1581,19 @@ export type QueryOutstandingQueueArgs = {
 
 export type QueryParentOfArgs = {
   sku: Maybe<Scalars['String']>;
+};
+
+
+export type QueryPartnerProductArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryPartnerProductsArgs = {
+  search: Maybe<Scalars['String']>;
+  limit: Maybe<Scalars['Int']>;
+  offset: Maybe<Scalars['Int']>;
+  active: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1572,6 +1744,11 @@ export type QueryTransactionsArgs = {
   unsettledOnly: Maybe<Scalars['Boolean']>;
 };
 
+
+export type QueryVariationOptionsArgs = {
+  name: Maybe<Scalars['String']>;
+};
+
 export type Reward = {
    __typename?: 'Reward';
   id: Maybe<Scalars['ID']>;
@@ -1616,6 +1793,7 @@ export type ShipmentDoc = {
 };
 
 export type ShipmentInput = {
+  id: Maybe<Scalars['ID']>;
   reference: Maybe<Scalars['String']>;
   trackingNum: Maybe<Scalars['String']>;
   shipmentMethod: Maybe<Scalars['String']>;
@@ -1809,6 +1987,12 @@ export type VariationOption = {
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type VariationOptionInput = {
+  label: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
+  values: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
 export type AddDiscountMutationVariables = {
   id: Maybe<Scalars['ID']>;
   amount: Maybe<Scalars['BigDecimal']>;
@@ -1977,6 +2161,20 @@ export type MerchantProductsQuery = (
   )> }
 );
 
+export type AuditActivityQueryVariables = {
+  id: Maybe<Scalars['ID']>;
+  type: Maybe<Scalars['String']>;
+};
+
+
+export type AuditActivityQuery = (
+  { __typename?: 'Query' }
+  & { auditActivity: Maybe<Array<Maybe<(
+    { __typename?: 'Action' }
+    & Pick<Action, 'id' | 'action' | 'object' | 'objectId' | 'state' | 'comment' | 'createdDate' | 'createdBy'>
+  )>>> }
+);
+
 export type OrderAQueryVariables = {
   id: Maybe<Scalars['ID']>;
 };
@@ -2001,19 +2199,6 @@ export type OrderAQuery = (
       & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate'>
     )>>> }
   )> }
-);
-
-export type OrderActionsQueryVariables = {
-  orderId: Maybe<Scalars['ID']>;
-};
-
-
-export type OrderActionsQuery = (
-  { __typename?: 'Query' }
-  & { orderActions: Maybe<Array<Maybe<(
-    { __typename?: 'Action' }
-    & Pick<Action, 'id' | 'action' | 'object' | 'objectId' | 'state' | 'comment' | 'createdDate' | 'createdBy'>
-  )>>> }
 );
 
 export type PurchaseQueryVariables = {
@@ -2846,6 +3031,66 @@ export function useMerchantProductsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type MerchantProductsQueryHookResult = ReturnType<typeof useMerchantProductsQuery>;
 export type MerchantProductsLazyQueryHookResult = ReturnType<typeof useMerchantProductsLazyQuery>;
 export type MerchantProductsQueryResult = ApolloReactCommon.QueryResult<MerchantProductsQuery, MerchantProductsQueryVariables>;
+export const AuditActivityDocument = gql`
+    query auditActivity($id: ID, $type: String) {
+  auditActivity(id: $id, type: $type) {
+    id
+    action
+    object
+    objectId
+    state
+    comment
+    createdDate
+    createdBy
+  }
+}
+    `;
+export type AuditActivityComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AuditActivityQuery, AuditActivityQueryVariables>, 'query'>;
+
+    export const AuditActivityComponent = (props: AuditActivityComponentProps) => (
+      <ApolloReactComponents.Query<AuditActivityQuery, AuditActivityQueryVariables> query={AuditActivityDocument} {...props} />
+    );
+    
+export type AuditActivityProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<AuditActivityQuery, AuditActivityQueryVariables>
+    } & TChildProps;
+export function withAuditActivity<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AuditActivityQuery,
+  AuditActivityQueryVariables,
+  AuditActivityProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, AuditActivityQuery, AuditActivityQueryVariables, AuditActivityProps<TChildProps, TDataName>>(AuditActivityDocument, {
+      alias: 'auditActivity',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useAuditActivityQuery__
+ *
+ * To run a query within a React component, call `useAuditActivityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAuditActivityQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAuditActivityQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      type: // value for 'type'
+ *   },
+ * });
+ */
+export function useAuditActivityQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AuditActivityQuery, AuditActivityQueryVariables>) {
+        return ApolloReactHooks.useQuery<AuditActivityQuery, AuditActivityQueryVariables>(AuditActivityDocument, baseOptions);
+      }
+export function useAuditActivityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AuditActivityQuery, AuditActivityQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<AuditActivityQuery, AuditActivityQueryVariables>(AuditActivityDocument, baseOptions);
+        }
+export type AuditActivityQueryHookResult = ReturnType<typeof useAuditActivityQuery>;
+export type AuditActivityLazyQueryHookResult = ReturnType<typeof useAuditActivityLazyQuery>;
+export type AuditActivityQueryResult = ApolloReactCommon.QueryResult<AuditActivityQuery, AuditActivityQueryVariables>;
 export const OrderADocument = gql`
     query orderA($id: ID) {
   orderA(id: $id) {
@@ -2951,65 +3196,6 @@ export function useOrderALazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookO
 export type OrderAQueryHookResult = ReturnType<typeof useOrderAQuery>;
 export type OrderALazyQueryHookResult = ReturnType<typeof useOrderALazyQuery>;
 export type OrderAQueryResult = ApolloReactCommon.QueryResult<OrderAQuery, OrderAQueryVariables>;
-export const OrderActionsDocument = gql`
-    query orderActions($orderId: ID) {
-  orderActions(orderId: $orderId) {
-    id
-    action
-    object
-    objectId
-    state
-    comment
-    createdDate
-    createdBy
-  }
-}
-    `;
-export type OrderActionsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<OrderActionsQuery, OrderActionsQueryVariables>, 'query'>;
-
-    export const OrderActionsComponent = (props: OrderActionsComponentProps) => (
-      <ApolloReactComponents.Query<OrderActionsQuery, OrderActionsQueryVariables> query={OrderActionsDocument} {...props} />
-    );
-    
-export type OrderActionsProps<TChildProps = {}, TDataName extends string = 'data'> = {
-      [key in TDataName]: ApolloReactHoc.DataValue<OrderActionsQuery, OrderActionsQueryVariables>
-    } & TChildProps;
-export function withOrderActions<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
-  TProps,
-  OrderActionsQuery,
-  OrderActionsQueryVariables,
-  OrderActionsProps<TChildProps, TDataName>>) {
-    return ApolloReactHoc.withQuery<TProps, OrderActionsQuery, OrderActionsQueryVariables, OrderActionsProps<TChildProps, TDataName>>(OrderActionsDocument, {
-      alias: 'orderActions',
-      ...operationOptions
-    });
-};
-
-/**
- * __useOrderActionsQuery__
- *
- * To run a query within a React component, call `useOrderActionsQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrderActionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrderActionsQuery({
- *   variables: {
- *      orderId: // value for 'orderId'
- *   },
- * });
- */
-export function useOrderActionsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OrderActionsQuery, OrderActionsQueryVariables>) {
-        return ApolloReactHooks.useQuery<OrderActionsQuery, OrderActionsQueryVariables>(OrderActionsDocument, baseOptions);
-      }
-export function useOrderActionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OrderActionsQuery, OrderActionsQueryVariables>) {
-          return ApolloReactHooks.useLazyQuery<OrderActionsQuery, OrderActionsQueryVariables>(OrderActionsDocument, baseOptions);
-        }
-export type OrderActionsQueryHookResult = ReturnType<typeof useOrderActionsQuery>;
-export type OrderActionsLazyQueryHookResult = ReturnType<typeof useOrderActionsLazyQuery>;
-export type OrderActionsQueryResult = ApolloReactCommon.QueryResult<OrderActionsQuery, OrderActionsQueryVariables>;
 export const PurchaseDocument = gql`
     query purchase($id: ID) {
   purchase(id: $id) {

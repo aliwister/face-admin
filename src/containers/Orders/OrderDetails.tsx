@@ -577,7 +577,7 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          {orderData.orderA && <AuditHistory id={orderData.orderA.id}/>}
+          {orderData.orderA && <AuditHistory id={orderData.orderA.id} type={"order"}/>}
         </Col>
       </Row>
 

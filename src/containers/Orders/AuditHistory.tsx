@@ -19,13 +19,14 @@ import {errorHandler} from "../../api/config";
 import Typography from "@material-ui/core/Typography";
 import {PaymentFormDialog} from "./components/PaymentFormDialog";
 import {RefundFormDialog} from "./components/RefundFormDialog";
-import {useOrderActionsQuery, useOrderAQuery} from "../../codegen/generated/_graphql";
+import {useAuditActivityQuery, useOrderAQuery} from "../../codegen/generated/_graphql";
 
 //const
-export default function AuditHistory({id}) {
-  const { data, loading, error, refetch } = useOrderActionsQuery({
+export default function AuditHistory({id, type}) {
+  const { data, loading, error, refetch } = useAuditActivityQuery({
     variables: {
-      orderId: id
+      type: type,
+      id: id
     },
     fetchPolicy: "network-only",
     context: { clientName: "shopLink" }
@@ -46,9 +47,9 @@ export default function AuditHistory({id}) {
                 <TableCell>User</TableCell>
               </TableRow>
             </TableHead>
-            {data && data.orderActions && (
+            {data && data.auditActivity && (
               <TableBody>
-                {data.orderActions.map(row => (
+                {data.auditActivity.map(row => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
                       {row.id}

@@ -27,12 +27,12 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => {
-  console.log(shipment);
+/*  console.log(shipment);
   console.log(shipment.merchantId)
   console.log(merchants.filter(obj => {
     console.log(obj.id)
     return obj.id == shipment.merchantId
-  }));
+  }));*/
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {
       ...shipment,

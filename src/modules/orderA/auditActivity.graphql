@@ -1,5 +1,5 @@
-  query orderActions($orderId: ID) {
-    orderActions(orderId: $orderId) {
+  query auditActivity($id: ID, $type: String) {
+    auditActivity(id: $id, type: $type) {
       id
       action
       object

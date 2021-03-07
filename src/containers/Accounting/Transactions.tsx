@@ -381,6 +381,7 @@ export default function Transactions() {
                 <TableCell align="center">Processed Date</TableCell>
                 <TableCell align="center">Settlement Date</TableCell>
                 <TableCell align="left">Customer Name</TableCell>
+                <TableCell align="left">ref</TableCell>
               </TableRow>
             </TableHead>
             {data && data.transactions.items.length && (
@@ -415,6 +416,7 @@ export default function Transactions() {
                     <TableCell align="left">
                       {row.customer}
                     </TableCell>
+                    <TableCell align="left">{row.id}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -24,6 +24,7 @@ import EditPackage from "./Packages/EditPackage";
 
 import {adminAPI} from "../../api/config";
 import { useShipmentItemDetailsQuery, usePkgItemDetailsQuery} from "../../codegen/generated/_graphql";
+import AuditHistory from "../Orders/AuditHistory";
 
 const ACCEPT_PACKAGE = gql`
   mutation acceptPackage($pkg: PackageInput) {
@@ -342,8 +343,8 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   const handleDetrackStart = () => dispatch({type:'SEND_TO_DETRACK_START'});
   const handleDetrackCancel = () => dispatch({type:'SEND_TO_DETRACK_CANCEL'});
 
-  const handleRemoveFromShipment = (itemId) => dispatch({type: 'REMOVE_ITEM_FROM_SHIPMENT_START', payload: itemId})
-  const handleRemoveFromPkg = (itemId) => dispatch({type: 'REMOVE_ITEM_FROM_PKG_START', payload: itemId})
+  const handleRemoveFromShipment = (item) => dispatch({type: 'REMOVE_ITEM_FROM_SHIPMENT_START', payload: item})
+  const handleRemoveFromPkg = (item) => dispatch({type: 'REMOVE_ITEM_FROM_PKG_START', payload: item})
 
   return (
 	  <Grid container xs={12} md={12} spacing={1}>
@@ -396,6 +397,10 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
         }
       </Grid>
       <CreatePkgDialog onSubmit={handleAcceptPackage} handleClose={handleClose} open={state.pkgDialog} />
+      <Grid item md={12}>
+        {state.shipment && <AuditHistory id={state.shipment.id} type={"shipment"}/>}
+      </Grid>
 	  </Grid>
+
   );
 }

@@ -23,6 +23,9 @@ export const RETURN_REASONS = [
 export const EDIT_REASONS = [
   {value: 'Wrong item ordered', label: 'Wrong item ordered'},
   {value: 'No Longer Needed', label: 'No Longer Needed'},
+  {value: 'Not available', label: 'Not available'},
+  {value: 'Per customer request', label: 'Per customer request'},
+  {value: 'Account/Order Adjustment', label: 'Account/Order Adjustment'},
   {value: 'Duplicate', label: 'Duplicate'},
   {value: 'Damaged/Broken', label: 'Damaged/Broken'},
   {value: 'Defective not working', label: 'Defective not working'},
@@ -82,7 +85,7 @@ export const ROLES = [
 ];
 export const USERS_ALL = [
   {value: 'ali@badals.com', label: 'Ali'},
-  {value: 'aliwister@gmail.com', label: 'Ali'},
+  /*{value: 'aliwister@gmail.com', label: 'Ali'},*/
   {value: 'shabib@badals.com', label: 'Shabib'},
   {value: 'faljulandani662@gmail.com', label: 'Fatma'},
   {value: 'humaidaljabri6@gmail.com', label: 'Humaid'},

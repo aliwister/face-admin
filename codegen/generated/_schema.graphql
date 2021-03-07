@@ -69,6 +69,11 @@ type Attribute {
   value: String
 }
 
+input AttributeInput {
+  name: String
+  value: String
+}
+
 """Built-in java.math.BigDecimal"""
 scalar BigDecimal
 
@@ -138,6 +143,60 @@ input CheckoutCartInput {
 type CheckoutSession {
   redirectUrl: String
   secureKey: String
+}
+
+type ChildProduct {
+  id: ID
+  slug: String
+
+  """Must be Unique"""
+  image: String
+
+  """Main image"""
+  priceObj: Price
+
+  """null For Parent"""
+  costObj: Price
+
+  """null For Parent"""
+  salePriceObj: Price
+
+  """null For Parent"""
+  weight: BigDecimal
+  availability: Int
+
+  """In hours"""
+  quantity: BigDecimal
+  discountInPercent: Int
+  gallery: [String]
+
+  """Ordered"""
+  variationAttributes: [Attribute]
+}
+
+input ChildProductInput {
+  id: ID
+  isDirty: Boolean
+
+  """For new product doesn't matter"""
+  sku: String
+  upc: String
+  weight: BigDecimal
+  availability: Int
+
+  """In hours"""
+  priceObj: PriceInput
+  costObj: PriceInput
+  salePriceObj: PriceInput
+  quantity: BigDecimal
+  gallery: [String]
+
+  """Ordered"""
+  image: String
+
+  """Main image"""
+  variationAttributes: [AttributeInput]
+  active: Boolean
 }
 
 enum Condition {
@@ -322,7 +381,7 @@ type Mutation {
   addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
   addToPricingQ(sku: String): Message
   addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
-  approveProduct(id: ID): Product
+  approveProduct(id: ID): Message
   cancelOrder(id: ID, reason: String): Order
   cancelPurchase(id: ID, reason: String): Purchase
   closeOrder(id: ID, reason: String): Order
@@ -352,11 +411,13 @@ type Mutation {
   """
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
+  deleteProduct(id: Long): Message
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
   getAdminFile(filename: String, contentType: String): PresignedUrl
   getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
   getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+  getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
   getUploadUrl(filename: String, contentType: String): PresignedUrl
   importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
   indexProduct(id: Int): Attribute
@@ -366,8 +427,9 @@ type Mutation {
 
   """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
-  removeItem(shipmentItemId: Long): Message
+  removeItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   resetPassword(email: String): String
+  savePartnerProduct(product: PartnerProductInput): ProductEnvelope
   saveShipment(shipment: ShipmentInput): Shipment
   sendOrderLevelEmail(id: ID, template: String): Message
   sendPaymentSms(id: ID, mobile: String): Message
@@ -378,12 +440,12 @@ type Mutation {
   setDial(dial: String, ref: Long): Message
   setEstimatedShipDate(id: Long, date: Date): Message
   setHashtags(hashtags: [String], ref: Long): Message
-  setOrderState(id: ID, state: OrderState): Order
+  setOrderState(value: OrderState): Message
   setProcessedDate(paymentIds: [Long], date: Date): Message
   setPurchaseState(id: ID, state: OrderState): Purchase
   setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
-  unpackItem(shipmentItemId: Long): Message
+  unpackItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   updateCart(secureKey: String, items: [CartItemInput]): Cart
   updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
@@ -418,7 +480,7 @@ type OrderItem {
   orderId: Long
   sequence: Int
   productName: String
-  quantity: Int
+  quantity: BigDecimal
   price: BigDecimal
   comment: String
   image: String
@@ -509,6 +571,96 @@ input PackagingContentInput {
   quantity: BigDecimal
 }
 
+type PartnerProduct {
+  id: ID
+
+  """Auto generated"""
+  sku: String
+  upc: String
+  ref: String
+  slug: String
+
+  """Must be Unique"""
+  brand: String
+
+  """The English value"""
+  name: String
+
+  """The English value"""
+  image: String
+
+  """Main image"""
+  priceObj: Price
+  costObj: Price
+  weight: BigDecimal
+  variationType: String
+
+  """SIMPLE, CHILD, PARENT"""
+  unit: String
+  availability: Int
+
+  """In hours"""
+  salePriceObj: Price
+  quantity: BigDecimal
+  discountInPercent: Int
+  options: [VariationOption]
+  langs: [ProductI18n]
+  gallery: [String]
+
+  """Ordered"""
+  children: [ChildProduct]
+}
+
+input PartnerProductInput {
+  id: ID
+
+  """Auto generated"""
+  sku: String
+  upc: String
+  model: String
+  hashtags: [String]
+
+  """Hashtags"""
+  slug: String
+
+  """Must be Unique"""
+  brand: String
+
+  """The English value"""
+  name: String
+
+  """The English value"""
+  image: String
+
+  """Main image"""
+  priceObj: PriceInput
+
+  """null For Parent"""
+  costObj: PriceInput
+
+  """null For Parent"""
+  salePriceObj: PriceInput
+
+  """null For Parent"""
+  weight: BigDecimal
+
+  """KG"""
+  variationType: String
+
+  """SIMPLE, CHILD, PARENT"""
+  unit: String
+  availability: Int
+
+  """In hours"""
+  quantity: BigDecimal
+  gallery: [String]
+
+  """Ordered"""
+  children: [ChildProductInput]
+  langs: [ProductI18nInput]
+  options: [VariationOptionInput]
+}
+
 type Payment {
   id: ID
   paymentMethod: String
@@ -566,7 +718,13 @@ type PrepQueue {
 type PresignedUrl {
   uploadUrl: String
   imageUrl: String
+  saveUrl: String
   status: String
+}
+
+type Price {
+  amount: BigDecimal
+  currency: String
 }
 
 input PriceInput {
@@ -616,7 +774,6 @@ type Product {
   discountInPercent: Float
   slug: String
   categories: [Category]
-  type: ProductType
   author: String
   unit: String
   description: String
@@ -629,6 +786,12 @@ type Product {
   inStock: Boolean
   hashtags: [String]
   dial: String
+}
+
+type ProductEnvelope {
+  message: String
+  product: PartnerProduct
+  code: Int
 }
 
 enum ProductGroup {
@@ -655,6 +818,8 @@ type ProductI18n {
   description: String
   model: String
   features: [String]
+  brand: String
+  lang: String
 }
 
 input ProductI18nInput {
@@ -662,6 +827,7 @@ input ProductI18nInput {
   description: String
   model: String
   features: [String]
+  brand: String
   lang: String
 }
 
@@ -705,12 +871,6 @@ type ProductResponse {
   items: [Product!]!
   total: Int!
   hasMore: Boolean!
-}
-
-enum ProductType {
-  CHILDREN_BOOKS
-  TEEN_BOOKS
-  ADULT_BOOKS
 }
 
 type Purchase {
@@ -803,6 +963,7 @@ input PurchaseShipmentInput {
 }
 
 type Query {
+  auditActivity(id: ID, type: String): [Action]
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
   customer(mobile: String): Customer
@@ -813,6 +974,7 @@ type Query {
   getCart(secureKey: String, items: [CartItemInput]): Cart
   getProductByDial(dial: String): Product
   getProductBySku(sku: String, isParent: Boolean = false): Product
+  hashtagList: [Hashtag]
   hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
   hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
   inventory: [Inventory]
@@ -824,7 +986,6 @@ type Query {
   merchants: [Merchant]
   mws(sku: String): Product
   orderA(id: ID): Order
-  orderActions(orderId: ID): [Action]
 
   """getOrders(): [Orders]"""
   orderConfirmation(ref: String, key: String): Order
@@ -832,6 +993,8 @@ type Query {
   ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
   outstandingQueue(keyword: String): [OutstandingQueue]
   parentOf(sku: String): String
+  partnerProduct(id: ID): PartnerProduct
+  partnerProducts(search: String, limit: Int, offset: Int, active: Boolean): MerchantProductResponse
   pas(sku: String): Product
   pasUk(sku: String): Product
   payments(orderId: ID): [Payment]
@@ -864,6 +1027,8 @@ type Query {
   transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String, unsettledOnly: Boolean): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
   unshippedQueue: [UnshippedQueue]
+  variationOptions(name: String): VariationOption
+  variations: [VariationOption]
 }
 
 type Reward {
@@ -908,6 +1073,7 @@ type ShipmentDoc {
 }
 
 input ShipmentInput {
+  id: ID
   reference: String
   trackingNum: String
   shipmentMethod: String
@@ -1083,6 +1249,12 @@ type Variation {
 }
 
 type VariationOption {
+  label: String
+  name: String
+  values: [String]
+}
+
+input VariationOptionInput {
   label: String
   name: String
   values: [String]

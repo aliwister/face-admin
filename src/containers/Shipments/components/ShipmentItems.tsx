@@ -49,7 +49,7 @@ Product
                   </a>:
                   <span>{a.productId}</span>
                 }</TableCell>
-                <TableCell><Button variant="contained" color="secondary" onClick = {() => handleDeleteItem(a.id)}>X</Button></TableCell>
+                <TableCell><Button variant="contained" color="secondary" onClick = {() => handleDeleteItem(a)}>X</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>

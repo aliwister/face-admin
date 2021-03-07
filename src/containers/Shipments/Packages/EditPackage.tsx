@@ -29,16 +29,16 @@ const ADD_ITEM = gql`
 `;
 
 const REMOVE_ITEM = gql`
-  mutation removeItem($shipmentItemId : Long) {
-    removeItem(shipmentItemId: $shipmentItemId) {
+  mutation removeItem($shipmentId: ID, $shipmentItemId: Long, $description: String, $quantity: BigDecimal) {
+    removeItem(shipmentId: $shipmentId, shipmentItemId: $shipmentItemId, description: $description, quantity: $quantity) {
       value
     }
   }
 `;
 
 const UNPACK_ITEM = gql`
-  mutation unpackItem($shipmentItemId : Long) {
-    unpackItem(shipmentItemId: $shipmentItemId) {
+  mutation unpackItem($shipmentId: ID, $shipmentItemId: Long, $description: String, $quantity: BigDecimal) {
+    unpackItem(shipmentId: $shipmentId, shipmentItemId: $shipmentItemId, description: $description, quantity: $quantity) {
       value
     }
   }
@@ -139,7 +139,10 @@ export default function EditPackage({state, dispatch, refreshShipment}) {
     if (state.context === 'PKG')
       return handleUnpackItem(data);
     let dto = {
-      shipmentItemId: state.item
+      shipmentId: state.shipment.id,
+      shipmentItemId: state.item.id,
+      description: state.item.description,
+      quantity: state.item.quantity
     }
     const {
       data: { removeItem },
@@ -154,7 +157,10 @@ export default function EditPackage({state, dispatch, refreshShipment}) {
   }
   const handleUnpackItem = async (data) => {
     let dto = {
-      shipmentItemId: state.item
+      shipmentId: state.shipment.id,
+      shipmentItemId: state.item.id,
+      description: state.item.description,
+      quantity: state.item.quantity
     }
     const {
       data: { unpackItem },

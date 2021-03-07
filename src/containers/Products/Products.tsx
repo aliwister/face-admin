@@ -38,10 +38,6 @@ export const ProductsRow = styled('div', ({ $theme }) => ({
   },
 }));
 
-
-
-
-
 export const ProductCardWrapper = styled('div', () => ({
   height: '100%',
 }));
