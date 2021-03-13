@@ -142,7 +142,7 @@ export default function AdvancedTrackingPage() {
           </AppBar>
 
           <TabPanel value={tab} index={0}>
-            <AdvancedTracking id={null} showAll={true} />
+            <AdvancedTracking id={null} showAll={false} />
           </TabPanel>
           <TabPanel value={tab} index={1}>
           </TabPanel>

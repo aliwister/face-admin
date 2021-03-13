@@ -583,7 +583,7 @@ export default function OrderDetails(props) {
       </Row>
       <Row>
         <Col md={12}>
-          {orderData.orderA && <AdvancedTracking id={orderData.orderA.reference} showAll={false}/>}
+          {orderData.orderA && <AdvancedTracking id={orderData.orderA.reference} showAll={true}/>}
         </Col>
       </Row>
 
