@@ -153,6 +153,11 @@ type ChildProduct {
   image: String
 
   """Main image"""
+  sku: String
+  upc: String
+  isDirty: Boolean
+
+  """Always false on the type"""
   priceObj: Price
 
   """null For Parent"""
@@ -172,29 +177,34 @@ type ChildProduct {
 
   """Ordered"""
   variationAttributes: [Attribute]
+  active: Boolean
 }
 
 input ChildProductInput {
   id: ID
+  slug: String
+
+  """Must be Unique"""
+  image: String
+
+  """Main image"""
+  sku: String
+  upc: String
   isDirty: Boolean
 
   """For new product doesn't matter"""
-  sku: String
-  upc: String
+  priceObj: PriceInput
+  costObj: PriceInput
+  salePriceObj: PriceInput
   weight: BigDecimal
   availability: Int
 
   """In hours"""
-  priceObj: PriceInput
-  costObj: PriceInput
-  salePriceObj: PriceInput
   quantity: BigDecimal
+  discountInPercent: Int
   gallery: [String]
 
   """Ordered"""
-  image: String
-
-  """Main image"""
   variationAttributes: [AttributeInput]
   active: Boolean
 }
@@ -247,6 +257,11 @@ type HashtagResponse {
   hasMore: Boolean!
 }
 
+type I18String {
+  lang: String
+  value: String
+}
+
 type Inventory {
   productId: Long
   title: String
@@ -266,6 +281,22 @@ type Item {
 type ItemIssuance {
   id: ID
   shipmentId: Long
+}
+
+type ItemTracking {
+  id: ID
+  description: String
+  image: String
+  quantity: String
+  reference: String
+  po: String
+  orderDate: String
+  invoiceDate: String
+  purchaseDate: String
+  purchaseShipments: [ShipmentInfo]
+  transitShipments: [ShipmentInfo]
+  customerShipments: [ShipmentInfo]
+  delivered: String
 }
 
 type LineItem {
@@ -577,7 +608,13 @@ type PartnerProduct {
   """Auto generated"""
   sku: String
   upc: String
+  model: String
+  hashtags: [String]
+
+  """Hashtags"""
   ref: String
+
+  """SIMPLE, CHILD, PARENT"""
   slug: String
 
   """Must be Unique"""
@@ -592,15 +629,13 @@ type PartnerProduct {
   """Main image"""
   priceObj: Price
   costObj: Price
+  salePriceObj: Price
   weight: BigDecimal
   variationType: String
-
-  """SIMPLE, CHILD, PARENT"""
   unit: String
   availability: Int
 
   """In hours"""
-  salePriceObj: Price
   quantity: BigDecimal
   discountInPercent: Int
   options: [VariationOption]
@@ -621,6 +656,9 @@ input PartnerProductInput {
   hashtags: [String]
 
   """Hashtags"""
+  ref: String
+
+  """SIMPLE, CHILD, PARENT"""
   slug: String
 
   """Must be Unique"""
@@ -647,18 +685,19 @@ input PartnerProductInput {
   """KG"""
   variationType: String
 
-  """SIMPLE, CHILD, PARENT"""
+  """readonly"""
   unit: String
   availability: Int
 
   """In hours"""
   quantity: BigDecimal
+  discountInPercent: Int
+  options: [VariationOptionInput]
+  langs: [ProductI18nInput]
   gallery: [String]
 
   """Ordered"""
   children: [ChildProductInput]
-  langs: [ProductI18nInput]
-  options: [VariationOptionInput]
 }
 
 type Payment {
@@ -963,9 +1002,12 @@ input PurchaseShipmentInput {
 }
 
 type Query {
+  advancedTracking(ref: String, showAll: Boolean = false): [ItemTracking]
   auditActivity(id: ID, type: String): [Action]
+  brands: [I18String]
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
+  collections: [I18String]
   customer(mobile: String): Customer
   customers: [Customer]
   ebay(id: String): Product
@@ -1070,6 +1112,13 @@ type Shipment {
 type ShipmentDoc {
   id: ID
   fileKey: String
+}
+
+type ShipmentInfo {
+  id: String
+  shipmentMethod: String
+  trackingNum: String
+  status: String
 }
 
 input ShipmentInput {

@@ -8,7 +8,6 @@ import {
   ORDERS,
   SETTINGS,
   CUSTOMERS,
-  COUPONS,
   STUFF_MEMBERS,
   SITE_SETTINGS,
   ORDERDETAILS,
@@ -26,7 +25,7 @@ import {
   OUTSTANDINGQ,
   UNSHIPPEDQ,
   ACCOUNTING,
-  HASHTAGS
+  HASHTAGS, ADVANCED_TRACKING
 } from "./settings/constants";
 import AuthProvider, { AuthContext } from "./context/auth";
 import { InLineLoader } from "./components/InlineLoader/InlineLoader";
@@ -39,6 +38,7 @@ import UnshippedQueue from "./containers/Purchases/UnshippedQueue";
 import {TransactionsDocument} from "./codegen/generated/_graphql";
 import Transactions from "./containers/Accounting/Transactions";
 import Hashtags from "./containers/Hashtag/List";
+import AdvancedTrackingPage from "./containers/Shipments/AdvancedTrackingPage";
 const PurchaseDetails = lazy(() => import(  "./containers/Purchases/PurchaseDetails"));
 const Purchases = lazy(() => import(  "./containers/Purchases/Purchases"));
 const Shipments = lazy(() => import(  "./containers/Shipments/Shipments"));
@@ -297,10 +297,10 @@ const Routes = () => {
               </Suspense>
             </AdminLayout>
           </EmployeeRoute>
-          <EmployeeRoute path={COUPONS}>
+          <EmployeeRoute path={ADVANCED_TRACKING}>
             <AdminLayout>
               <Suspense fallback={<InLineLoader />}>
-                <Coupons />
+                <AdvancedTrackingPage />
               </Suspense>
             </AdminLayout>
           </EmployeeRoute>

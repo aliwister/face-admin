@@ -14,7 +14,7 @@ import {
   SHIPMENTS,
   ORDERS,
   CUSTOMERS,
-  COUPONS,
+  ADVANCED_TRACKING,
   SETTINGS, ACCOUNTING,
 } from '../../../settings/constants';
 import { AuthContext } from '../../../context/auth';
@@ -81,8 +81,8 @@ const sidebarMenus = [
     icon: <CustomerIcon />,
   },
   {
-    name: 'Coupons',
-    path: COUPONS,
+    name: 'Advanced Tracking',
+    path: ADVANCED_TRACKING,
     exact: false,
     isAdmin: 1,
     icon: <CouponIcon />,

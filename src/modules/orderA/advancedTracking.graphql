@@ -1,0 +1,33 @@
+  query advancedTracking($ref: String, $showAll: Boolean) {
+    advancedTracking(ref: $ref, showAll: $showAll) {
+      id
+      description
+      image
+      quantity
+      reference
+      po
+      orderDate
+      invoiceDate
+      purchaseDate
+
+      delivered
+   purchaseShipments{
+         id
+     status
+     trackingNum
+     shipmentMethod
+       }
+   transitShipments{
+         id
+     status
+     trackingNum
+     shipmentMethod
+   }
+      customerShipments{
+            id
+        status
+        trackingNum
+        shipmentMethod
+      }
+    }
+  }

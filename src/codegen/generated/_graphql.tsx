@@ -180,6 +180,10 @@ export type ChildProduct = {
   /** Must be Unique */
   image: Maybe<Scalars['String']>;
   /** Main image */
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  isDirty: Maybe<Scalars['Boolean']>;
+  /** Always false on the type */
   priceObj: Maybe<Price>;
   /** null For Parent */
   costObj: Maybe<Price>;
@@ -194,25 +198,29 @@ export type ChildProduct = {
   gallery: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Ordered */
   variationAttributes: Maybe<Array<Maybe<Attribute>>>;
+  active: Maybe<Scalars['Boolean']>;
 };
 
 export type ChildProductInput = {
   id: Maybe<Scalars['ID']>;
-  isDirty: Maybe<Scalars['Boolean']>;
-  /** For new product doesn't matter */
+  slug: Maybe<Scalars['String']>;
+  /** Must be Unique */
+  image: Maybe<Scalars['String']>;
+  /** Main image */
   sku: Maybe<Scalars['String']>;
   upc: Maybe<Scalars['String']>;
-  weight: Maybe<Scalars['BigDecimal']>;
-  availability: Maybe<Scalars['Int']>;
-  /** In hours */
+  isDirty: Maybe<Scalars['Boolean']>;
+  /** For new product doesn't matter */
   priceObj: Maybe<PriceInput>;
   costObj: Maybe<PriceInput>;
   salePriceObj: Maybe<PriceInput>;
+  weight: Maybe<Scalars['BigDecimal']>;
+  availability: Maybe<Scalars['Int']>;
+  /** In hours */
   quantity: Maybe<Scalars['BigDecimal']>;
+  discountInPercent: Maybe<Scalars['Int']>;
   gallery: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Ordered */
-  image: Maybe<Scalars['String']>;
-  /** Main image */
   variationAttributes: Maybe<Array<Maybe<AttributeInput>>>;
   active: Maybe<Scalars['Boolean']>;
 };
@@ -268,6 +276,12 @@ export type HashtagResponse = {
   hasMore: Scalars['Boolean'];
 };
 
+export type I18String = {
+   __typename?: 'I18String';
+  lang: Maybe<Scalars['String']>;
+  value: Maybe<Scalars['String']>;
+};
+
 export type Inventory = {
    __typename?: 'Inventory';
   productId: Maybe<Scalars['Long']>;
@@ -290,6 +304,23 @@ export type ItemIssuance = {
    __typename?: 'ItemIssuance';
   id: Maybe<Scalars['ID']>;
   shipmentId: Maybe<Scalars['Long']>;
+};
+
+export type ItemTracking = {
+   __typename?: 'ItemTracking';
+  id: Maybe<Scalars['ID']>;
+  description: Maybe<Scalars['String']>;
+  image: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['String']>;
+  reference: Maybe<Scalars['String']>;
+  po: Maybe<Scalars['String']>;
+  orderDate: Maybe<Scalars['String']>;
+  invoiceDate: Maybe<Scalars['String']>;
+  purchaseDate: Maybe<Scalars['String']>;
+  purchaseShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
+  transitShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
+  customerShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
+  delivered: Maybe<Scalars['String']>;
 };
 
 export type LineItem = {
@@ -1019,7 +1050,11 @@ export type PartnerProduct = {
   /** Auto generated */
   sku: Maybe<Scalars['String']>;
   upc: Maybe<Scalars['String']>;
+  model: Maybe<Scalars['String']>;
+  hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
+  /** Hashtags */
   ref: Maybe<Scalars['String']>;
+  /** SIMPLE, CHILD, PARENT */
   slug: Maybe<Scalars['String']>;
   /** Must be Unique */
   brand: Maybe<Scalars['String']>;
@@ -1030,13 +1065,12 @@ export type PartnerProduct = {
   /** Main image */
   priceObj: Maybe<Price>;
   costObj: Maybe<Price>;
+  salePriceObj: Maybe<Price>;
   weight: Maybe<Scalars['BigDecimal']>;
   variationType: Maybe<Scalars['String']>;
-  /** SIMPLE, CHILD, PARENT */
   unit: Maybe<Scalars['String']>;
   availability: Maybe<Scalars['Int']>;
   /** In hours */
-  salePriceObj: Maybe<Price>;
   quantity: Maybe<Scalars['BigDecimal']>;
   discountInPercent: Maybe<Scalars['Int']>;
   options: Maybe<Array<Maybe<VariationOption>>>;
@@ -1054,6 +1088,8 @@ export type PartnerProductInput = {
   model: Maybe<Scalars['String']>;
   hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Hashtags */
+  ref: Maybe<Scalars['String']>;
+  /** SIMPLE, CHILD, PARENT */
   slug: Maybe<Scalars['String']>;
   /** Must be Unique */
   brand: Maybe<Scalars['String']>;
@@ -1071,16 +1107,17 @@ export type PartnerProductInput = {
   weight: Maybe<Scalars['BigDecimal']>;
   /** KG */
   variationType: Maybe<Scalars['String']>;
-  /** SIMPLE, CHILD, PARENT */
+  /** readonly */
   unit: Maybe<Scalars['String']>;
   availability: Maybe<Scalars['Int']>;
   /** In hours */
   quantity: Maybe<Scalars['BigDecimal']>;
+  discountInPercent: Maybe<Scalars['Int']>;
+  options: Maybe<Array<Maybe<VariationOptionInput>>>;
+  langs: Maybe<Array<Maybe<ProductI18nInput>>>;
   gallery: Maybe<Array<Maybe<Scalars['String']>>>;
   /** Ordered */
   children: Maybe<Array<Maybe<ChildProductInput>>>;
-  langs: Maybe<Array<Maybe<ProductI18nInput>>>;
-  options: Maybe<Array<Maybe<VariationOptionInput>>>;
 };
 
 export type Payment = {
@@ -1398,9 +1435,12 @@ export type PurchaseShipmentInput = {
 
 export type Query = {
    __typename?: 'Query';
+  advancedTracking: Maybe<Array<Maybe<ItemTracking>>>;
   auditActivity: Maybe<Array<Maybe<Action>>>;
+  brands: Maybe<Array<Maybe<I18String>>>;
   categories: Array<Category>;
   category: Category;
+  collections: Maybe<Array<Maybe<I18String>>>;
   customer: Maybe<Customer>;
   customers: Maybe<Array<Maybe<Customer>>>;
   ebay: Maybe<Product>;
@@ -1462,6 +1502,12 @@ export type Query = {
   unshippedQueue: Maybe<Array<Maybe<UnshippedQueue>>>;
   variationOptions: Maybe<VariationOption>;
   variations: Maybe<Array<Maybe<VariationOption>>>;
+};
+
+
+export type QueryAdvancedTrackingArgs = {
+  ref: Maybe<Scalars['String']>;
+  showAll?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1790,6 +1836,14 @@ export type ShipmentDoc = {
    __typename?: 'ShipmentDoc';
   id: Maybe<Scalars['ID']>;
   fileKey: Maybe<Scalars['String']>;
+};
+
+export type ShipmentInfo = {
+   __typename?: 'ShipmentInfo';
+  id: Maybe<Scalars['String']>;
+  shipmentMethod: Maybe<Scalars['String']>;
+  trackingNum: Maybe<Scalars['String']>;
+  status: Maybe<Scalars['String']>;
 };
 
 export type ShipmentInput = {
@@ -2159,6 +2213,30 @@ export type MerchantProductsQuery = (
       & Pick<MerchantProduct, 'id' | 'ref' | 'name' | 'brand' | 'description' | 'features' | 'name_ar' | 'brand_ar' | 'description_ar' | 'features_ar' | 'image' | 'price' | 'unit' | 'sku' | 'salePrice' | 'discountInPercent' | 'upc' | 'availability' | 'weight' | 'cost' | 'quantity' | 'shopIds' | 'browseNode' | 'browseNode_ar' | 'slug'>
     )>>> }
   )> }
+);
+
+export type AdvancedTrackingQueryVariables = {
+  ref: Maybe<Scalars['String']>;
+  showAll: Maybe<Scalars['Boolean']>;
+};
+
+
+export type AdvancedTrackingQuery = (
+  { __typename?: 'Query' }
+  & { advancedTracking: Maybe<Array<Maybe<(
+    { __typename?: 'ItemTracking' }
+    & Pick<ItemTracking, 'id' | 'description' | 'image' | 'quantity' | 'reference' | 'po' | 'orderDate' | 'invoiceDate' | 'purchaseDate' | 'delivered'>
+    & { purchaseShipments: Maybe<Array<Maybe<(
+      { __typename?: 'ShipmentInfo' }
+      & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
+    )>>>, transitShipments: Maybe<Array<Maybe<(
+      { __typename?: 'ShipmentInfo' }
+      & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
+    )>>>, customerShipments: Maybe<Array<Maybe<(
+      { __typename?: 'ShipmentInfo' }
+      & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
+    )>>> }
+  )>>> }
 );
 
 export type AuditActivityQueryVariables = {
@@ -3031,6 +3109,86 @@ export function useMerchantProductsLazyQuery(baseOptions?: ApolloReactHooks.Lazy
 export type MerchantProductsQueryHookResult = ReturnType<typeof useMerchantProductsQuery>;
 export type MerchantProductsLazyQueryHookResult = ReturnType<typeof useMerchantProductsLazyQuery>;
 export type MerchantProductsQueryResult = ApolloReactCommon.QueryResult<MerchantProductsQuery, MerchantProductsQueryVariables>;
+export const AdvancedTrackingDocument = gql`
+    query advancedTracking($ref: String, $showAll: Boolean) {
+  advancedTracking(ref: $ref, showAll: $showAll) {
+    id
+    description
+    image
+    quantity
+    reference
+    po
+    orderDate
+    invoiceDate
+    purchaseDate
+    delivered
+    purchaseShipments {
+      id
+      status
+      trackingNum
+      shipmentMethod
+    }
+    transitShipments {
+      id
+      status
+      trackingNum
+      shipmentMethod
+    }
+    customerShipments {
+      id
+      status
+      trackingNum
+      shipmentMethod
+    }
+  }
+}
+    `;
+export type AdvancedTrackingComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>, 'query'>;
+
+    export const AdvancedTrackingComponent = (props: AdvancedTrackingComponentProps) => (
+      <ApolloReactComponents.Query<AdvancedTrackingQuery, AdvancedTrackingQueryVariables> query={AdvancedTrackingDocument} {...props} />
+    );
+    
+export type AdvancedTrackingProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>
+    } & TChildProps;
+export function withAdvancedTracking<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AdvancedTrackingQuery,
+  AdvancedTrackingQueryVariables,
+  AdvancedTrackingProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, AdvancedTrackingQuery, AdvancedTrackingQueryVariables, AdvancedTrackingProps<TChildProps, TDataName>>(AdvancedTrackingDocument, {
+      alias: 'advancedTracking',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useAdvancedTrackingQuery__
+ *
+ * To run a query within a React component, call `useAdvancedTrackingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAdvancedTrackingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAdvancedTrackingQuery({
+ *   variables: {
+ *      ref: // value for 'ref'
+ *      showAll: // value for 'showAll'
+ *   },
+ * });
+ */
+export function useAdvancedTrackingQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>) {
+        return ApolloReactHooks.useQuery<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>(AdvancedTrackingDocument, baseOptions);
+      }
+export function useAdvancedTrackingLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>(AdvancedTrackingDocument, baseOptions);
+        }
+export type AdvancedTrackingQueryHookResult = ReturnType<typeof useAdvancedTrackingQuery>;
+export type AdvancedTrackingLazyQueryHookResult = ReturnType<typeof useAdvancedTrackingLazyQuery>;
+export type AdvancedTrackingQueryResult = ApolloReactCommon.QueryResult<AdvancedTrackingQuery, AdvancedTrackingQueryVariables>;
 export const AuditActivityDocument = gql`
     query auditActivity($id: ID, $type: String) {
   auditActivity(id: $id, type: $type) {

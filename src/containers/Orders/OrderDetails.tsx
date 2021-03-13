@@ -50,6 +50,7 @@ import {ReturnDialog} from "./components/ReturnDialog";
 import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 import AuditHistory from "./AuditHistory";
 import {WorkItems} from "../Dashboard/WorkItems";
+import AdvancedTracking from "./AdvancedTracking";
 
 
 
@@ -578,6 +579,11 @@ export default function OrderDetails(props) {
       <Row>
         <Col md={12}>
           {orderData.orderA && <AuditHistory id={orderData.orderA.id} type={"order"}/>}
+        </Col>
+      </Row>
+      <Row>
+        <Col md={12}>
+          {orderData.orderA && <AdvancedTracking id={orderData.orderA.reference} showAll={false}/>}
         </Col>
       </Row>
 
