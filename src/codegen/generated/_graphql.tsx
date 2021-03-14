@@ -317,6 +317,10 @@ export type ItemTracking = {
   orderDate: Maybe<Scalars['String']>;
   invoiceDate: Maybe<Scalars['String']>;
   purchaseDate: Maybe<Scalars['String']>;
+  merchant: Maybe<Scalars['String']>;
+  merchantId: Maybe<Scalars['Long']>;
+  sku: Maybe<Scalars['String']>;
+  url: Maybe<Scalars['String']>;
   purchaseShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
   transitShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
   customerShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
@@ -2226,7 +2230,7 @@ export type AdvancedTrackingQuery = (
   { __typename?: 'Query' }
   & { advancedTracking: Maybe<Array<Maybe<(
     { __typename?: 'ItemTracking' }
-    & Pick<ItemTracking, 'id' | 'description' | 'image' | 'quantity' | 'reference' | 'po' | 'orderDate' | 'invoiceDate' | 'purchaseDate' | 'delivered'>
+    & Pick<ItemTracking, 'id' | 'description' | 'image' | 'quantity' | 'reference' | 'po' | 'orderDate' | 'invoiceDate' | 'purchaseDate' | 'merchant' | 'merchantId' | 'sku' | 'url' | 'delivered'>
     & { purchaseShipments: Maybe<Array<Maybe<(
       { __typename?: 'ShipmentInfo' }
       & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
@@ -3122,6 +3126,10 @@ export const AdvancedTrackingDocument = gql`
     orderDate
     invoiceDate
     purchaseDate
+    merchant
+    merchantId
+    sku
+    url
     delivered
     purchaseShipments {
       id

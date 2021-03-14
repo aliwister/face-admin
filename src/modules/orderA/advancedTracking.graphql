@@ -9,7 +9,10 @@
       orderDate
       invoiceDate
       purchaseDate
-
+merchant
+merchantId
+sku
+url
       delivered
    purchaseShipments{
          id

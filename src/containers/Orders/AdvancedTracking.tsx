@@ -11,6 +11,7 @@ import Button from "@material-ui/core/Button";
 import {DateDialog} from "../Shipments/components/DateDialog";
 import {Tablelate} from "../../components/Table/Tabelate";
 import {Styles} from "../Shipments/components/ShipQueueTable";
+import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 
 function ShipmentInfo({data}) {
   return (
@@ -44,11 +45,10 @@ export default function AdvancedTracking({id, showAll}) {
           {
             Header: 'Image',
             accessor: (row) => (<Image url={row.image} className="product-image" style={{maxWidth: '70px'}} />)
-
           },
           {
             Header: 'Description',
-            accessor: 'description',
+            accessor: (row) => (<MerchantURL merchantId={row.merchantId} sku={row.sku} url={row.url} name={row.description}/>)
           },
           {
             Header: 'Quantity',
@@ -64,7 +64,7 @@ export default function AdvancedTracking({id, showAll}) {
           },
           {
             Header: 'PO',
-            accessor: (row) => (<Link to={`/purchase-details/${row.po}`}>{row.po}</Link>)
+            accessor: (row) => (<Link to={`/purchase-details/${row.po}`} target={"_blank"}>{row.po}({row.merchant})</Link>)
           },
           {
             Header: 'Order Date',
