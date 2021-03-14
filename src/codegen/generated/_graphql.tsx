@@ -1844,6 +1844,7 @@ export type ShipmentInfo = {
   shipmentMethod: Maybe<Scalars['String']>;
   trackingNum: Maybe<Scalars['String']>;
   status: Maybe<Scalars['String']>;
+  to: Maybe<Scalars['String']>;
 };
 
 export type ShipmentInput = {
@@ -2231,7 +2232,7 @@ export type AdvancedTrackingQuery = (
       & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
     )>>>, transitShipments: Maybe<Array<Maybe<(
       { __typename?: 'ShipmentInfo' }
-      & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
+      & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod' | 'to'>
     )>>>, customerShipments: Maybe<Array<Maybe<(
       { __typename?: 'ShipmentInfo' }
       & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
@@ -3133,6 +3134,7 @@ export const AdvancedTrackingDocument = gql`
       status
       trackingNum
       shipmentMethod
+      to
     }
     customerShipments {
       id
