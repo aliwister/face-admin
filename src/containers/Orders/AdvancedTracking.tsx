@@ -79,10 +79,6 @@ export default function AdvancedTracking({id, showAll}) {
             accessor: 'purchaseDate',
           },
           {
-            Header: 'Carrier',
-            accessor: 'carrier',
-          },
-          {
             Header: 'Transit Tracking',
             accessor: (row) => (row.transitShipments && row.transitShipments.map( s => ( <ShipmentInfo data={s}/>)))
           },
