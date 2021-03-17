@@ -2404,7 +2404,7 @@ export type ShipmentQuery = (
   { __typename?: 'Query' }
   & { shipment: Maybe<(
     { __typename?: 'Shipment' }
-    & Pick<Shipment, 'id' | 'actualShipCost' | 'latestCancelDate' | 'handlingInstructions' | 'reference' | 'trackingNum' | 'trackingLink' | 'shipmentMethod' | 'shipmentType' | 'shipmentStatus' | 'customerFirstName' | 'customerLastName' | 'customerId' | 'merchantId'>
+    & Pick<Shipment, 'id' | 'actualShipCost' | 'latestCancelDate' | 'handlingInstructions' | 'reference' | 'trackingNum' | 'trackingLink' | 'shipmentMethod' | 'shipmentType' | 'shipmentStatus' | 'customerFirstName' | 'customerLastName' | 'customerId' | 'merchantId' | 'partyId' | 'partyName'>
     & { pkgs: Maybe<Array<Maybe<(
       { __typename?: 'Pkg' }
       & Pick<Pkg, 'id' | 'length' | 'width' | 'height' | 'weight' | 'packageType'>
@@ -3786,6 +3786,8 @@ export const ShipmentDocument = gql`
     customerLastName
     customerId
     merchantId
+    partyId
+    partyName
     pkgs {
       id
       length

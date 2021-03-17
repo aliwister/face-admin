@@ -14,6 +14,8 @@ query shipment($id: ID) {
       customerLastName
       customerId
       merchantId
+      partyId
+      partyName
       pkgs {
           id
           length
