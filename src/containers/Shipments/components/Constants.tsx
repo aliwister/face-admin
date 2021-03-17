@@ -92,3 +92,13 @@ export const USERS_ALL = [
   {value: 'sooor363@gmail.com', label: 'Salah'},
   {value: 'azeez@badals.com', label: 'Nishanth'}
 ];
+
+export const STORES = [
+  {id: 6	, name: "Access USA"},
+  {id: 7	, name: "AMForward"},
+  {id: 11, name: "Badals.com"},
+  {id: 23, name: "Falcon"},
+  {id: 30, name: "Ship7"},
+  {id: 31, name: "Stackry"},
+  {id: 34, name: "Forward2Me"},
+];

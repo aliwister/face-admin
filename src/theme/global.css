@@ -10,3 +10,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
+.my-react-select .Select-control:before {
+  color: #aaa;
+  content: 'Flavors';
+  line-height: 34px;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: absolute;
+}
+
+.my-react-select .Select-placeholder + .Select-input,
+.my-react-select .Select-input:first-child,
+.my-react-select .Select-value:first-child {
+  margin-left: 70px;
+}

@@ -1,35 +1,22 @@
 import React, { useState } from 'react';
-import Moment from 'react-moment';
-import { useHistory } from 'react-router-dom';
 
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 
-import Checkbox from '../../components/CheckBox/CheckBox';
-import { useAlert } from "react-alert";
+
 import { Link } from 'react-router-dom';
 import {
-  Box,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow, Typography
+  Grid
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
 
-import {useForm} from "react-hook-form";
 
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import AppBar from "@material-ui/core/AppBar";
 
-import useTheme from "@material-ui/core/styles/useTheme";
 
 import {CreateShipmentDialog} from "./components/CreateShipmentDialog";
 import {StatusMultiSelect} from "./components/StatusMultiSelect";
@@ -77,23 +64,7 @@ const SHIPMENTS = gql`
 
   }
 `;
-const MERCHANTS = gql`
-query merchants {
-  merchants {
-    id
-    name
-  }
-}
-`;
 
-
-const CREATE_SHIPMENT = gql`
-  mutation createShipment($shipment: ShipmentInput) {
-    createShipment(shipment: $shipment) {
-      id
-    }
-  }
-`;
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
@@ -129,26 +100,6 @@ export default function Shipments() {
   const [acceptdialog, setAcceptdialog] = React.useState(false);
   const [createdialog, setCreatedialog] = React.useState(false);
   const [importcsvdialog, openImportcsvdialog] = React.useState(false);
-
-  const [merchant, setMerchant] = React.useState({id:0});
-  const alert = useAlert();
-  const classes = useStyles();
-  const theme = useTheme();
-
-  const history = useHistory();
-  const { data:merchants, loading:merhcnatsLoading} = useQuery(MERCHANTS, {context: { clientName: "shopLink" }});
-
-  const [createShipmentMutation] = useMutation(CREATE_SHIPMENT,{context: { clientName: "adminLink" }});
-
-
-/*  const { data, error, refetch } = useQuery(SHIPMENTS, {
-    variables: {
-      status: status,
-      type: 'CUSTOMER'
-    },
-    fetchPolicy: "network-only",
-    context: { clientName: "adminLink" }
-  });  */
 
   const { data, error, refetch } = useQuery(SHIPMENT_QUEUE, {
     variables: {
@@ -199,42 +150,12 @@ export default function Shipments() {
     openImportcsvdialog(false);
   };
 
-  if(merhcnatsLoading) {
-    return <div>Loading</div>
-  }
   const onSubmit = data => console.log(data);
-
-  const handleSubmitNewShipment = async data => {
-    console.log(data);
-    // @ts-ignore
-    const dto = {
-      ...data,
-      shipmentStatus: 'PROCESSING',
-      merchantId: data.merchant.id,
-      shipmentType: data.shipmentType.value,
-      shipmentMethod: data.shipmentMethod.value
-    };
-    console.log(dto);
-    delete dto['merchant'];
-    const {
-      data: { createShipment },
-    }: any = await createShipmentMutation({
-      variables: { shipment: dto },
-    });
-    if(createShipment)  {
-      alert.success(createShipment.id);
-      history.push('/shipment-details/'+createShipment.id+'/EDIT');
-    }
-  }
 
 
 
   function handleAcceptButton() {
     setAcceptdialog(true);
-  }
-
-  function handleCreateButton() {
-    setCreatedialog(true);
   }
 
   function handleImportCsvButton() {
@@ -287,7 +208,7 @@ export default function Shipments() {
 
   return (
     <>
-      <CreateShipmentDialog show={createdialog} onClose={handleClose} onSubmit={handleSubmitNewShipment} merchants={merchants} defaults={{}} />
+
       <AcceptShipmentDialog show={acceptdialog} onClose={handleClose} />
       <ImportAmazonCsvDialog show={importcsvdialog} onClose={handleClose} />
       <Grid container spacing={1}>
@@ -299,9 +220,7 @@ export default function Shipments() {
         <Grid  item  md={2} >
         </Grid>
         <Grid item  md={5} style={{textAlign: 'right'}}>
-          <Button variant="contained" color="primary" onClick={handleCreateButton} >
-            Create
-          </Button>
+          <CreateShipmentDialog  defaults={{}} />
           <Button variant="contained" color="primary" onClick={handleAcceptButton} >
             Accept
           </Button>

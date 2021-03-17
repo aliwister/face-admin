@@ -155,6 +155,7 @@ export default function ImportQueue() {
     merchant: {id: 6, name: 'Access USA'},
     details: "Sent via Fedex to Muscat, Oman",
     loading: false,
+    open: true,
   });
 
   const alert = useAlert();
@@ -171,7 +172,8 @@ export default function ImportQueue() {
          reference: formData.reference,
          trackingNum: formData.trackingNum,
          shipmentStatus: 'PROCESSING',
-         merchantId: formData.merchant.id,
+         merchantId: formData.merchantId,
+         partyId: formData.partyId,
          shipmentType: formData.shipmentType.value,
          shipmentMethod: formData.shipmentMethod.value,
          pkgCount: formData.pkgCount,
@@ -454,7 +456,7 @@ export default function ImportQueue() {
         Create Stackry Shipment
       </Button>
 
-      {merchants && createShipmentDialog && <CreateShipmentDialog onSubmit={onCreateShipment} merchants={merchants} show={createShipmentDialog} onClose={onClose} defaults={defaults} />}
+      {createShipmentDialog && <CreateShipmentDialog onSubmit={onCreateShipment} show={createShipmentDialog} onClose={onClose} defaults={defaults} />}
       {events    && addTrackingDialog && <AddTrackingDialog    onSubmit={addTrackingEvent} events={events}       show={addTrackingDialog}    onClose={onClose} defaults={defaults} />}
     </>
   );

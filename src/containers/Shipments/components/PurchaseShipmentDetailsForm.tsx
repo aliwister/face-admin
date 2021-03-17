@@ -38,6 +38,9 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
       ...shipment,
       merchant: merchants.filter(obj => {
         return obj.id == shipment.merchantId
+      })[0],
+      party: merchants.filter(obj => {
+        return obj.id == shipment.partyId
       })[0]
     }
   });
@@ -54,6 +57,7 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
       'shipmentType',
       'shipmentStatus',
       'merchantId',
+      'partyId',
       'pkgCount',
       'handlingInstructions']);
     //console.log(_.assign({},shipmentInput, data));
@@ -78,12 +82,29 @@ export const PurchaseShipmentDetailsForm = ({merchants, shipment, onSubmit}) => 
         <Grid item md={6}>
           <Controller
             as={<Select
+                  className="my-react-select"
                   options={merchants}
                   getOptionLabel={(option: any) => option.name}
                   getOptionValue={(option: any) => option.id}
+                  placeholder="Merchant Store"
                 />}
             rules={{ required: true }}
             name="merchant"
+            register={register}
+            control={control}
+          />
+        </Grid>
+        <Grid item md={6}>
+          <Controller
+            as={<Select
+                  className="my-react-select"
+                  options={merchants}
+                  getOptionLabel={(option: any) => option.name}
+                  getOptionValue={(option: any) => option.id}
+                  placeholder="To"
+                />}
+            rules={{ required: true }}
+            name="party"
             register={register}
             control={control}
           />

@@ -325,8 +325,10 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
       ...data,
       shipmentStatus: 'PROCESSING',
       merchantId: data.merchant.id,
+      partyId: data.party.id,
     };
     delete dto['merchant'];
+    delete dto['party'];
 
     const {
       data: { saveShipment },
@@ -350,7 +352,7 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
 	  <Grid container xs={12} md={12} spacing={1}>
 		  <Grid item md={4}>
         <SendToDetrackDialog onSubmit={handleDetrackSubmit} onClose={handleDetrackCancel} open={state.sendDetrackDialog} />
-        {(shipment.shipmentType === 'PURCHASE') &&
+        {(shipment.shipmentType === 'PURCHASE' || shipment.shipmentType === 'TRANSIT') &&
           <PurchaseShipmentDetailsForm merchants={merchants.merchants} shipment={state.shipment} onSubmit={handleSaveShipment}/>
         }
         {(shipment.shipmentType === 'CUSTOMER') &&

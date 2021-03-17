@@ -37,6 +37,11 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment, order}) =>{
       return;
     }
 
+    if(order.balance >= 0 || data.amount > Math.abs(order.balance)) {
+      alert.error("Cannot refund more than balance");
+      return;
+    }
+
     let refund = {...data, amount : -1*data.amount};
 
     refund.ref = payment.id;

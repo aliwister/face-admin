@@ -64,37 +64,27 @@ export default function AdvancedTrackingPage() {
       console.log(newValue)
       if(newValue == 0) {
         refetch({
-            viewName: "INCOMING"
+            viewName: null
           });
       }
       else if (newValue == 1) {
         refetch({
-          viewName: "ALL_PURCHASE"
+          viewName: "NO_PO"
         });
       }
       else if (newValue == 2) {
         refetch({
-          viewName: "UNCLOSED_TRANSIT"
+          viewName: "PO_NO_TRANSIT"
         });
       }
       else if (newValue == 3) {
         refetch({
-          viewName: "CANCELLED_TRANSIT"
+          viewName: "LONG_TRANSIT"
         });
       }
       else if (newValue ==4) {
         refetch({
-          viewName: "ALL_TRANSIT"
-        });
-      }
-      else if (newValue == 5) {
-        refetch({
-          viewName: "CUSTOMER_SCHEDULED"
-        });
-      }
-      else if (newValue == 6) {
-        refetch({
-          viewName: "CUSTOMER_FAILED"
+          viewName: "LOST"
         });
       }
     }
@@ -105,7 +95,7 @@ export default function AdvancedTrackingPage() {
     <>
       <Grid container spacing={1}>
         <Grid item  md={3} >
-          <StatusMultiSelect handleStatus={handleStatus} status={status} />
+          <CreateShipmentDialog defaults={{}} />
         </Grid>
         <Grid item  md={2} >
         </Grid>
@@ -131,13 +121,11 @@ export default function AdvancedTrackingPage() {
         <Grid item xs={12}>
           <AppBar position="static">
             <Tabs value={tab} onChange={handleChange}>
-              <Tab label="Incoming"  />
-              <Tab label="All Purchase"  />
-              <Tab label="Unclosed"  />
-              <Tab label="Cancelled Transit"  />
-              <Tab label="All Transit"  />
-              <Tab label="Customer Scheduled"  />
-              <Tab label="Customer Failed"  />
+              <Tab label="All" />
+              <Tab label="No PO" />
+              <Tab label="PO & No Transit" />
+              <Tab label="Long Transit" />
+              <Tab label="Lost/Partial Shipment" />
             </Tabs>
           </AppBar>
 
@@ -153,8 +141,6 @@ export default function AdvancedTrackingPage() {
           <TabPanel value={tab} index={4}>
           </TabPanel>
           <TabPanel value={tab} index={5}>
-          </TabPanel>
-          <TabPanel value={tab} index={6}>
           </TabPanel>
         </Grid>
       </Grid>

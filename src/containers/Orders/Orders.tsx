@@ -35,8 +35,8 @@ import {useForm} from "react-hook-form";
 import TimeAgo from 'react-timeago';
 
 const GET_ORDERS = gql`
-  query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String) {
-    ordersA(state: $state, offset: $offset, limit: $limit, searchText: $searchText) {
+  query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String, $balance: Boolean) {
+    ordersA(state: $state, offset: $offset, limit: $limit, searchText: $searchText, balance: $balance) {
       total,
       hasMore,
       items {
@@ -100,6 +100,7 @@ export default function Orders() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState([ORDER_STATES[4]]);
+  const [balance, setBalance] = useState(false);
   const [limit, setLimit] = useState([]);
   const [search, setSearch] = useState([]);
   const alert = useAlert();
@@ -117,6 +118,7 @@ export default function Orders() {
       state: arrayToObject(status, 'value'),
       limit: 15,
       searchText: "",
+      balance: balance
     },
     fetchPolicy: "network-only",
     context: { clientName: "shopLink" }
@@ -134,9 +136,10 @@ export default function Orders() {
         state: arrayToObject(value, 'value'),
         limit: 15, //limit.length ? limit[0].value : null,
         searchText: "",
+        balance: balance
       });
     } else {
-      refetch({ state: [], limit:10, searchText:"" });
+      refetch({ state: [], limit:10, searchText:"", balance:balance });
     }
   }
   function handleSearch(data) {
@@ -146,9 +149,10 @@ export default function Orders() {
         state: arrayToObject(status, 'value'),
         limit: 15, //limit.length ? limit[0].value : null,
         searchText: searchText,
+        balance: balance,
       });
     } else {
-      refetch({ state: [], limit:10, searchText:searchText });
+      refetch({ state: [], limit:10, searchText:searchText, balance:balance });
     }
   }
   function loadMore() {
@@ -214,6 +218,18 @@ export default function Orders() {
         />
         <form onSubmit={handleSubmit(handleSearch)}>
           <TextField name="search" inputRef={register({required: true, minLength: 2, maxLength: 12})} style={{width:'320px'}}></TextField>
+          <Checkbox
+            checked={balance}
+            onChange={() => setBalance(!balance)}
+            overrides={{
+              Checkmark: {
+                style: {
+                  borderWidth: '2px',
+                  borderRadius: '4px',
+                },
+              },
+            }}
+          >Balance Only</Checkbox>
           <Button size="medium" variant="contained" color="primary" type="submit" >Go</Button>
         </form>
       </Grid>
