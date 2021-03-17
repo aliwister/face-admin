@@ -25,11 +25,12 @@ function ShipmentInfo({data}) {
 }
 
 //const
-export default function AdvancedTracking({id, showAll}) {
+export default function AdvancedTracking({id, showAll, queueName=""}) {
   const { data, loading, error, refetch } = useAdvancedTrackingQuery({
     variables: {
       showAll: showAll,
-      ref: id
+      ref: id,
+      queueName: queueName
     },
     context: { clientName: "adminLink" }
   });

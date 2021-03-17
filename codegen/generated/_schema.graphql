@@ -1006,7 +1006,7 @@ input PurchaseShipmentInput {
 }
 
 type Query {
-  advancedTracking(ref: String, showAll: Boolean = false): [ItemTracking]
+  advancedTracking(ref: String, showAll: Boolean = false, queueName: String): [ItemTracking]
   auditActivity(id: ID, type: String): [Action]
   brands: [I18String]
   categories(type: String!): [Category!]!
@@ -1036,7 +1036,7 @@ type Query {
   """getOrders(): [Orders]"""
   orderConfirmation(ref: String, key: String): Order
   orders(limit: Int = 10): [Order]
-  ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
+  ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
   outstandingQueue(keyword: String): [OutstandingQueue]
   parentOf(sku: String): String
   partnerProduct(id: ID): PartnerProduct
@@ -1111,6 +1111,8 @@ type Shipment {
   customerFirstName: String
   customerLastName: String
   merchantName: String
+  partyId: Long
+  partyName: String
 }
 
 type ShipmentDoc {
@@ -1136,6 +1138,7 @@ input ShipmentInput {
   merchantId: Long
   pkgCount: Int
   handlingInstructions: String
+  partyId: Long
 }
 
 type ShipmentItem {

@@ -1,5 +1,5 @@
-  query advancedTracking($ref: String, $showAll: Boolean) {
-    advancedTracking(ref: $ref, showAll: $showAll) {
+  query advancedTracking($ref: String, $showAll: Boolean, $queueName: String) {
+    advancedTracking(ref: $ref, showAll: $showAll, queueName:$queueName) {
       id
       description
       image

@@ -60,33 +60,6 @@ export default function AdvancedTrackingPage() {
    const handleChange = (event, newValue) => {
     if(tab != newValue) {
       setTab(newValue);
-
-      console.log(newValue)
-      if(newValue == 0) {
-        refetch({
-            viewName: null
-          });
-      }
-      else if (newValue == 1) {
-        refetch({
-          viewName: "NO_PO"
-        });
-      }
-      else if (newValue == 2) {
-        refetch({
-          viewName: "PO_NO_TRANSIT"
-        });
-      }
-      else if (newValue == 3) {
-        refetch({
-          viewName: "LONG_TRANSIT"
-        });
-      }
-      else if (newValue ==4) {
-        refetch({
-          viewName: "LOST"
-        });
-      }
     }
 
   };
@@ -130,17 +103,19 @@ export default function AdvancedTrackingPage() {
           </AppBar>
 
           <TabPanel value={tab} index={0}>
-            <AdvancedTracking id={null} showAll={false} />
+            <AdvancedTracking id={null} showAll={false} queueName={"null"} />
           </TabPanel>
           <TabPanel value={tab} index={1}>
+             <AdvancedTracking id={null} showAll={false}  queueName={"NO_PO"}/>
           </TabPanel>
           <TabPanel value={tab} index={2}>
+             <AdvancedTracking id={null} showAll={false}  queueName={"PO_NO_TRANSIT"}/>
           </TabPanel>
           <TabPanel value={tab} index={3}>
+             <AdvancedTracking id={null} showAll={false}  queueName={"LONG_TRANSIT"}/>
           </TabPanel>
           <TabPanel value={tab} index={4}>
-          </TabPanel>
-          <TabPanel value={tab} index={5}>
+             <AdvancedTracking id={null} showAll={false}  queueName={"LOST"}/>
           </TabPanel>
         </Grid>
       </Grid>

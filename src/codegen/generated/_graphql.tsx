@@ -1512,6 +1512,7 @@ export type Query = {
 export type QueryAdvancedTrackingArgs = {
   ref: Maybe<Scalars['String']>;
   showAll?: Maybe<Scalars['Boolean']>;
+  queueName: Maybe<Scalars['String']>;
 };
 
 
@@ -1621,6 +1622,7 @@ export type QueryOrdersAArgs = {
   offset: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
   searchText: Maybe<Scalars['String']>;
+  balance: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -1834,6 +1836,8 @@ export type Shipment = {
   customerFirstName: Maybe<Scalars['String']>;
   customerLastName: Maybe<Scalars['String']>;
   merchantName: Maybe<Scalars['String']>;
+  partyId: Maybe<Scalars['Long']>;
+  partyName: Maybe<Scalars['String']>;
 };
 
 export type ShipmentDoc = {
@@ -1861,6 +1865,7 @@ export type ShipmentInput = {
   merchantId: Maybe<Scalars['Long']>;
   pkgCount: Maybe<Scalars['Int']>;
   handlingInstructions: Maybe<Scalars['String']>;
+  partyId: Maybe<Scalars['Long']>;
 };
 
 export type ShipmentItem = {
@@ -2223,6 +2228,7 @@ export type MerchantProductsQuery = (
 export type AdvancedTrackingQueryVariables = {
   ref: Maybe<Scalars['String']>;
   showAll: Maybe<Scalars['Boolean']>;
+  queueName: Maybe<Scalars['String']>;
 };
 
 
@@ -3115,8 +3121,8 @@ export type MerchantProductsQueryHookResult = ReturnType<typeof useMerchantProdu
 export type MerchantProductsLazyQueryHookResult = ReturnType<typeof useMerchantProductsLazyQuery>;
 export type MerchantProductsQueryResult = ApolloReactCommon.QueryResult<MerchantProductsQuery, MerchantProductsQueryVariables>;
 export const AdvancedTrackingDocument = gql`
-    query advancedTracking($ref: String, $showAll: Boolean) {
-  advancedTracking(ref: $ref, showAll: $showAll) {
+    query advancedTracking($ref: String, $showAll: Boolean, $queueName: String) {
+  advancedTracking(ref: $ref, showAll: $showAll, queueName: $queueName) {
     id
     description
     image
@@ -3187,6 +3193,7 @@ export function withAdvancedTracking<TProps, TChildProps = {}, TDataName extends
  *   variables: {
  *      ref: // value for 'ref'
  *      showAll: // value for 'showAll'
+ *      queueName: // value for 'queueName'
  *   },
  * });
  */
