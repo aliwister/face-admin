@@ -285,9 +285,12 @@ type ItemIssuance {
 
 type ItemTracking {
   id: ID
+  pid: Long
+  productId: Long
+  price: BigDecimal
   description: String
   image: String
-  quantity: String
+  quantity: BigDecimal
   reference: String
   po: String
   orderDate: String

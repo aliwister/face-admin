@@ -16,15 +16,15 @@ import {MerchantLookup} from "../../../components/Merchant/MerchantsLookup";
 
 
 const CREATE_SHIPMENT = gql`
-  mutation createShipment($shipment: ShipmentInput) {
-    createShipment(shipment: $shipment) {
+  mutation createShipment($shipment: ShipmentInput, $shipmentItems: [ShipmentItemInput]) {
+    createShipment(shipment: $shipment, shipmentItems: $shipmentItems) {
       id
     }
   }
 `;
 
-export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = null,  defaults}) => {
-  console.log(defaults);
+export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = null, defaults, getContent=()=>[], forward = false}) => {
+  //console.log(defaults);
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: defaults
   });
@@ -34,6 +34,7 @@ export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = n
   const [to, setTo] = React.useState(defaults.to ?defaults.to: {id:0});
   const alert = useAlert();
   const history = useHistory();
+  const content = getContent();
 
 
   function handleCreateButton() {
@@ -56,29 +57,37 @@ export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = n
     data['merchantId'] = merchant.id;
     data['partyId'] = to.id;
 
+    //const s = items;
+
+
     if(onSubmit) {
       return onSubmit(data);
     }
 
     // @ts-ignore
     const dto = {
-      ...data,
-      shipmentStatus: 'PROCESSING',
-      //merchantId: merchant.value,
-      //partyId: to.value,
-      shipmentType: data.shipmentType.value,
-      shipmentMethod: data.shipmentMethod.value
+      shipment: {
+        ...data,
+        shipmentStatus: 'PROCESSING',
+        //merchantId: merchant.value,
+        //partyId: to.value,
+        shipmentType: data.shipmentType.value,
+        shipmentMethod: data.shipmentMethod.value
+      },
+      shipmentItems: content,
+      trackingNums: []
     };
     console.log(dto);
     delete dto['merchant'];
     const {
       data: { createShipment },
     }: any = await createShipmentMutation({
-      variables: { shipment: dto },
+      variables: {  ...dto  },
     });
     if(createShipment)  {
       alert.success(createShipment.id);
-      history.push('/shipment-details/'+createShipment.id+'/EDIT');
+      if(forward)
+        history.push('/shipment-details/'+createShipment.id+'/EDIT');
     }
   }
 
@@ -126,7 +135,13 @@ export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = n
         <div><TextField variant="outlined" fullWidth type="number" placeholder="Pkg count" name="pkgCount"
                         inputRef={register({required: true})} /></div>
         <div><textarea name="handlingInstructions" ref={register({required: true})}  rows={3} cols={10}/></div>
-
+        <div>
+          Content:
+          {content.map((x,y) =>
+            <>{x.description} <br/></>
+          )
+          }
+        </div>
 
       </DialogContent>
       <DialogActions>

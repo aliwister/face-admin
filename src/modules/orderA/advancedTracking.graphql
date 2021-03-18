@@ -1,6 +1,9 @@
   query advancedTracking($ref: String, $showAll: Boolean, $queueName: String) {
     advancedTracking(ref: $ref, showAll: $showAll, queueName:$queueName) {
       id
+      pid
+      productId
+      price
       description
       image
       quantity
@@ -9,17 +12,17 @@
       orderDate
       invoiceDate
       purchaseDate
-merchant
-merchantId
-sku
-url
+      merchant
+      merchantId
+      sku
+      url
       delivered
-   purchaseShipments{
+      purchaseShipments{
          id
-     status
-     trackingNum
-     shipmentMethod
-       }
+         status
+         trackingNum
+         shipmentMethod
+      }
    transitShipments{
          id
      status

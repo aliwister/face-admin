@@ -68,7 +68,7 @@ export default function AdvancedTrackingPage() {
     <>
       <Grid container spacing={1}>
         <Grid item  md={3} >
-          <CreateShipmentDialog defaults={{}} />
+
         </Grid>
         <Grid item  md={2} >
         </Grid>
@@ -109,7 +109,8 @@ export default function AdvancedTrackingPage() {
              <AdvancedTracking id={null} showAll={false}  queueName={"NO_PO"}/>
           </TabPanel>
           <TabPanel value={tab} index={2}>
-             <AdvancedTracking id={null} showAll={false}  queueName={"PO_NO_TRANSIT"}/>
+
+             <AdvancedTracking id={null} showAll={false}  queueName={"PO_NO_TRANSIT"} createShipmentFlag={true}/>
           </TabPanel>
           <TabPanel value={tab} index={3}>
              <AdvancedTracking id={null} showAll={false}  queueName={"LONG_TRANSIT"}/>

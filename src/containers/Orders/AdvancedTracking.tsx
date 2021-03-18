@@ -12,6 +12,9 @@ import {DateDialog} from "../Shipments/components/DateDialog";
 import {Tablelate} from "../../components/Table/Tabelate";
 import {Styles} from "../Shipments/components/ShipQueueTable";
 import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
+import {create} from "domain";
+import {CreateShipmentDialog} from "../Shipments/components/CreateShipmentDialog";
+import Checkbox from "@material-ui/core/Checkbox";
 
 function ShipmentInfo({data}) {
   return (
@@ -25,7 +28,9 @@ function ShipmentInfo({data}) {
 }
 
 //const
-export default function AdvancedTracking({id, showAll, queueName=""}) {
+export default function AdvancedTracking({id, showAll, queueName="", createShipmentFlag=false}) {
+  const [selectedRows, setSelectedRows] = React.useState({});
+  const [create, setCreate] = React.useState(false);
   const { data, loading, error, refetch } = useAdvancedTrackingQuery({
     variables: {
       showAll: showAll,
@@ -34,6 +39,19 @@ export default function AdvancedTracking({id, showAll, queueName=""}) {
     },
     context: { clientName: "adminLink" }
   });
+
+  const onCreateShipment = () => {
+    setCreate(true);
+  }
+
+  const getContent = () => {
+    var indexArr = Object.keys(selectedRows);
+    //const s = data.advancedTracking.filter(e => ~checkedId.indexOf(e.id)).map(({__typename, id, ...props}) => ({...props, from: id}));
+    var resultArr = indexArr.map(i => data.advancedTracking[i]).map(({__typename, delivered, customerShipments, id, transitShipments, purchaseShipments, merchant, merchantId, orderDate, invoiceDate, purchaseDate, reference, sku, url, po, quantity, pid, ...props}) => ({...props, quantity, purchaseShipments: {shipmentItemId: null, purchaseItemId: pid, quantity: quantity, purchaseId: po}}));
+    console.log(resultArr)
+    return resultArr;
+  }
+
   const columns = React.useMemo(
     () => [
       {
@@ -104,9 +122,21 @@ export default function AdvancedTracking({id, showAll, queueName=""}) {
 
   return (
     <>
+      {createShipmentFlag && <CreateShipmentDialog defaults={
+        {
+          shipmentType: {value: 'TRANSIT', label: 'TRANSIT'},
+          shipmentMethod: {value: 'UPS', label: 'UPS'},
+          shipmentStatus: {value: 'IN_TRANSIT', label: 'IN_TRANSIT'},
+          to: {id: 6, name: 'Access USA'},
+          merchant: {id: 1, name: 'Amazon'},
+          pkgCount: 1,
+          handlingInstructions: 'manually added'
+        }
+      } getContent={getContent} />}
+      <button className="action" onClick={()=>getContent()}>Get Content</button>
       <TableContainer component={Paper}>
         <Styles>
-          <Tablelate columns={columns} data={data.advancedTracking } />
+          <Tablelate columns={columns} data={data.advancedTracking } setSelectedRows={setSelectedRows} />
         </Styles>
       </TableContainer>
     </>

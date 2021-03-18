@@ -220,7 +220,7 @@ export default function Shipments() {
         <Grid  item  md={2} >
         </Grid>
         <Grid item  md={5} style={{textAlign: 'right'}}>
-          <CreateShipmentDialog  defaults={{}} />
+          <CreateShipmentDialog  defaults={{}} forward={true}/>
           <Button variant="contained" color="primary" onClick={handleAcceptButton} >
             Accept
           </Button>

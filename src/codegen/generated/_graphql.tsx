@@ -15,10 +15,10 @@ export type Scalars = {
   Float: number;
   /** Long type */
   Long: any;
-  Date: any;
-  LocalDate: any;
   /** Built-in java.math.BigDecimal */
   BigDecimal: any;
+  Date: any;
+  LocalDate: any;
   LocalDateTime: any;
 };
 
@@ -309,9 +309,12 @@ export type ItemIssuance = {
 export type ItemTracking = {
    __typename?: 'ItemTracking';
   id: Maybe<Scalars['ID']>;
+  pid: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['Long']>;
+  price: Maybe<Scalars['BigDecimal']>;
   description: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
-  quantity: Maybe<Scalars['String']>;
+  quantity: Maybe<Scalars['BigDecimal']>;
   reference: Maybe<Scalars['String']>;
   po: Maybe<Scalars['String']>;
   orderDate: Maybe<Scalars['String']>;
@@ -2236,7 +2239,7 @@ export type AdvancedTrackingQuery = (
   { __typename?: 'Query' }
   & { advancedTracking: Maybe<Array<Maybe<(
     { __typename?: 'ItemTracking' }
-    & Pick<ItemTracking, 'id' | 'description' | 'image' | 'quantity' | 'reference' | 'po' | 'orderDate' | 'invoiceDate' | 'purchaseDate' | 'merchant' | 'merchantId' | 'sku' | 'url' | 'delivered'>
+    & Pick<ItemTracking, 'id' | 'pid' | 'productId' | 'price' | 'description' | 'image' | 'quantity' | 'reference' | 'po' | 'orderDate' | 'invoiceDate' | 'purchaseDate' | 'merchant' | 'merchantId' | 'sku' | 'url' | 'delivered'>
     & { purchaseShipments: Maybe<Array<Maybe<(
       { __typename?: 'ShipmentInfo' }
       & Pick<ShipmentInfo, 'id' | 'status' | 'trackingNum' | 'shipmentMethod'>
@@ -3124,6 +3127,9 @@ export const AdvancedTrackingDocument = gql`
     query advancedTracking($ref: String, $showAll: Boolean, $queueName: String) {
   advancedTracking(ref: $ref, showAll: $showAll, queueName: $queueName) {
     id
+    pid
+    productId
+    price
     description
     image
     quantity
