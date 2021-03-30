@@ -1,0 +1,5 @@
+mutation addShipmentDoc($id: Long, $filename: String) {
+  addShipmentDoc(id: $id, filename: $filename) {
+    value
+  }
+}

@@ -285,8 +285,8 @@ type ItemIssuance {
 
 type ItemTracking {
   id: ID
-  pid: Long
-  productId: Long
+  pid: Int
+  productId: String
   price: BigDecimal
   description: String
   image: String
@@ -297,7 +297,7 @@ type ItemTracking {
   invoiceDate: String
   purchaseDate: String
   merchant: String
-  merchantId: Long
+  merchantId: Int
   sku: String
   url: String
   purchaseShipments: [ShipmentInfo]
@@ -416,6 +416,7 @@ type Mutation {
   addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+  addShipmentDoc(id: Long, filename: String): Message
   addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
   addToPricingQ(sku: String): Message
   addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
@@ -1005,7 +1006,7 @@ input PurchaseShipmentInput {
   shipmentItemId: Int
   purchaseItemId: Int
   quantity: BigDecimal
-  purchaseId: Long
+  purchaseId: Int
 }
 
 type Query {
@@ -1063,6 +1064,7 @@ type Query {
   shipQueue: [ShipQueue]
   shipQueueByCustomerId(customerId: Long): [ShipQueue]
   shipment(id: ID): Shipment
+  shipmentDocs(id: ID): [ShipmentDoc]
   shipmentItemDetails(id: ID): [ShipmentItemDetails]
   shipmentItemsByTrackingNums(trackingNums: [String], showClosed: Boolean): [ShipmentItem]
   shipmentItemsCountByTrackingNums(trackingNums: [String]): [ShipmentItemSummary]
@@ -1172,10 +1174,10 @@ input ShipmentItemInput {
   quantity: BigDecimal
   description: String
   shipmentId: Long
-  productId: Long
+  productId: String
   image: String
   purchaseShipments: [PurchaseShipmentInput]
-  from: Long
+  from: Int
   price: BigDecimal
 }
 

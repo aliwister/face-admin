@@ -3,7 +3,7 @@ import NativeSelect from "@material-ui/core/NativeSelect";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import Button from "@material-ui/core/Button";
-import React from "react";
+import React, {useState} from "react";
 import {Controller, useForm} from "react-hook-form";
 import Webcam from "react-webcam";
 
@@ -36,8 +36,11 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
   const [acceptShipmentMutation] = useMutation(ACCEPT_SHIPMENT,{context: { clientName: "adminLink" }});
   const history = useHistory();
   const alert = useAlert();
+  const [files, setFiles] = useState([]);
   const webcamRef = React.useRef(null);
-
+  const handleUploader = async files => {
+    setFiles(files);
+  };
 
   const handleAcceptShipment = async formData => {
     console.log( formData.trackingNum);
@@ -60,13 +63,11 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
       },
     });
 
-    const imageSrc = webcamRef.current.getScreenshot();
 
-    // @ts-ignore
-    const imgData = new Buffer.from(imageSrc.split(',')[1], 'base64');
     let {data: { getUploadUrl }} = await getUploadUrlMutation({variables: {filename: filename}});
+    const [pendingImage] = files;
 
-    let xyz = await handleUpload(imgData , getUploadUrl, "image/jpeg");
+    let xyz = await handleUpload(pendingImage, getUploadUrl, "image/jpeg");
     console.log(xyz);
 
     if(acceptShipment)  {
@@ -105,16 +106,8 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
           control={control}
           defaultValue=""
         /></div>
-        <Webcam
-        audio={false}
-        height={720}
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        width={500}
-        videoConstraints={videoConstraints}
-        />
-        <button onClick={capture}>Capture photo</button>
 
+        <Uploader onChange={handleUploader} handleUpload={handleUpload } />
 
       </DialogContent>
       <DialogActions>

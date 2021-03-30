@@ -13,10 +13,10 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** Long type */
-  Long: any;
   /** Built-in java.math.BigDecimal */
   BigDecimal: any;
+  /** Long type */
+  Long: any;
   Date: any;
   LocalDate: any;
   LocalDateTime: any;
@@ -309,8 +309,8 @@ export type ItemIssuance = {
 export type ItemTracking = {
    __typename?: 'ItemTracking';
   id: Maybe<Scalars['ID']>;
-  pid: Maybe<Scalars['Long']>;
-  productId: Maybe<Scalars['Long']>;
+  pid: Maybe<Scalars['Int']>;
+  productId: Maybe<Scalars['String']>;
   price: Maybe<Scalars['BigDecimal']>;
   description: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
@@ -321,7 +321,7 @@ export type ItemTracking = {
   invoiceDate: Maybe<Scalars['String']>;
   purchaseDate: Maybe<Scalars['String']>;
   merchant: Maybe<Scalars['String']>;
-  merchantId: Maybe<Scalars['Long']>;
+  merchantId: Maybe<Scalars['Int']>;
   sku: Maybe<Scalars['String']>;
   url: Maybe<Scalars['String']>;
   purchaseShipments: Maybe<Array<Maybe<ShipmentInfo>>>;
@@ -444,6 +444,7 @@ export type Mutation = {
   addI18n: Maybe<ProductI18n>;
   addItem: Maybe<Message>;
   addPayment: Maybe<Payment>;
+  addShipmentDoc: Maybe<Message>;
   addToElastic: Maybe<Message>;
   addToPricingQ: Maybe<Message>;
   addTrackingEvent: Maybe<Message>;
@@ -562,6 +563,12 @@ export type MutationAddPaymentArgs = {
   amount: Maybe<Scalars['BigDecimal']>;
   method: Maybe<Scalars['String']>;
   authCode: Maybe<Scalars['String']>;
+};
+
+
+export type MutationAddShipmentDocArgs = {
+  id: Maybe<Scalars['Long']>;
+  filename: Maybe<Scalars['String']>;
 };
 
 
@@ -1437,7 +1444,7 @@ export type PurchaseShipmentInput = {
   shipmentItemId: Maybe<Scalars['Int']>;
   purchaseItemId: Maybe<Scalars['Int']>;
   quantity: Maybe<Scalars['BigDecimal']>;
-  purchaseId: Maybe<Scalars['Long']>;
+  purchaseId: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -1494,6 +1501,7 @@ export type Query = {
   shipQueue: Maybe<Array<Maybe<ShipQueue>>>;
   shipQueueByCustomerId: Maybe<Array<Maybe<ShipQueue>>>;
   shipment: Maybe<Shipment>;
+  shipmentDocs: Maybe<Array<Maybe<ShipmentDoc>>>;
   shipmentItemDetails: Maybe<Array<Maybe<ShipmentItemDetails>>>;
   shipmentItemsByTrackingNums: Maybe<Array<Maybe<ShipmentItem>>>;
   shipmentItemsCountByTrackingNums: Maybe<Array<Maybe<ShipmentItemSummary>>>;
@@ -1740,6 +1748,11 @@ export type QueryShipmentArgs = {
 };
 
 
+export type QueryShipmentDocsArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
 export type QueryShipmentItemDetailsArgs = {
   id: Maybe<Scalars['ID']>;
 };
@@ -1901,10 +1914,10 @@ export type ShipmentItemInput = {
   quantity: Maybe<Scalars['BigDecimal']>;
   description: Maybe<Scalars['String']>;
   shipmentId: Maybe<Scalars['Long']>;
-  productId: Maybe<Scalars['Long']>;
+  productId: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
   purchaseShipments: Maybe<Array<Maybe<PurchaseShipmentInput>>>;
-  from: Maybe<Scalars['Long']>;
+  from: Maybe<Scalars['Int']>;
   price: Maybe<Scalars['BigDecimal']>;
 };
 
@@ -2072,6 +2085,19 @@ export type AddDiscountMutation = (
   & { addDiscount: Maybe<(
     { __typename?: 'Message' }
     & Pick<Message, 'value'>
+  )> }
+);
+
+export type GetAdminFileMutationVariables = {
+  filename: Maybe<Scalars['String']>;
+};
+
+
+export type GetAdminFileMutation = (
+  { __typename?: 'Mutation' }
+  & { getAdminFile: Maybe<(
+    { __typename?: 'PresignedUrl' }
+    & Pick<PresignedUrl, 'uploadUrl'>
   )> }
 );
 
@@ -2398,6 +2424,20 @@ export type SetShipmentStatusMutation = (
   )> }
 );
 
+export type AddShipmentDocMutationVariables = {
+  id: Maybe<Scalars['Long']>;
+  filename: Maybe<Scalars['String']>;
+};
+
+
+export type AddShipmentDocMutation = (
+  { __typename?: 'Mutation' }
+  & { addShipmentDoc: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
 export type ShipmentQueryVariables = {
   id: Maybe<Scalars['ID']>;
 };
@@ -2413,6 +2453,19 @@ export type ShipmentQuery = (
       & Pick<Pkg, 'id' | 'length' | 'width' | 'height' | 'weight' | 'packageType'>
     )>>> }
   )> }
+);
+
+export type ShipmentDocsQueryVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type ShipmentDocsQuery = (
+  { __typename?: 'Query' }
+  & { shipmentDocs: Maybe<Array<Maybe<(
+    { __typename?: 'ShipmentDoc' }
+    & Pick<ShipmentDoc, 'fileKey'>
+  )>>> }
 );
 
 export type ShipmentItemDetailsQueryVariables = {
@@ -2533,6 +2586,57 @@ export function useAddDiscountMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type AddDiscountMutationHookResult = ReturnType<typeof useAddDiscountMutation>;
 export type AddDiscountMutationResult = ApolloReactCommon.MutationResult<AddDiscountMutation>;
 export type AddDiscountMutationOptions = ApolloReactCommon.BaseMutationOptions<AddDiscountMutation, AddDiscountMutationVariables>;
+export const GetAdminFileDocument = gql`
+    mutation getAdminFile($filename: String) {
+  getAdminFile(filename: $filename) {
+    uploadUrl
+  }
+}
+    `;
+export type GetAdminFileMutationFn = ApolloReactCommon.MutationFunction<GetAdminFileMutation, GetAdminFileMutationVariables>;
+export type GetAdminFileComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<GetAdminFileMutation, GetAdminFileMutationVariables>, 'mutation'>;
+
+    export const GetAdminFileComponent = (props: GetAdminFileComponentProps) => (
+      <ApolloReactComponents.Mutation<GetAdminFileMutation, GetAdminFileMutationVariables> mutation={GetAdminFileDocument} {...props} />
+    );
+    
+export type GetAdminFileProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<GetAdminFileMutation, GetAdminFileMutationVariables>
+    } & TChildProps;
+export function withGetAdminFile<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  GetAdminFileMutation,
+  GetAdminFileMutationVariables,
+  GetAdminFileProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, GetAdminFileMutation, GetAdminFileMutationVariables, GetAdminFileProps<TChildProps, TDataName>>(GetAdminFileDocument, {
+      alias: 'getAdminFile',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useGetAdminFileMutation__
+ *
+ * To run a mutation, you first call `useGetAdminFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGetAdminFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [getAdminFileMutation, { data, loading, error }] = useGetAdminFileMutation({
+ *   variables: {
+ *      filename: // value for 'filename'
+ *   },
+ * });
+ */
+export function useGetAdminFileMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<GetAdminFileMutation, GetAdminFileMutationVariables>) {
+        return ApolloReactHooks.useMutation<GetAdminFileMutation, GetAdminFileMutationVariables>(GetAdminFileDocument, baseOptions);
+      }
+export type GetAdminFileMutationHookResult = ReturnType<typeof useGetAdminFileMutation>;
+export type GetAdminFileMutationResult = ApolloReactCommon.MutationResult<GetAdminFileMutation>;
+export type GetAdminFileMutationOptions = ApolloReactCommon.BaseMutationOptions<GetAdminFileMutation, GetAdminFileMutationVariables>;
 export const CreateHashtagDocument = gql`
     mutation createHashtag($hashtag: HashtagInput) {
   createHashtag(hashtag: $hashtag) {
@@ -3775,6 +3879,58 @@ export function useSetShipmentStatusMutation(baseOptions?: ApolloReactHooks.Muta
 export type SetShipmentStatusMutationHookResult = ReturnType<typeof useSetShipmentStatusMutation>;
 export type SetShipmentStatusMutationResult = ApolloReactCommon.MutationResult<SetShipmentStatusMutation>;
 export type SetShipmentStatusMutationOptions = ApolloReactCommon.BaseMutationOptions<SetShipmentStatusMutation, SetShipmentStatusMutationVariables>;
+export const AddShipmentDocDocument = gql`
+    mutation addShipmentDoc($id: Long, $filename: String) {
+  addShipmentDoc(id: $id, filename: $filename) {
+    value
+  }
+}
+    `;
+export type AddShipmentDocMutationFn = ApolloReactCommon.MutationFunction<AddShipmentDocMutation, AddShipmentDocMutationVariables>;
+export type AddShipmentDocComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<AddShipmentDocMutation, AddShipmentDocMutationVariables>, 'mutation'>;
+
+    export const AddShipmentDocComponent = (props: AddShipmentDocComponentProps) => (
+      <ApolloReactComponents.Mutation<AddShipmentDocMutation, AddShipmentDocMutationVariables> mutation={AddShipmentDocDocument} {...props} />
+    );
+    
+export type AddShipmentDocProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<AddShipmentDocMutation, AddShipmentDocMutationVariables>
+    } & TChildProps;
+export function withAddShipmentDoc<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AddShipmentDocMutation,
+  AddShipmentDocMutationVariables,
+  AddShipmentDocProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AddShipmentDocMutation, AddShipmentDocMutationVariables, AddShipmentDocProps<TChildProps, TDataName>>(AddShipmentDocDocument, {
+      alias: 'addShipmentDoc',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useAddShipmentDocMutation__
+ *
+ * To run a mutation, you first call `useAddShipmentDocMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddShipmentDocMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addShipmentDocMutation, { data, loading, error }] = useAddShipmentDocMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      filename: // value for 'filename'
+ *   },
+ * });
+ */
+export function useAddShipmentDocMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddShipmentDocMutation, AddShipmentDocMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddShipmentDocMutation, AddShipmentDocMutationVariables>(AddShipmentDocDocument, baseOptions);
+      }
+export type AddShipmentDocMutationHookResult = ReturnType<typeof useAddShipmentDocMutation>;
+export type AddShipmentDocMutationResult = ApolloReactCommon.MutationResult<AddShipmentDocMutation>;
+export type AddShipmentDocMutationOptions = ApolloReactCommon.BaseMutationOptions<AddShipmentDocMutation, AddShipmentDocMutationVariables>;
 export const ShipmentDocument = gql`
     query shipment($id: ID) {
   shipment(id: $id) {
@@ -3850,6 +4006,58 @@ export function useShipmentLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHoo
 export type ShipmentQueryHookResult = ReturnType<typeof useShipmentQuery>;
 export type ShipmentLazyQueryHookResult = ReturnType<typeof useShipmentLazyQuery>;
 export type ShipmentQueryResult = ApolloReactCommon.QueryResult<ShipmentQuery, ShipmentQueryVariables>;
+export const ShipmentDocsDocument = gql`
+    query shipmentDocs($id: ID) {
+  shipmentDocs(id: $id) {
+    fileKey
+  }
+}
+    `;
+export type ShipmentDocsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<ShipmentDocsQuery, ShipmentDocsQueryVariables>, 'query'>;
+
+    export const ShipmentDocsComponent = (props: ShipmentDocsComponentProps) => (
+      <ApolloReactComponents.Query<ShipmentDocsQuery, ShipmentDocsQueryVariables> query={ShipmentDocsDocument} {...props} />
+    );
+    
+export type ShipmentDocsProps<TChildProps = {}, TDataName extends string = 'data'> = {
+      [key in TDataName]: ApolloReactHoc.DataValue<ShipmentDocsQuery, ShipmentDocsQueryVariables>
+    } & TChildProps;
+export function withShipmentDocs<TProps, TChildProps = {}, TDataName extends string = 'data'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  ShipmentDocsQuery,
+  ShipmentDocsQueryVariables,
+  ShipmentDocsProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withQuery<TProps, ShipmentDocsQuery, ShipmentDocsQueryVariables, ShipmentDocsProps<TChildProps, TDataName>>(ShipmentDocsDocument, {
+      alias: 'shipmentDocs',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useShipmentDocsQuery__
+ *
+ * To run a query within a React component, call `useShipmentDocsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useShipmentDocsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useShipmentDocsQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useShipmentDocsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<ShipmentDocsQuery, ShipmentDocsQueryVariables>) {
+        return ApolloReactHooks.useQuery<ShipmentDocsQuery, ShipmentDocsQueryVariables>(ShipmentDocsDocument, baseOptions);
+      }
+export function useShipmentDocsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<ShipmentDocsQuery, ShipmentDocsQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<ShipmentDocsQuery, ShipmentDocsQueryVariables>(ShipmentDocsDocument, baseOptions);
+        }
+export type ShipmentDocsQueryHookResult = ReturnType<typeof useShipmentDocsQuery>;
+export type ShipmentDocsLazyQueryHookResult = ReturnType<typeof useShipmentDocsLazyQuery>;
+export type ShipmentDocsQueryResult = ApolloReactCommon.QueryResult<ShipmentDocsQuery, ShipmentDocsQueryVariables>;
 export const ShipmentItemDetailsDocument = gql`
     query shipmentItemDetails($id: ID) {
   shipmentItemDetails(id: $id) {

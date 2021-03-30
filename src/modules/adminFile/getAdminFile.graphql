@@ -1,0 +1,5 @@
+mutation getAdminFile($filename: String) {
+  getAdminFile(filename:$filename) {
+    uploadUrl
+  }
+}

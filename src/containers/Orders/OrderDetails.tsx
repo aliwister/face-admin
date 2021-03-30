@@ -39,7 +39,7 @@ import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Checkbox from "@material-ui/core/Checkbox";
 import TableFooter from "@material-ui/core/TableFooter";
 import {ActionReasonDialog} from "./components/ActionReasonDialog";
-import {useAddDiscountMutation, useOrderAQuery} from "../../codegen/generated/_graphql";
+import {useAddDiscountMutation, useGetAdminFileMutation, useOrderAQuery} from "../../codegen/generated/_graphql";
 import LaunchIcon from '@material-ui/icons/Launch';
 import {Shipments} from "./components/Shipments";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
@@ -62,13 +62,7 @@ mutation sendPaymentSms($id: ID, $mobile: String) {
   }
 }
 `;
-const GET_ADMIN_FILE = gql`
-mutation getAdminFile($filename: String) {
-  getAdminFile(filename:$filename) {
-    uploadUrl
-  }
-}
-`;
+
 const EDIT_ORDER = gql`
 mutation editOrder($id: ID, $orderItems: [OrderItemInput], $reason: String) {
   editOrder(id:$id, orderItems:$orderItems, reason: $reason) {
@@ -165,7 +159,7 @@ export default function OrderDetails(props) {
   const [editOrderMutation] = useMutation(EDIT_ORDER, { context: { clientName: "shopLink" }});
   const [cancelOrderMutation] = useMutation(CANCEL_ORDER, { context: { clientName: "shopLink" }});
   const [closeOrderMutation] = useMutation(CLOSE_ORDER, { context: { clientName: "shopLink" }});
-  const [getAdminFileMutation] = useMutation(GET_ADMIN_FILE, { context: { clientName: "shopLink" }});
+  const [getAdminFileMutation] = useGetAdminFileMutation({ context: { clientName: "shopLink" }});
   const [addDiscountMutation] = useAddDiscountMutation({context : {clientName: "shopLink"}});
   const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
