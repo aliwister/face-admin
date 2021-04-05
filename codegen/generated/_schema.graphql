@@ -463,6 +463,7 @@ type Mutation {
   issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
   pasLookup(sku: String): Product
   prepItem(dto: PackagingContentInput): Message
+  processCheckoutRefund(token: String, amount: String, ref: String, description: String): Message
 
   """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
@@ -1167,6 +1168,7 @@ type ShipmentItemDetails {
   shipmentId: Long
   productId: Long
   image: String
+  po: Long
 }
 
 input ShipmentItemInput {

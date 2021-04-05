@@ -321,8 +321,6 @@ export default function EditShipment({shipment, merchants, refreshShipment, acti
   const [addShipmentDocMutation] = useAddShipmentDocMutation({ context: { clientName: "adminLink" }});
   const [getAdminFileMutation] = useGetAdminFileMutation({ context: { clientName: "shopLink" }});
 
-
-
   const alert = useAlert();
   const classes = useStyles();
 

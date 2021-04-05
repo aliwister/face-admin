@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Button from "@material-ui/core/Button";
+import {Link} from "react-router-dom";
 
 export const ShipmentItems = ({state, dispatch, label, handleDeleteItem}) => {
   return (
@@ -38,7 +39,7 @@ Product
           <TableBody>
             {state && state.map((a,b) => (
               <TableRow>
-                <TableCell>{a.id}</TableCell>
+                <TableCell><Link to={`/purchase-details/${a.po}`} target={"_blank"}>{a.id}</Link></TableCell>
                 <TableCell>{a.sequence}</TableCell>
                 <TableCell>{a.description}</TableCell>
                 <TableCell>{a.quantity}</TableCell>

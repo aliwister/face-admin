@@ -489,6 +489,7 @@ export type Mutation = {
   issueItem: Maybe<ItemIssuance>;
   pasLookup: Maybe<Product>;
   prepItem: Maybe<Message>;
+  processCheckoutRefund: Maybe<Message>;
   /** cancelOrder(id: ID): Order */
   refundPayment: Maybe<Payment>;
   removeItem: Maybe<Message>;
@@ -783,6 +784,14 @@ export type MutationPasLookupArgs = {
 
 export type MutationPrepItemArgs = {
   dto: Maybe<PackagingContentInput>;
+};
+
+
+export type MutationProcessCheckoutRefundArgs = {
+  token: Maybe<Scalars['String']>;
+  amount: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['String']>;
+  description: Maybe<Scalars['String']>;
 };
 
 
@@ -1907,6 +1916,7 @@ export type ShipmentItemDetails = {
   shipmentId: Maybe<Scalars['Long']>;
   productId: Maybe<Scalars['Long']>;
   image: Maybe<Scalars['String']>;
+  po: Maybe<Scalars['Long']>;
 };
 
 export type ShipmentItemInput = {
@@ -2477,7 +2487,7 @@ export type ShipmentItemDetailsQuery = (
   { __typename?: 'Query' }
   & { shipmentItemDetails: Maybe<Array<Maybe<(
     { __typename?: 'ShipmentItemDetails' }
-    & Pick<ShipmentItemDetails, 'id' | 'sequence' | 'quantity' | 'description' | 'shipmentId' | 'productId' | 'image'>
+    & Pick<ShipmentItemDetails, 'id' | 'sequence' | 'quantity' | 'description' | 'shipmentId' | 'productId' | 'image' | 'po'>
   )>>> }
 );
 
@@ -4068,6 +4078,7 @@ export const ShipmentItemDetailsDocument = gql`
     shipmentId
     productId
     image
+    po
   }
 }
     `;

@@ -7,5 +7,6 @@ query shipmentItemDetails($id: ID) {
         shipmentId
         productId
         image
+        po
   }
 }

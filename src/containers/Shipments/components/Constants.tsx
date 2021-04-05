@@ -5,12 +5,14 @@ export const SHIPMENT_METHODS = [
   {value: 'Fedex', label: 'Fedex'},
   {value: 'UPS', label: 'UPS'},
   {value: 'USPS', label: 'USPS'},
+  {value: 'OnTrac', label: 'OnTrac'},
   {value: 'Falcon', label: 'Falcon'},
   {value: 'Aramex', label: 'Aramex'},
   {value: 'Oman Post', label: 'Oman Post'},
   {value: 'Cargo', label: 'Cargo'},
   {value: 'Pickup', label: 'Pickup'},
   {value: 'Badals Express', label: 'Badals Express'},
+  {value: 'Other', label: 'Other'},
 ];
 export const RETURN_REASONS = [
   {value: 'WRONG', label: 'Wrong item received'},
