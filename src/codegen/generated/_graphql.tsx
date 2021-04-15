@@ -76,6 +76,9 @@ export type Address = {
   city: Maybe<Scalars['String']>;
   mobile: Maybe<Scalars['String']>;
   alias: Maybe<Scalars['String']>;
+  lng: Maybe<Scalars['String']>;
+  lat: Maybe<Scalars['String']>;
+  plusCode: Maybe<Scalars['String']>;
 };
 
 export type AddressPojo = {
@@ -165,6 +168,7 @@ export type CheckoutCartInput = {
   carrier: Maybe<Scalars['String']>;
   currency: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<LineItemInput>>>;
+  allowPickup: Maybe<Scalars['Boolean']>;
 };
 
 export type CheckoutSession = {
@@ -966,6 +970,7 @@ export type Order = {
   createdDate: Maybe<Scalars['Date']>;
   payments: Maybe<Array<Maybe<Payment>>>;
   balance: Maybe<Scalars['BigDecimal']>;
+  cartSecureKey: Maybe<Scalars['String']>;
 };
 
 export type OrderItem = {
@@ -2151,7 +2156,7 @@ export type CustomerQuery = (
     & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
     & { addresses: Maybe<Array<Maybe<(
       { __typename?: 'Address' }
-      & Pick<Address, 'id' | 'alias' | 'line1' | 'line2' | 'city' | 'mobile'>
+      & Pick<Address, 'id' | 'alias' | 'line1' | 'line2' | 'city' | 'mobile' | 'lng' | 'lat' | 'plusCode'>
     )>>> }
   )> }
 );
@@ -2312,7 +2317,7 @@ export type OrderAQuery = (
   { __typename?: 'Query' }
   & { orderA: Maybe<(
     { __typename?: 'Order' }
-    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'couponName' | 'deliveryDate' | 'cartId' | 'currency' | 'balance' | 'carrier'>
+    & Pick<Order, 'id' | 'reference' | 'createdDate' | 'invoiceDate' | 'total' | 'paymentMethod' | 'subtotal' | 'orderState' | 'deliveryTotal' | 'discountsTotal' | 'couponName' | 'deliveryDate' | 'cartId' | 'cartSecureKey' | 'currency' | 'balance' | 'carrier'>
     & { customer: (
       { __typename?: 'Customer' }
       & Pick<Customer, 'id' | 'firstname' | 'lastname' | 'email' | 'mobile'>
@@ -2766,6 +2771,9 @@ export const CustomerDocument = gql`
       line2
       city
       mobile
+      lng
+      lat
+      plusCode
     }
   }
 }
@@ -3403,6 +3411,7 @@ export const OrderADocument = gql`
     couponName
     deliveryDate
     cartId
+    cartSecureKey
     customer {
       id
       firstname

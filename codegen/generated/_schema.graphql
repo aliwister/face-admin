@@ -50,6 +50,9 @@ type Address {
   city: String
   mobile: String
   alias: String
+  lng: String
+  lat: String
+  plusCode: String
 }
 
 input AddressPojo {
@@ -138,6 +141,7 @@ input CheckoutCartInput {
   carrier: String
   currency: String
   items: [LineItemInput]
+  allowPickup: Boolean
 }
 
 type CheckoutSession {
@@ -513,6 +517,7 @@ type Order {
   createdDate: Date
   payments: [Payment]
   balance: BigDecimal
+  cartSecureKey: String
 }
 
 type OrderItem {

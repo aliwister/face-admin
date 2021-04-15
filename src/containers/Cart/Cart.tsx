@@ -135,13 +135,16 @@ export default function Cart() {
       cost,
       image
     }));
-    const addresses = customer.customer.addresses.map(({id, alias, line1, line2, city, mobile, __typename}) => ({
+    const addresses = customer.customer.addresses.map(({id, alias, line1, line2, city, mobile,lng,
+                                                         lat,
+                                                         plusCode, __typename}) => ({
       id,
       alias,
       line1,
       line2,
       city,
-      mobile
+      mobile,
+
     }));
 
 

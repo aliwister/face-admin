@@ -12,6 +12,9 @@ query customer( $mobile: String) {
       line2
       city
       mobile
+      lng
+            lat
+            plusCode
     }
   }
 }
