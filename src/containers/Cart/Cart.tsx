@@ -144,7 +144,9 @@ export default function Cart() {
       line2,
       city,
       mobile,
-
+      lng,
+      lat,
+      plusCode
     }));
 
 
