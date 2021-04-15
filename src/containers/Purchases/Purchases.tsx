@@ -46,6 +46,7 @@ const GET_ORDERS = gql`
         invoiceDate
         subtotal
         deliveryTotal
+        createdDate
         taxesTotal
         discountTotal
         total
@@ -326,12 +327,11 @@ export default function Purchases() {
                   <TableRow>
                     <TableCell>#</TableCell>
                     <TableCell>ID</TableCell>
-                    <TableCell align="left">Ref</TableCell>
-                    <TableCell align="left">Name</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="center">Payment</TableCell>
+                    <TableCell align="left">Merchant</TableCell>
+                    <TableCell align="center">Total</TableCell>
+                    <TableCell align="center">Line Count</TableCell>
                     <TableCell align="center">Date</TableCell>
-                    <TableCell align="center">Status</TableCell>
+
                   </TableRow>
                 </TableHead>
                 {data && data.purchases.items.length && (
@@ -356,29 +356,10 @@ export default function Purchases() {
                               <Link to={`purchase-details/${row.id}`}>{row.id}</Link>
                             </TableCell>
                             <TableCell align="left">{row.merchantObj.name}</TableCell>
-
-                            <TableCell align="left">{row.deliveryTotal}</TableCell>
-                            <TableCell align="right">{row.taxesTotal}</TableCell>
-
                             <TableCell align="center">{row.currency} {row.total}</TableCell>
+                            <TableCell align="center">{row.purchaseItems.length}</TableCell>
+
                             <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
-                            <TableCell align="right">
-                              <Status
-                                  className={
-                                    row.orderState === 'Delivered'
-                                        ? sent
-                                        : row.orderState === 'PAYMENT_ACCEPTED'
-                                        ? paid
-                                        : row.orderState === 'AWAITING_PAYMENT'
-                                            ? processing
-                                            : row.orderState === 'CANCELLED'
-                                                ? failed
-                                                : ''
-                                  }
-                              >
-                                {row.orderState}
-                              </Status>
-                            </TableCell>
                           </TableRow>
                       ))}
                     </TableBody>

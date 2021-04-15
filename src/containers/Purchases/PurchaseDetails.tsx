@@ -10,6 +10,8 @@ import {usePurchaseQuery} from "../../codegen/generated/_graphql";
 import {useMutation} from "@apollo/react-hooks";
 import {gql} from "apollo-boost";
 import Button from "@material-ui/core/Button";
+import AuditHistory from "../Orders/AuditHistory";
+import {Grid, Row} from "../../components/FlexBox/FlexBox";
 
 const UPDATE_PURCHASE = gql`
   mutation updatePurchase($dto: PurchaseInput, $items: [PurchaseItemInput]) {
@@ -111,6 +113,8 @@ export default function PurchaseDetails(props) {
       </Button> </h1>
       <Heading>PO {data.purchase.id}</Heading>
       <PurchaseForm purchase={data.purchase} savePurchase={savePurchase} setMerchant={setMerchant}/>
+
+          {data.purchase && <AuditHistory id={data.purchase.id} type={"purchase"}/>}
 
     </>
   );

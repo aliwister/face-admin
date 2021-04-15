@@ -12,15 +12,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 import { useAlert } from "react-alert";
-import {
-  TableRow,
-  TableHead,
-  TableContainer,
-  Table,
-  Paper,
-  TableCell,
-  Typography,
-  TableBody } from '@material-ui/core';
+import {  Typography, Checkbox
+   } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -101,6 +94,7 @@ export default function Cart() {
   }
 
   const [secureKey, setSecureKey] = useState('');
+  const [allowPickup, setAllowPickup] = useState(false);
   const [create, setCreate] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -110,6 +104,13 @@ export default function Cart() {
   const [total, setTotal] = useState();
   const [subtotal, setSubtotal] = useState();
 /*  const [customer, setCustomer] = useState();*/
+
+  const handlePickup = e => {
+    console.log(e.target.checked)
+    setAllowPickup(e.target.checked)
+  }
+
+
 
   const alert = useAlert();
   const classes = useStyles();
@@ -152,6 +153,7 @@ export default function Cart() {
       items,
       addresses: addresses,
       currency: data.currency.value,
+      allowPickup: allowPickup
     };
     const {
       data: { createCart },
@@ -174,6 +176,7 @@ export default function Cart() {
     refetch({keyword: keyword})
   }
 
+  // @ts-ignore
   return (
 
       <Grid item xs={12} md={12}>
@@ -208,7 +211,7 @@ export default function Cart() {
         <div>
           {data && <SearchResults data={data.findByKeyword} add={add} />}
         </div>
-        <Typography variant="h6">Cart Items</Typography>
+        <Checkbox checked={allowPickup} onChange={handlePickup} />Allow Pickup
         <TableForm register={register} onSubmit={handleSubmit(onSubmit)} fields={fields} remove={removeItem} watch={watch} order={cart} control={control}/>
         {secureKey &&
         <a color="inherit" href={`https://checkout.badals.com/checkout/start?token=${secureKey}`} target="_blank">
