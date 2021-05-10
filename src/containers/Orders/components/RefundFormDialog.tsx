@@ -54,7 +54,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment, order}) =>{
     <form onSubmit={handleSubmit(formSubmit)}>
       <DialogTitle id="form-dialog-title">Refund Amount</DialogTitle>
       <DialogContent>
-      <TextField variant="filled" size="small" placeholder="Amount" name="amount" className={classes.textBox} inputRef={register({required: true, max: 1500, min:0, maxLength: 5})} />
+      <TextField variant="filled" size="small" placeholder="Amount" name="amount" className={classes.textBox} inputRef={register({required: true, max: 1500, min:0, maxLength:6 })} />
       <br/>
       <TextField variant="filled" size="small" type="text" placeholder="Auth Code" name="authCode" value={payment.authCode} className={classes.textBox} inputRef={register({required: true, maxLength: 10})} />
       <br/>

@@ -52,6 +52,8 @@
         authCode
         amount
         processedDate
+        settlementDate
+        voided
       }
       currency
       balance

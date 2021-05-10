@@ -1,79 +1,38 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
-import {Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@material-ui/core";
+import {Table, TableBody, TableCell, TableHead, TableRow} from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
-import Select from "@material-ui/core/Select";
+
 import { useAlert } from "react-alert";
-import Paper from "@material-ui/core/Paper";
 import {OrderInfoPaper} from "./Orders.style";
-import MenuItem from "@material-ui/core/MenuItem";
-import makeStyles from "@material-ui/core/styles/makeStyles";
-import FormControl from "@material-ui/core/FormControl";
-import Checkbox from "@material-ui/core/Checkbox";
-import Image from "../../components/Image/Image";
+
 import TableFooter from "@material-ui/core/TableFooter";
-import {errorHandler} from "../../api/config";
 import Typography from "@material-ui/core/Typography";
 import {PaymentFormDialog} from "./components/PaymentFormDialog";
 import {RefundFormDialog} from "./components/RefundFormDialog";
-
-//const
-
-
-const SEND_PAYMENT_SMS = gql`
-mutation sendPaymentSms($id: ID, $mobile: String) {
-  sendPaymentSms(id:$id, mobile:$mobile) {
-    value
-  }
-}
-`;
-
-const GET_PAYMENTS = gql`
-mutation addPayment($id: ID, $amount: BigDecimal, $method: String) {
-  addPayment(id: $id, amount: $amount, method: $method) {
-    paymentMethod
-    amount
-  }
-}
-`;
-
-const ADD_PAYMENT_MUTATION = gql`
-mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
-  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
-    paymentMethod
-    amount
-  }
-}
-`;
-
-const ADD_REFUND_MUTATION = gql`
-mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankName: String, $bankAccountNumber: String, $bankOwnerName: String, $ref: Long, $paymentMethod: String) {
-  refundPayment(id: $id, amount: $amount, ref: $ref, authCode: $authCode, bankName: $bankName, bankAccountNumber: $bankAccountNumber, bankOwnerName: $bankOwnerName, paymentMethod: $paymentMethod)  {
-    paymentMethod
-    amount
-  }
-}
-`;
-
-
+import BlockIcon from '@material-ui/icons/Block';
+import CheckIcon from '@material-ui/icons/Check';
+import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
+import {
+  useAddPaymentMutation,
+  useRefundPaymentMutation,
+  useVoidPaymentMutation
+} from "../../codegen/generated/_graphql";
 
 export default function Payment({order, refetch}) {
   const [b1,setB1] = useState(true);
 
   const [paymentDialog,setPaymentdialog] = useState(false);
   const [refundDialog,setRefunddialog] = useState(false);
+  const [voidDialog,setVoidDialog] = useState(false);
   const [activePayment,setActivepayment] = useState({});
 
-
-  const [addPaymentMutation] = useMutation(ADD_PAYMENT_MUTATION,{context: { clientName: "shopLink" }});
-  const [addRefundMutation] = useMutation(ADD_REFUND_MUTATION,{context: { clientName: "shopLink" }});
-
+  const [addPaymentMutation] = useAddPaymentMutation({context: { clientName: "shopLink" }});
+  const [addRefundMutation] = useRefundPaymentMutation({context: { clientName: "shopLink" }});
+  const [voidPaymentMutation] = useVoidPaymentMutation({context: { clientName: "shopLink" }});
 
   const alert = useAlert();
-
 
   const onSubmit = async formData => {
     setB1(false);
@@ -103,15 +62,34 @@ export default function Payment({order, refetch}) {
     }
   }
 
+  const onVoidSubmit = async formData => {
+    setB1(false);
+    //console.log(formData);
+    const {
+      data: { voidPayment },
+    }: any = await voidPaymentMutation({
+      variables: {id: activePayment['id']}
+    });
+    if(voidPayment)  {
+      handleClose();
+      alert.success(voidPayment.value);
+      refetch();
+    }
+  }
 
   const handleClose = () => {
     setPaymentdialog(false);
     setRefunddialog(false);
+    setVoidDialog(false);
   }
   const handlePaymentDialogOpen = () => setPaymentdialog(true);
   const handleRefundDialogOpen = (payment) => {
     setActivepayment(payment);
     setRefunddialog(true);
+  }
+  const handleVoidDialogOpen = (payment) => {
+    setActivepayment(payment);
+    setVoidDialog(true);
   }
 
   return (
@@ -143,13 +121,15 @@ export default function Payment({order, refetch}) {
                     <TableCell align="left">{row.authCode}</TableCell>
                     <TableCell align="left">OMR {row.amount}</TableCell>
                     <TableCell align="left">{row.processedDate?row.processedDate.substr(0,10):""}</TableCell>
-                    <TableCell align="right"><Button variant="contained" size="small" onClick={() => handleRefundDialogOpen(row)}>Refund</Button></TableCell>
+                    <TableCell align="left">{row.settlementDate?row.settlementDate.substr(0,10):""}</TableCell>
+                    <TableCell align="left">{row.voided?<BlockIcon/>:<CheckIcon/>}</TableCell>
+                    <TableCell align="right">
+                      <Button variant="contained" size="small" onClick={() => handleRefundDialogOpen(row)}>Refund</Button>
+                      {!row.processedDate && !row.voided && <Button variant="contained" size="small" onClick={() => handleVoidDialogOpen(row)}>Void</Button>}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
-
-
-
             )}
             <TableFooter>
 
@@ -170,7 +150,9 @@ export default function Payment({order, refetch}) {
 
           <PaymentFormDialog onSubmit={onSubmit} open={paymentDialog} onClose={handleClose}/>
           <RefundFormDialog onSubmit={onRefundSubmit} open={refundDialog} onClose={handleClose} payment={activePayment} order={order} />
-
+          <ConfirmDialog title="Close Shipment?" open={voidDialog} cancel={handleClose} onConfirm={onVoidSubmit}>
+            Are you sure you want to void payment <>{activePayment['id']}</> ?
+          </ConfirmDialog>}
         </OrderInfoPaper>
 {/*        <Snackbar open={snack} autoHideDuration={6000} onClose={()=>{setSnack(false)}}>
             <Alert onClose={handleClose} severity="success">

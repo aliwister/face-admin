@@ -91,6 +91,9 @@ export type AddressPojo = {
   city: Maybe<Scalars['String']>;
   alias: Maybe<Scalars['String']>;
   country: Maybe<Scalars['String']>;
+  lng: Maybe<Scalars['String']>;
+  lat: Maybe<Scalars['String']>;
+  plusCode: Maybe<Scalars['String']>;
 };
 
 export type Attribute = {
@@ -134,6 +137,13 @@ export type CartItemInput = {
   quantity: Maybe<Scalars['Int']>;
 };
 
+export type CartResponse = {
+   __typename?: 'CartResponse';
+  cart: Maybe<Cart>;
+  success: Maybe<Scalars['Boolean']>;
+  message: Maybe<Scalars['String']>;
+};
+
 export type Category = {
    __typename?: 'Category';
   id: Scalars['Int'];
@@ -175,6 +185,13 @@ export type CheckoutSession = {
    __typename?: 'CheckoutSession';
   redirectUrl: Maybe<Scalars['String']>;
   secureKey: Maybe<Scalars['String']>;
+};
+
+export type CheckoutSessionResponse = {
+   __typename?: 'CheckoutSessionResponse';
+  secureKey: Maybe<Scalars['String']>;
+  success: Maybe<Scalars['Boolean']>;
+  message: Maybe<Scalars['String']>;
 };
 
 export type ChildProduct = {
@@ -445,7 +462,6 @@ export type Mutation = {
   acceptPackage: Maybe<Pkg>;
   acceptShipment: Maybe<Shipment>;
   addDiscount: Maybe<Message>;
-  addI18n: Maybe<ProductI18n>;
   addItem: Maybe<Message>;
   addPayment: Maybe<Payment>;
   addShipmentDoc: Maybe<Message>;
@@ -461,14 +477,13 @@ export type Mutation = {
   completePricingRequestAndEmail: Maybe<Message>;
   contact: Maybe<Message>;
   createCart: Maybe<CheckoutCart>;
+  createCheckout: Maybe<CheckoutSessionResponse>;
   createCheckoutSession: Maybe<CheckoutSession>;
   createHashtag: Maybe<Message>;
   createMerchantProduct: Maybe<Message>;
-  createNewProduct: Maybe<Product>;
   createOrder: Maybe<Order>;
   createOverride: Maybe<Product>;
   createProduct: Maybe<MerchantProduct>;
-  /** createOrderFromCart(cart: CartInput): Order */
   createPurchase: Maybe<Purchase>;
   /**
    * processAmazonShipments: Message
@@ -489,12 +504,10 @@ export type Mutation = {
   getPartnerImageUploadUrl: Maybe<PresignedUrl>;
   getUploadUrl: Maybe<PresignedUrl>;
   importProducts: Maybe<Message>;
-  indexProduct: Maybe<Attribute>;
   issueItem: Maybe<ItemIssuance>;
   pasLookup: Maybe<Product>;
   prepItem: Maybe<Message>;
   processCheckoutRefund: Maybe<Message>;
-  /** cancelOrder(id: ID): Order */
   refundPayment: Maybe<Payment>;
   removeItem: Maybe<Message>;
   resetPassword: Maybe<Scalars['String']>;
@@ -505,7 +518,6 @@ export type Mutation = {
   sendProductLevelEmail: Maybe<Message>;
   sendToDetrack: Maybe<Message>;
   setAccountingCode: Maybe<Message>;
-  setCart: Maybe<Cart>;
   setDial: Maybe<Message>;
   setEstimatedShipDate: Maybe<Message>;
   setHashtags: Maybe<Message>;
@@ -515,9 +527,10 @@ export type Mutation = {
   setSettlementDate: Maybe<Message>;
   setShipmentStatus: Maybe<Message>;
   unpackItem: Maybe<Message>;
-  updateCart: Maybe<Cart>;
+  updateCart: Maybe<CartResponse>;
   updateFromDetrack: Maybe<Message>;
   updatePurchase: Maybe<Purchase>;
+  voidPayment: Maybe<Message>;
 };
 
 
@@ -545,12 +558,6 @@ export type MutationAddDiscountArgs = {
   id: Maybe<Scalars['ID']>;
   amount: Maybe<Scalars['BigDecimal']>;
   couponName: Maybe<Scalars['String']>;
-};
-
-
-export type MutationAddI18nArgs = {
-  id: Maybe<Scalars['Int']>;
-  i18n: Maybe<ProductI18nInput>;
 };
 
 
@@ -649,6 +656,11 @@ export type MutationCreateCartArgs = {
 };
 
 
+export type MutationCreateCheckoutArgs = {
+  secureKey: Maybe<Scalars['String']>;
+};
+
+
 export type MutationCreateCheckoutSessionArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
@@ -662,11 +674,6 @@ export type MutationCreateHashtagArgs = {
 
 export type MutationCreateMerchantProductArgs = {
   product: Maybe<AddProductInput>;
-};
-
-
-export type MutationCreateNewProductArgs = {
-  product: Maybe<ProductInput>;
 };
 
 
@@ -768,11 +775,6 @@ export type MutationImportProductsArgs = {
 };
 
 
-export type MutationIndexProductArgs = {
-  id: Maybe<Scalars['Int']>;
-};
-
-
 export type MutationIssueItemArgs = {
   orderItemId: Maybe<Scalars['Long']>;
   productId: Maybe<Scalars['Long']>;
@@ -870,12 +872,6 @@ export type MutationSetAccountingCodeArgs = {
 };
 
 
-export type MutationSetCartArgs = {
-  secureKey: Maybe<Scalars['String']>;
-  items: Maybe<Array<Maybe<CartItemInput>>>;
-};
-
-
 export type MutationSetDialArgs = {
   dial: Maybe<Scalars['String']>;
   ref: Maybe<Scalars['Long']>;
@@ -945,6 +941,11 @@ export type MutationUpdateFromDetrackArgs = {
 export type MutationUpdatePurchaseArgs = {
   dto: Maybe<PurchaseInput>;
   items: Maybe<Array<Maybe<PurchaseItemInput>>>;
+};
+
+
+export type MutationVoidPaymentArgs = {
+  id: Maybe<Scalars['ID']>;
 };
 
 export type Order = {
@@ -1167,6 +1168,7 @@ export type Payment = {
   processedDate: Maybe<Scalars['Date']>;
   customer: Maybe<Scalars['String']>;
   cartId: Maybe<Scalars['String']>;
+  voided: Maybe<Scalars['Boolean']>;
 };
 
 export type PaymentInput = {
@@ -1327,39 +1329,6 @@ export type ProductI18nInput = {
   lang: Maybe<Scalars['String']>;
 };
 
-export type ProductInput = {
-  sku: Maybe<Scalars['String']>;
-  upc: Maybe<Scalars['String']>;
-  price: Maybe<Scalars['BigDecimal']>;
-  salePrice: Maybe<Scalars['BigDecimal']>;
-  /** currency: String, */
-  image: Maybe<Scalars['String']>;
-  /**
-   * images: [String],
-   * releaseDate: LocalDate,
-   * active: Boolean,
-   * similarProducts: [Int],
-   */
-  url: Maybe<Scalars['String']>;
-  name: Maybe<Scalars['String']>;
-  brand: Maybe<Scalars['String']>;
-  group: Maybe<Scalars['String']>;
-  features: Maybe<Scalars['String']>;
-  name_ar: Maybe<Scalars['String']>;
-  brand_ar: Maybe<Scalars['String']>;
-  group_ar: Maybe<Scalars['String']>;
-  features_ar: Maybe<Scalars['String']>;
-  /**
-   * condition: Condition,
-   * isUsed: Boolean,
-   * availableForOrder: Boolean,
-   */
-  cost: Maybe<Scalars['BigDecimal']>;
-  weight: Maybe<Scalars['Float']>;
-  availability: Maybe<Scalars['Int']>;
-  quantity: Maybe<Scalars['Int']>;
-};
-
 export type ProductResponse = {
    __typename?: 'ProductResponse';
   items: Array<Product>;
@@ -1466,6 +1435,7 @@ export type Query = {
   advancedTracking: Maybe<Array<Maybe<ItemTracking>>>;
   auditActivity: Maybe<Array<Maybe<Action>>>;
   brands: Maybe<Array<Maybe<I18String>>>;
+  cart: Maybe<Cart>;
   categories: Array<Category>;
   category: Category;
   collections: Maybe<Array<Maybe<I18String>>>;
@@ -1474,7 +1444,6 @@ export type Query = {
   ebay: Maybe<Product>;
   findByKeyword: Maybe<ProductResponse>;
   getAddresses: Maybe<Array<Maybe<Address>>>;
-  getCart: Maybe<Cart>;
   getProductByDial: Maybe<Product>;
   getProductBySku: Maybe<Product>;
   hashtagList: Maybe<Array<Maybe<Hashtag>>>;
@@ -1547,6 +1516,12 @@ export type QueryAuditActivityArgs = {
 };
 
 
+export type QueryCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<CartItemInput>>>;
+};
+
+
 export type QueryCategoriesArgs = {
   type: Scalars['String'];
 };
@@ -1574,12 +1549,6 @@ export type QueryFindByKeywordArgs = {
 
 export type QueryGetAddressesArgs = {
   customerId: Maybe<Scalars['Int']>;
-};
-
-
-export type QueryGetCartArgs = {
-  secureKey: Maybe<Scalars['String']>;
-  items: Maybe<Array<Maybe<CartItemInput>>>;
 };
 
 
@@ -2329,8 +2298,57 @@ export type OrderAQuery = (
       & Pick<OrderItem, 'id' | 'sequence' | 'productId' | 'productSku' | 'productUrl' | 'productName' | 'productMerchantId' | 'price' | 'quantity' | 'image' | 'lineTotal' | 'po'>
     )>>>, payments: Maybe<Array<Maybe<(
       { __typename?: 'Payment' }
-      & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate'>
+      & Pick<Payment, 'id' | 'createdDate' | 'paymentMethod' | 'authCode' | 'amount' | 'processedDate' | 'settlementDate' | 'voided'>
     )>>> }
+  )> }
+);
+
+export type AddPaymentMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
+  method: Maybe<Scalars['String']>;
+  authCode: Maybe<Scalars['String']>;
+};
+
+
+export type AddPaymentMutation = (
+  { __typename?: 'Mutation' }
+  & { addPayment: Maybe<(
+    { __typename?: 'Payment' }
+    & Pick<Payment, 'paymentMethod' | 'amount'>
+  )> }
+);
+
+export type RefundPaymentMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+  amount: Maybe<Scalars['BigDecimal']>;
+  authCode: Maybe<Scalars['String']>;
+  bankName: Maybe<Scalars['String']>;
+  bankAccountNumber: Maybe<Scalars['String']>;
+  bankOwnerName: Maybe<Scalars['String']>;
+  ref: Maybe<Scalars['Long']>;
+  paymentMethod: Maybe<Scalars['String']>;
+};
+
+
+export type RefundPaymentMutation = (
+  { __typename?: 'Mutation' }
+  & { refundPayment: Maybe<(
+    { __typename?: 'Payment' }
+    & Pick<Payment, 'paymentMethod' | 'amount'>
+  )> }
+);
+
+export type VoidPaymentMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type VoidPaymentMutation = (
+  { __typename?: 'Mutation' }
+  & { voidPayment: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
   )> }
 );
 
@@ -3448,6 +3466,8 @@ export const OrderADocument = gql`
       authCode
       amount
       processedDate
+      settlementDate
+      voided
     }
     currency
     balance
@@ -3500,6 +3520,171 @@ export function useOrderALazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookO
 export type OrderAQueryHookResult = ReturnType<typeof useOrderAQuery>;
 export type OrderALazyQueryHookResult = ReturnType<typeof useOrderALazyQuery>;
 export type OrderAQueryResult = ApolloReactCommon.QueryResult<OrderAQuery, OrderAQueryVariables>;
+export const AddPaymentDocument = gql`
+    mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
+  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
+    paymentMethod
+    amount
+  }
+}
+    `;
+export type AddPaymentMutationFn = ApolloReactCommon.MutationFunction<AddPaymentMutation, AddPaymentMutationVariables>;
+export type AddPaymentComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<AddPaymentMutation, AddPaymentMutationVariables>, 'mutation'>;
+
+    export const AddPaymentComponent = (props: AddPaymentComponentProps) => (
+      <ApolloReactComponents.Mutation<AddPaymentMutation, AddPaymentMutationVariables> mutation={AddPaymentDocument} {...props} />
+    );
+    
+export type AddPaymentProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<AddPaymentMutation, AddPaymentMutationVariables>
+    } & TChildProps;
+export function withAddPayment<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AddPaymentMutation,
+  AddPaymentMutationVariables,
+  AddPaymentProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, AddPaymentMutation, AddPaymentMutationVariables, AddPaymentProps<TChildProps, TDataName>>(AddPaymentDocument, {
+      alias: 'addPayment',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useAddPaymentMutation__
+ *
+ * To run a mutation, you first call `useAddPaymentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPaymentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPaymentMutation, { data, loading, error }] = useAddPaymentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      amount: // value for 'amount'
+ *      method: // value for 'method'
+ *      authCode: // value for 'authCode'
+ *   },
+ * });
+ */
+export function useAddPaymentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddPaymentMutation, AddPaymentMutationVariables>) {
+        return ApolloReactHooks.useMutation<AddPaymentMutation, AddPaymentMutationVariables>(AddPaymentDocument, baseOptions);
+      }
+export type AddPaymentMutationHookResult = ReturnType<typeof useAddPaymentMutation>;
+export type AddPaymentMutationResult = ApolloReactCommon.MutationResult<AddPaymentMutation>;
+export type AddPaymentMutationOptions = ApolloReactCommon.BaseMutationOptions<AddPaymentMutation, AddPaymentMutationVariables>;
+export const RefundPaymentDocument = gql`
+    mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankName: String, $bankAccountNumber: String, $bankOwnerName: String, $ref: Long, $paymentMethod: String) {
+  refundPayment(id: $id, amount: $amount, ref: $ref, authCode: $authCode, bankName: $bankName, bankAccountNumber: $bankAccountNumber, bankOwnerName: $bankOwnerName, paymentMethod: $paymentMethod) {
+    paymentMethod
+    amount
+  }
+}
+    `;
+export type RefundPaymentMutationFn = ApolloReactCommon.MutationFunction<RefundPaymentMutation, RefundPaymentMutationVariables>;
+export type RefundPaymentComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<RefundPaymentMutation, RefundPaymentMutationVariables>, 'mutation'>;
+
+    export const RefundPaymentComponent = (props: RefundPaymentComponentProps) => (
+      <ApolloReactComponents.Mutation<RefundPaymentMutation, RefundPaymentMutationVariables> mutation={RefundPaymentDocument} {...props} />
+    );
+    
+export type RefundPaymentProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<RefundPaymentMutation, RefundPaymentMutationVariables>
+    } & TChildProps;
+export function withRefundPayment<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  RefundPaymentMutation,
+  RefundPaymentMutationVariables,
+  RefundPaymentProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, RefundPaymentMutation, RefundPaymentMutationVariables, RefundPaymentProps<TChildProps, TDataName>>(RefundPaymentDocument, {
+      alias: 'refundPayment',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useRefundPaymentMutation__
+ *
+ * To run a mutation, you first call `useRefundPaymentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefundPaymentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refundPaymentMutation, { data, loading, error }] = useRefundPaymentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      amount: // value for 'amount'
+ *      authCode: // value for 'authCode'
+ *      bankName: // value for 'bankName'
+ *      bankAccountNumber: // value for 'bankAccountNumber'
+ *      bankOwnerName: // value for 'bankOwnerName'
+ *      ref: // value for 'ref'
+ *      paymentMethod: // value for 'paymentMethod'
+ *   },
+ * });
+ */
+export function useRefundPaymentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RefundPaymentMutation, RefundPaymentMutationVariables>) {
+        return ApolloReactHooks.useMutation<RefundPaymentMutation, RefundPaymentMutationVariables>(RefundPaymentDocument, baseOptions);
+      }
+export type RefundPaymentMutationHookResult = ReturnType<typeof useRefundPaymentMutation>;
+export type RefundPaymentMutationResult = ApolloReactCommon.MutationResult<RefundPaymentMutation>;
+export type RefundPaymentMutationOptions = ApolloReactCommon.BaseMutationOptions<RefundPaymentMutation, RefundPaymentMutationVariables>;
+export const VoidPaymentDocument = gql`
+    mutation voidPayment($id: ID) {
+  voidPayment(id: $id) {
+    value
+  }
+}
+    `;
+export type VoidPaymentMutationFn = ApolloReactCommon.MutationFunction<VoidPaymentMutation, VoidPaymentMutationVariables>;
+export type VoidPaymentComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<VoidPaymentMutation, VoidPaymentMutationVariables>, 'mutation'>;
+
+    export const VoidPaymentComponent = (props: VoidPaymentComponentProps) => (
+      <ApolloReactComponents.Mutation<VoidPaymentMutation, VoidPaymentMutationVariables> mutation={VoidPaymentDocument} {...props} />
+    );
+    
+export type VoidPaymentProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<VoidPaymentMutation, VoidPaymentMutationVariables>
+    } & TChildProps;
+export function withVoidPayment<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  VoidPaymentMutation,
+  VoidPaymentMutationVariables,
+  VoidPaymentProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, VoidPaymentMutation, VoidPaymentMutationVariables, VoidPaymentProps<TChildProps, TDataName>>(VoidPaymentDocument, {
+      alias: 'voidPayment',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useVoidPaymentMutation__
+ *
+ * To run a mutation, you first call `useVoidPaymentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useVoidPaymentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [voidPaymentMutation, { data, loading, error }] = useVoidPaymentMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useVoidPaymentMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<VoidPaymentMutation, VoidPaymentMutationVariables>) {
+        return ApolloReactHooks.useMutation<VoidPaymentMutation, VoidPaymentMutationVariables>(VoidPaymentDocument, baseOptions);
+      }
+export type VoidPaymentMutationHookResult = ReturnType<typeof useVoidPaymentMutation>;
+export type VoidPaymentMutationResult = ApolloReactCommon.MutationResult<VoidPaymentMutation>;
+export type VoidPaymentMutationOptions = ApolloReactCommon.BaseMutationOptions<VoidPaymentMutation, VoidPaymentMutationVariables>;
 export const PurchaseDocument = gql`
     query purchase($id: ID) {
   purchase(id: $id) {

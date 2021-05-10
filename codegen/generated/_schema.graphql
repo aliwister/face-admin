@@ -65,6 +65,9 @@ input AddressPojo {
   city: String
   alias: String
   country: String
+  lng: String
+  lat: String
+  plusCode: String
 }
 
 type Attribute {
@@ -108,6 +111,12 @@ input CartItemInput {
   quantity: Int
 }
 
+type CartResponse {
+  cart: Cart
+  success: Boolean
+  message: String
+}
+
 type Category {
   id: Int!
   title: String!
@@ -147,6 +156,12 @@ input CheckoutCartInput {
 type CheckoutSession {
   redirectUrl: String
   secureKey: String
+}
+
+type CheckoutSessionResponse {
+  secureKey: String
+  success: Boolean
+  message: String
 }
 
 type ChildProduct {
@@ -417,7 +432,6 @@ type Mutation {
   acceptPackage(pkg: PackageInput): Pkg
   acceptShipment(trackingNum: String, payment: PaymentInput, invoiceLink: String): Shipment
   addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
-  addI18n(id: Int, i18n: ProductI18nInput): ProductI18n
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
   addShipmentDoc(id: Long, filename: String): Message
@@ -433,15 +447,13 @@ type Mutation {
   completePricingRequestAndEmail(id: Long): Message
   contact(id: Int): Message
   createCart(cart: CheckoutCartInput): CheckoutCart
+  createCheckout(secureKey: String): CheckoutSessionResponse
   createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
   createHashtag(hashtag: HashtagInput): Message
   createMerchantProduct(product: AddProductInput): Message
-  createNewProduct(product: ProductInput): Product
   createOrder(id: Int): Order
   createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
   createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
-
-  """createOrderFromCart(cart: CartInput): Order"""
   createPurchase(dto: PurchaseInput): Purchase
 
   """
@@ -463,13 +475,10 @@ type Mutation {
   getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
   getUploadUrl(filename: String, contentType: String): PresignedUrl
   importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
-  indexProduct(id: Int): Attribute
   issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
   pasLookup(sku: String): Product
   prepItem(dto: PackagingContentInput): Message
   processCheckoutRefund(token: String, amount: String, ref: String, description: String): Message
-
-  """cancelOrder(id: ID): Order"""
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
   removeItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   resetPassword(email: String): String
@@ -480,7 +489,6 @@ type Mutation {
   sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
   setAccountingCode(paymentIds: [Long], code: String): Message
-  setCart(secureKey: String, items: [CartItemInput]): Cart
   setDial(dial: String, ref: Long): Message
   setEstimatedShipDate(id: Long, date: Date): Message
   setHashtags(hashtags: [String], ref: Long): Message
@@ -490,9 +498,10 @@ type Mutation {
   setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
   unpackItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
-  updateCart(secureKey: String, items: [CartItemInput]): Cart
+  updateCart(secureKey: String, items: [CartItemInput]): CartResponse
   updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+  voidPayment(id: ID): Message
 }
 
 type Order {
@@ -732,6 +741,7 @@ type Payment {
   processedDate: Date
   customer: String
   cartId: String
+  voided: Boolean
 }
 
 input PaymentInput {
@@ -884,42 +894,6 @@ input ProductI18nInput {
   lang: String
 }
 
-input ProductInput {
-  sku: String
-  upc: String
-  price: BigDecimal
-  salePrice: BigDecimal
-
-  """currency: String,"""
-  image: String
-
-  """
-  images: [String],
-  releaseDate: LocalDate,
-  active: Boolean,
-  similarProducts: [Int],
-  """
-  url: String
-  name: String
-  brand: String
-  group: String
-  features: String
-  name_ar: String
-  brand_ar: String
-  group_ar: String
-  features_ar: String
-
-  """
-  condition: Condition,
-  isUsed: Boolean,
-  availableForOrder: Boolean,
-  """
-  cost: BigDecimal
-  weight: Float
-  availability: Int
-  quantity: Int
-}
-
 type ProductResponse {
   items: [Product!]!
   total: Int!
@@ -1019,6 +993,7 @@ type Query {
   advancedTracking(ref: String, showAll: Boolean = false, queueName: String): [ItemTracking]
   auditActivity(id: ID, type: String): [Action]
   brands: [I18String]
+  cart(secureKey: String, items: [CartItemInput]): Cart
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
   collections: [I18String]
@@ -1027,7 +1002,6 @@ type Query {
   ebay(id: String): Product
   findByKeyword(keyword: String): ProductResponse
   getAddresses(customerId: Int): [Address]
-  getCart(secureKey: String, items: [CartItemInput]): Cart
   getProductByDial(dial: String): Product
   getProductBySku(sku: String, isParent: Boolean = false): Product
   hashtagList: [Hashtag]

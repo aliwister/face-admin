@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import { styled, withStyle, createThemedUseStyletron } from 'baseui';
-import Moment from 'react-moment';
-
 
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import { Wrapper, Header, Heading } from '../../components/WrapperStyle';
 import Checkbox from '../../components/CheckBox/CheckBox';
 import { useAlert } from "react-alert";
 import {
@@ -25,11 +21,8 @@ import {
   TextField
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import DeleteIcon from "@material-ui/icons/Delete";
 import {makeStyles} from "@material-ui/core/styles";
-import {LoadOrderForm} from "./components/LoadOrderForm";
 import  Select from "react-select";
-import {theme} from "../../theme";
 import {ORDER_STATES} from "./components/Constants";
 import {useForm} from "react-hook-form";
 import TimeAgo from 'react-timeago';

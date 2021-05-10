@@ -1,0 +1,6 @@
+mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
+  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
+    paymentMethod
+    amount
+  }
+}

@@ -1,0 +1,5 @@
+mutation voidPayment($id: ID) {
+  voidPayment(id: $id)  {
+    value
+  }
+}
