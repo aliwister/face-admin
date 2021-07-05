@@ -42,6 +42,7 @@ const GET_ORDERS = gql`
       hasMore,
       items {
         id
+        ref
         currency
         invoiceDate
         subtotal
@@ -187,7 +188,7 @@ export default function Purchases() {
       refetch({
         status: [value[0].value],
         limit: 15, //limit.length ? limit[0].value : null,
-        searchText: "",
+        searchText: null,
       });
     } else {
       refetch({ status: [], limit:10, searchText:"" });
@@ -328,9 +329,10 @@ export default function Purchases() {
                     <TableCell>#</TableCell>
                     <TableCell>ID</TableCell>
                     <TableCell align="left">Merchant</TableCell>
+                    <TableCell align="left">Ref</TableCell>
                     <TableCell align="center">Total</TableCell>
                     <TableCell align="center">Line Count</TableCell>
-                    <TableCell align="center">Date</TableCell>
+                    <TableCell align="right">Date</TableCell>
 
                   </TableRow>
                 </TableHead>
@@ -355,7 +357,9 @@ export default function Purchases() {
                             <TableCell component="th" scope="row">
                               <Link to={`purchase-details/${row.id}`}>{row.id}</Link>
                             </TableCell>
+
                             <TableCell align="left">{row.merchantObj.name}</TableCell>
+                            <TableCell align="left">{row.ref}</TableCell>
                             <TableCell align="center">{row.currency} {row.total}</TableCell>
                             <TableCell align="center">{row.purchaseItems.length}</TableCell>
 
