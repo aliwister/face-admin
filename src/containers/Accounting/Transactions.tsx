@@ -381,7 +381,6 @@ export default function Transactions() {
                 <TableCell align="center">Processed Date</TableCell>
                 <TableCell align="center">Settlement Date</TableCell>
                 <TableCell align="left">Customer Name</TableCell>
-                <TableCell align="left">ref</TableCell>
               </TableRow>
             </TableHead>
             {data && data.transactions.items.length && (
@@ -405,7 +404,13 @@ export default function Transactions() {
                     <TableCell component="th" scope="row">
                       {row.id}
                     </TableCell>
-                    <TableCell align="left"><Link to={`order-details/${row.orderReference}`} target={"_blank"}>{row.orderReference}</Link></TableCell>
+                    <TableCell align="left">
+                      {row.orderReference ?
+                        <Link to={`order-details/${row.orderReference}`} target={"_blank"}>{row.orderReference}</Link> :
+                        <>{row.invoiceNum}</>
+                      }
+                      </TableCell>
+
                     <TableCell align="left"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                     <TableCell align="left">{row.amount}</TableCell>
                     <TableCell align="left">{row.paymentMethod}</TableCell>
@@ -416,7 +421,6 @@ export default function Transactions() {
                     <TableCell align="left">
                       {row.customer}
                     </TableCell>
-                    <TableCell align="left">{row.id}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

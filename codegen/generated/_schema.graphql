@@ -53,6 +53,50 @@ type Address {
   lng: String
   lat: String
   plusCode: String
+  country: String
+  state: String
+}
+
+enum AddressField {
+  firstName
+  lastName
+  line1
+  line2
+  postalCode
+  state
+  city
+  mobile
+  alias
+  country
+  save
+}
+
+type AddressFormat {
+  inputFormat: String
+  displayFormat: String
+  descriptions: [FieldDescription]
+  gmap: OptionType
+}
+
+input AddressInput {
+  id: ID
+  line1: String
+  line2: String
+  firstName: String
+  lastName: String
+  city: String
+  country: String
+  state: String
+  mobile: String
+  alias: String
+  lng: String
+  lat: String
+  plusCode: String
+}
+
+type AddressList {
+  addresses: [Address]
+  displayFormat: String
 }
 
 input AddressPojo {
@@ -70,6 +114,25 @@ input AddressPojo {
   plusCode: String
 }
 
+type AddressResponse {
+  address: Address
+  success: Boolean
+  message: String
+  code: String
+}
+
+"""
+enum Currency {
+    OMR
+    AED
+    SAR
+    KWD
+    BHD
+    QAR
+    USD
+    EUR
+}
+"""
 type Attribute {
   name: String
   value: String
@@ -236,6 +299,10 @@ enum Condition {
   FAIR
 }
 
+type Currency {
+  code: String
+}
+
 type Customer {
   id: ID!
   firstname: String
@@ -248,6 +315,25 @@ type Customer {
 }
 
 scalar Date
+
+type FieldDescription {
+  field: AddressField
+  label: String
+  isRequired: Boolean
+  regex: String
+  fieldType: FieldType
+  options: [Option]
+}
+
+enum FieldType {
+  TEXT
+  REMOTE_SELECT
+  REMOTE_AUTOCOMPLETE
+  SELECT
+  CHECKBOX
+  AUTOCOMPLETE
+  MOBILE
+}
 
 type Gallery {
   url: String!
@@ -354,6 +440,10 @@ scalar LocalDate
 
 scalar LocalDateTime
 
+interface LocalizedObject {
+  _locale: String
+}
+
 """Long type"""
 scalar Long
 
@@ -390,6 +480,7 @@ type MerchantProduct {
   gallery: [String]
   browseNode: String
   browseNode_ar: String
+  active: Boolean
 }
 
 type MerchantProductResponse {
@@ -438,7 +529,6 @@ type Mutation {
   addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
   addToPricingQ(sku: String): Message
   addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
-  approveProduct(id: ID): Message
   cancelOrder(id: ID, reason: String): Order
   cancelPurchase(id: ID, reason: String): Purchase
   closeOrder(id: ID, reason: String): Order
@@ -466,6 +556,8 @@ type Mutation {
   """
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
+  createStubFromSearch(dto: ProductInput): Product
+  deleteAddress(id: ID): AddressResponse
   deleteProduct(id: Long): Message
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
@@ -479,9 +571,11 @@ type Mutation {
   pasLookup(sku: String): Product
   prepItem(dto: PackagingContentInput): Message
   processCheckoutRefund(token: String, amount: String, ref: String, description: String): Message
+  publishProduct(id: Long): Message
   refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
   removeItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   resetPassword(email: String): String
+  saveAddress(address: AddressInput): AddressResponse
   savePartnerProduct(product: PartnerProductInput): ProductEnvelope
   saveShipment(shipment: ShipmentInput): Shipment
   sendOrderLevelEmail(id: ID, template: String): Message
@@ -498,10 +592,22 @@ type Mutation {
   setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
   unpackItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
+  unpublishProduct(id: Long): Message
   updateCart(secureKey: String, items: [CartItemInput]): CartResponse
   updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
   voidPayment(id: ID): Message
+}
+
+type Option {
+  label: String
+  value: String
+}
+
+enum OptionType {
+  REQUIRED
+  OPTIONAL
+  NONE
 }
 
 type Order {
@@ -629,6 +735,7 @@ type PartnerProduct {
   id: ID
 
   """Auto generated"""
+  active: Boolean
   sku: String
   upc: String
   model: String
@@ -742,6 +849,7 @@ type Payment {
   customer: String
   cartId: String
   voided: Boolean
+  invoiceNum: String
 }
 
 input PaymentInput {
@@ -806,7 +914,7 @@ type PricingRequest {
   createdDate: String
 }
 
-type Product {
+type Product implements LocalizedObject {
   id: ID!
   ref: Long
   parent: Int
@@ -837,6 +945,7 @@ type Product {
   discountInPercent: Float
   slug: String
   categories: [Category]
+  variationType: VariationType
   author: String
   unit: String
   description: String
@@ -849,6 +958,9 @@ type Product {
   inStock: Boolean
   hashtags: [String]
   dial: String
+  rating: String
+  _locale: String
+  stub: Boolean
 }
 
 type ProductEnvelope {
@@ -892,6 +1004,44 @@ input ProductI18nInput {
   features: [String]
   brand: String
   lang: String
+}
+
+input ProductInput {
+  sku: String
+  upc: String
+  price: BigDecimal
+  salePrice: BigDecimal
+
+  """currency: String,"""
+  image: String
+
+  """
+  images: [String],
+  releaseDate: LocalDate,
+  active: Boolean,
+  similarProducts: [Int],
+  """
+  url: String
+  title: String
+  brand: String
+  group: String
+  features: String
+  name_ar: String
+  brand_ar: String
+  group_ar: String
+  features_ar: String
+
+  """
+  condition: Condition,
+  isUsed: Boolean,
+  availableForOrder: Boolean,
+  """
+  cost: BigDecimal
+  weight: Float
+  availability: Int
+  quantity: Int
+  isPrime: Boolean
+  rating: String
 }
 
 type ProductResponse {
@@ -990,6 +1140,8 @@ input PurchaseShipmentInput {
 }
 
 type Query {
+  addressDescription(isoCode: String, lang: String): AddressFormat
+  addresses: AddressList
   advancedTracking(ref: String, showAll: Boolean = false, queueName: String): [ItemTracking]
   auditActivity(id: ID, type: String): [Action]
   brands: [I18String]
@@ -997,14 +1149,23 @@ type Query {
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
   collections: [I18String]
+  currencies: [Currency]
+
+  """getAddresses(customerId: Int): [Address]"""
   customer(mobile: String): Customer
   customers: [Customer]
+
+  """
+  pas(sku: String):Product
+  pasUk(sku: String):Product
+  """
   ebay(id: String): Product
   findByKeyword(keyword: String): ProductResponse
-  getAddresses(customerId: Int): [Address]
+  findByKeywordIndex(keyword: String): ProductResponse
   getProductByDial(dial: String): Product
-  getProductBySku(sku: String, isParent: Boolean = false): Product
+  getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Product
   hashtagList: [Hashtag]
+  hashtagProducts(hashtag: String): ProductResponse
   hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
   hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
   inventory: [Inventory]
@@ -1025,13 +1186,11 @@ type Query {
   parentOf(sku: String): String
   partnerProduct(id: ID): PartnerProduct
   partnerProducts(search: String, limit: Int, offset: Int, active: Boolean): MerchantProductResponse
-  pas(sku: String): Product
-  pasUk(sku: String): Product
   payments(orderId: ID): [Payment]
   pkgItemDetails(id: ID): [ShipmentItemDetails]
   prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
   pricingRequests: [PricingRequest]
-  product(slug: String!, cookie: String = ""): Product!
+  product(slug: String!, cookie: String = "", _locale: String): Product!
   productAdmin(id: ID): Product
   productAny(id: ID): Product
   products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
@@ -1260,6 +1419,10 @@ type SortQueue {
   productId: Long
 }
 
+type Subscription {
+  getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Attribute!
+}
+
 type TrackingEvent {
   id: Long
   name: String
@@ -1301,4 +1464,10 @@ input VariationOptionInput {
   label: String
   name: String
   values: [String]
+}
+
+enum VariationType {
+  SIMPLE
+  CHILD
+  PARENT
 }

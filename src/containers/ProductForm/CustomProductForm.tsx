@@ -268,13 +268,13 @@ const AddProduct: React.FC<Props> = props => {
     let shipping = watch('shipping');
     let weight = watch('weight');
     alert.success(weight);
-    const conversion = {'aed': .105,'usd': .386,'gbp': .53,'omr': 1};
+    const conversion = {'aed': .105,'usd': .386,'gbp': .55,'omr': 1};
 
     let priceInOmr = (Number(cost) + Number(shipping) + Number(weight))* conversion[currency] * 1.07;
     alert.success(priceInOmr);
     switch(to) {
       case 'uk':
-        priceInOmr += Number(weight)*5 + 3;
+        priceInOmr += Number(weight)*6 + 3;
         break;
       case 'usa':
         //setCurrency('usd');

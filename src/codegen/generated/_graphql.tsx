@@ -79,6 +79,52 @@ export type Address = {
   lng: Maybe<Scalars['String']>;
   lat: Maybe<Scalars['String']>;
   plusCode: Maybe<Scalars['String']>;
+  country: Maybe<Scalars['String']>;
+  state: Maybe<Scalars['String']>;
+};
+
+export enum AddressField {
+  FirstName = 'firstName',
+  LastName = 'lastName',
+  Line1 = 'line1',
+  Line2 = 'line2',
+  PostalCode = 'postalCode',
+  State = 'state',
+  City = 'city',
+  Mobile = 'mobile',
+  Alias = 'alias',
+  Country = 'country',
+  Save = 'save'
+}
+
+export type AddressFormat = {
+   __typename?: 'AddressFormat';
+  inputFormat: Maybe<Scalars['String']>;
+  displayFormat: Maybe<Scalars['String']>;
+  descriptions: Maybe<Array<Maybe<FieldDescription>>>;
+  gmap: Maybe<OptionType>;
+};
+
+export type AddressInput = {
+  id: Maybe<Scalars['ID']>;
+  line1: Maybe<Scalars['String']>;
+  line2: Maybe<Scalars['String']>;
+  firstName: Maybe<Scalars['String']>;
+  lastName: Maybe<Scalars['String']>;
+  city: Maybe<Scalars['String']>;
+  country: Maybe<Scalars['String']>;
+  state: Maybe<Scalars['String']>;
+  mobile: Maybe<Scalars['String']>;
+  alias: Maybe<Scalars['String']>;
+  lng: Maybe<Scalars['String']>;
+  lat: Maybe<Scalars['String']>;
+  plusCode: Maybe<Scalars['String']>;
+};
+
+export type AddressList = {
+   __typename?: 'AddressList';
+  addresses: Maybe<Array<Maybe<Address>>>;
+  displayFormat: Maybe<Scalars['String']>;
 };
 
 export type AddressPojo = {
@@ -96,6 +142,26 @@ export type AddressPojo = {
   plusCode: Maybe<Scalars['String']>;
 };
 
+export type AddressResponse = {
+   __typename?: 'AddressResponse';
+  address: Maybe<Address>;
+  success: Maybe<Scalars['Boolean']>;
+  message: Maybe<Scalars['String']>;
+  code: Maybe<Scalars['String']>;
+};
+
+/**
+ * enum Currency {
+ *     OMR
+ *     AED
+ *     SAR
+ *     KWD
+ *     BHD
+ *     QAR
+ *     USD
+ *     EUR
+ * }
+ */
 export type Attribute = {
    __typename?: 'Attribute';
   name: Maybe<Scalars['String']>;
@@ -254,6 +320,11 @@ export enum Condition {
   Fair = 'FAIR'
 }
 
+export type Currency = {
+   __typename?: 'Currency';
+  code: Maybe<Scalars['String']>;
+};
+
 export type Customer = {
    __typename?: 'Customer';
   id: Scalars['ID'];
@@ -266,6 +337,26 @@ export type Customer = {
   addresses: Maybe<Array<Maybe<Address>>>;
 };
 
+
+export type FieldDescription = {
+   __typename?: 'FieldDescription';
+  field: Maybe<AddressField>;
+  label: Maybe<Scalars['String']>;
+  isRequired: Maybe<Scalars['Boolean']>;
+  regex: Maybe<Scalars['String']>;
+  fieldType: Maybe<FieldType>;
+  options: Maybe<Array<Maybe<Option>>>;
+};
+
+export enum FieldType {
+  Text = 'TEXT',
+  RemoteSelect = 'REMOTE_SELECT',
+  RemoteAutocomplete = 'REMOTE_AUTOCOMPLETE',
+  Select = 'SELECT',
+  Checkbox = 'CHECKBOX',
+  Autocomplete = 'AUTOCOMPLETE',
+  Mobile = 'MOBILE'
+}
 
 export type Gallery = {
    __typename?: 'Gallery';
@@ -379,6 +470,10 @@ export type LineItemInput = {
 
 
 
+export type LocalizedObject = {
+  _locale: Maybe<Scalars['String']>;
+};
+
 
 export type Merchant = {
    __typename?: 'Merchant';
@@ -415,6 +510,7 @@ export type MerchantProduct = {
   gallery: Maybe<Array<Maybe<Scalars['String']>>>;
   browseNode: Maybe<Scalars['String']>;
   browseNode_ar: Maybe<Scalars['String']>;
+  active: Maybe<Scalars['Boolean']>;
 };
 
 export type MerchantProductResponse = {
@@ -468,7 +564,6 @@ export type Mutation = {
   addToElastic: Maybe<Message>;
   addToPricingQ: Maybe<Message>;
   addTrackingEvent: Maybe<Message>;
-  approveProduct: Maybe<Message>;
   cancelOrder: Maybe<Order>;
   cancelPurchase: Maybe<Purchase>;
   closeOrder: Maybe<Order>;
@@ -495,6 +590,8 @@ export type Mutation = {
    */
   createShipment: Maybe<Shipment>;
   createStub: Maybe<MerchantProduct>;
+  createStubFromSearch: Maybe<Product>;
+  deleteAddress: Maybe<AddressResponse>;
   deleteProduct: Maybe<Message>;
   discountOrder: Maybe<Order>;
   editOrder: Maybe<Order>;
@@ -508,9 +605,11 @@ export type Mutation = {
   pasLookup: Maybe<Product>;
   prepItem: Maybe<Message>;
   processCheckoutRefund: Maybe<Message>;
+  publishProduct: Maybe<Message>;
   refundPayment: Maybe<Payment>;
   removeItem: Maybe<Message>;
   resetPassword: Maybe<Scalars['String']>;
+  saveAddress: Maybe<AddressResponse>;
   savePartnerProduct: Maybe<ProductEnvelope>;
   saveShipment: Maybe<Shipment>;
   sendOrderLevelEmail: Maybe<Message>;
@@ -527,6 +626,7 @@ export type Mutation = {
   setSettlementDate: Maybe<Message>;
   setShipmentStatus: Maybe<Message>;
   unpackItem: Maybe<Message>;
+  unpublishProduct: Maybe<Message>;
   updateCart: Maybe<CartResponse>;
   updateFromDetrack: Maybe<Message>;
   updatePurchase: Maybe<Purchase>;
@@ -604,11 +704,6 @@ export type MutationAddTrackingEventArgs = {
   trackingEvent: Maybe<Scalars['Int']>;
   eventDate: Maybe<Scalars['LocalDateTime']>;
   details: Maybe<Scalars['String']>;
-};
-
-
-export type MutationApproveProductArgs = {
-  id: Maybe<Scalars['ID']>;
 };
 
 
@@ -720,6 +815,16 @@ export type MutationCreateStubArgs = {
 };
 
 
+export type MutationCreateStubFromSearchArgs = {
+  dto: Maybe<ProductInput>;
+};
+
+
+export type MutationDeleteAddressArgs = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
 export type MutationDeleteProductArgs = {
   id: Maybe<Scalars['Long']>;
 };
@@ -801,6 +906,11 @@ export type MutationProcessCheckoutRefundArgs = {
 };
 
 
+export type MutationPublishProductArgs = {
+  id: Maybe<Scalars['Long']>;
+};
+
+
 export type MutationRefundPaymentArgs = {
   id: Maybe<Scalars['ID']>;
   amount: Maybe<Scalars['BigDecimal']>;
@@ -823,6 +933,11 @@ export type MutationRemoveItemArgs = {
 
 export type MutationResetPasswordArgs = {
   email: Maybe<Scalars['String']>;
+};
+
+
+export type MutationSaveAddressArgs = {
+  address: Maybe<AddressInput>;
 };
 
 
@@ -927,6 +1042,11 @@ export type MutationUnpackItemArgs = {
 };
 
 
+export type MutationUnpublishProductArgs = {
+  id: Maybe<Scalars['Long']>;
+};
+
+
 export type MutationUpdateCartArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
@@ -947,6 +1067,18 @@ export type MutationUpdatePurchaseArgs = {
 export type MutationVoidPaymentArgs = {
   id: Maybe<Scalars['ID']>;
 };
+
+export type Option = {
+   __typename?: 'Option';
+  label: Maybe<Scalars['String']>;
+  value: Maybe<Scalars['String']>;
+};
+
+export enum OptionType {
+  Required = 'REQUIRED',
+  Optional = 'OPTIONAL',
+  None = 'NONE'
+}
 
 export type Order = {
    __typename?: 'Order';
@@ -1077,6 +1209,7 @@ export type PartnerProduct = {
    __typename?: 'PartnerProduct';
   id: Maybe<Scalars['ID']>;
   /** Auto generated */
+  active: Maybe<Scalars['Boolean']>;
   sku: Maybe<Scalars['String']>;
   upc: Maybe<Scalars['String']>;
   model: Maybe<Scalars['String']>;
@@ -1169,6 +1302,7 @@ export type Payment = {
   customer: Maybe<Scalars['String']>;
   cartId: Maybe<Scalars['String']>;
   voided: Maybe<Scalars['Boolean']>;
+  invoiceNum: Maybe<Scalars['String']>;
 };
 
 export type PaymentInput = {
@@ -1239,7 +1373,7 @@ export type PricingRequest = {
   createdDate: Maybe<Scalars['String']>;
 };
 
-export type Product = {
+export type Product = LocalizedObject & {
    __typename?: 'Product';
   id: Scalars['ID'];
   ref: Maybe<Scalars['Long']>;
@@ -1270,6 +1404,7 @@ export type Product = {
   discountInPercent: Maybe<Scalars['Float']>;
   slug: Maybe<Scalars['String']>;
   categories: Maybe<Array<Maybe<Category>>>;
+  variationType: Maybe<VariationType>;
   author: Maybe<Scalars['String']>;
   unit: Maybe<Scalars['String']>;
   description: Maybe<Scalars['String']>;
@@ -1282,6 +1417,9 @@ export type Product = {
   inStock: Maybe<Scalars['Boolean']>;
   hashtags: Maybe<Array<Maybe<Scalars['String']>>>;
   dial: Maybe<Scalars['String']>;
+  rating: Maybe<Scalars['String']>;
+  _locale: Maybe<Scalars['String']>;
+  stub: Maybe<Scalars['Boolean']>;
 };
 
 export type ProductEnvelope = {
@@ -1327,6 +1465,41 @@ export type ProductI18nInput = {
   features: Maybe<Array<Maybe<Scalars['String']>>>;
   brand: Maybe<Scalars['String']>;
   lang: Maybe<Scalars['String']>;
+};
+
+export type ProductInput = {
+  sku: Maybe<Scalars['String']>;
+  upc: Maybe<Scalars['String']>;
+  price: Maybe<Scalars['BigDecimal']>;
+  salePrice: Maybe<Scalars['BigDecimal']>;
+  /** currency: String, */
+  image: Maybe<Scalars['String']>;
+  /**
+   * images: [String],
+   * releaseDate: LocalDate,
+   * active: Boolean,
+   * similarProducts: [Int],
+   */
+  url: Maybe<Scalars['String']>;
+  title: Maybe<Scalars['String']>;
+  brand: Maybe<Scalars['String']>;
+  group: Maybe<Scalars['String']>;
+  features: Maybe<Scalars['String']>;
+  name_ar: Maybe<Scalars['String']>;
+  brand_ar: Maybe<Scalars['String']>;
+  group_ar: Maybe<Scalars['String']>;
+  features_ar: Maybe<Scalars['String']>;
+  /**
+   * condition: Condition,
+   * isUsed: Boolean,
+   * availableForOrder: Boolean,
+   */
+  cost: Maybe<Scalars['BigDecimal']>;
+  weight: Maybe<Scalars['Float']>;
+  availability: Maybe<Scalars['Int']>;
+  quantity: Maybe<Scalars['Int']>;
+  isPrime: Maybe<Scalars['Boolean']>;
+  rating: Maybe<Scalars['String']>;
 };
 
 export type ProductResponse = {
@@ -1432,6 +1605,8 @@ export type PurchaseShipmentInput = {
 
 export type Query = {
    __typename?: 'Query';
+  addressDescription: Maybe<AddressFormat>;
+  addresses: Maybe<AddressList>;
   advancedTracking: Maybe<Array<Maybe<ItemTracking>>>;
   auditActivity: Maybe<Array<Maybe<Action>>>;
   brands: Maybe<Array<Maybe<I18String>>>;
@@ -1439,14 +1614,21 @@ export type Query = {
   categories: Array<Category>;
   category: Category;
   collections: Maybe<Array<Maybe<I18String>>>;
+  currencies: Maybe<Array<Maybe<Currency>>>;
+  /** getAddresses(customerId: Int): [Address] */
   customer: Maybe<Customer>;
   customers: Maybe<Array<Maybe<Customer>>>;
+  /**
+   * pas(sku: String):Product
+   * pasUk(sku: String):Product
+   */
   ebay: Maybe<Product>;
   findByKeyword: Maybe<ProductResponse>;
-  getAddresses: Maybe<Array<Maybe<Address>>>;
+  findByKeywordIndex: Maybe<ProductResponse>;
   getProductByDial: Maybe<Product>;
   getProductBySku: Maybe<Product>;
   hashtagList: Maybe<Array<Maybe<Hashtag>>>;
+  hashtagProducts: Maybe<ProductResponse>;
   hashtags: Maybe<HashtagResponse>;
   hashtagsWithProducts: Maybe<HashtagResponse>;
   inventory: Maybe<Array<Maybe<Inventory>>>;
@@ -1465,8 +1647,6 @@ export type Query = {
   parentOf: Maybe<Scalars['String']>;
   partnerProduct: Maybe<PartnerProduct>;
   partnerProducts: Maybe<MerchantProductResponse>;
-  pas: Maybe<Product>;
-  pasUk: Maybe<Product>;
   payments: Maybe<Array<Maybe<Payment>>>;
   pkgItemDetails: Maybe<Array<Maybe<ShipmentItemDetails>>>;
   prepQueue: Maybe<Array<Maybe<PrepQueue>>>;
@@ -1500,6 +1680,12 @@ export type Query = {
   unshippedQueue: Maybe<Array<Maybe<UnshippedQueue>>>;
   variationOptions: Maybe<VariationOption>;
   variations: Maybe<Array<Maybe<VariationOption>>>;
+};
+
+
+export type QueryAddressDescriptionArgs = {
+  isoCode: Maybe<Scalars['String']>;
+  lang: Maybe<Scalars['String']>;
 };
 
 
@@ -1547,8 +1733,8 @@ export type QueryFindByKeywordArgs = {
 };
 
 
-export type QueryGetAddressesArgs = {
-  customerId: Maybe<Scalars['Int']>;
+export type QueryFindByKeywordIndexArgs = {
+  keyword: Maybe<Scalars['String']>;
 };
 
 
@@ -1560,6 +1746,12 @@ export type QueryGetProductByDialArgs = {
 export type QueryGetProductBySkuArgs = {
   sku: Maybe<Scalars['String']>;
   isParent?: Maybe<Scalars['Boolean']>;
+  _locale: Maybe<Scalars['String']>;
+};
+
+
+export type QueryHashtagProductsArgs = {
+  hashtag: Maybe<Scalars['String']>;
 };
 
 
@@ -1643,16 +1835,6 @@ export type QueryPartnerProductsArgs = {
 };
 
 
-export type QueryPasArgs = {
-  sku: Maybe<Scalars['String']>;
-};
-
-
-export type QueryPasUkArgs = {
-  sku: Maybe<Scalars['String']>;
-};
-
-
 export type QueryPaymentsArgs = {
   orderId: Maybe<Scalars['ID']>;
 };
@@ -1672,6 +1854,7 @@ export type QueryPrepQueueArgs = {
 export type QueryProductArgs = {
   slug: Scalars['String'];
   cookie?: Maybe<Scalars['String']>;
+  _locale: Maybe<Scalars['String']>;
 };
 
 
@@ -2009,6 +2192,18 @@ export type SortQueue = {
   productId: Maybe<Scalars['Long']>;
 };
 
+export type Subscription = {
+   __typename?: 'Subscription';
+  getProductBySku: Attribute;
+};
+
+
+export type SubscriptionGetProductBySkuArgs = {
+  sku: Maybe<Scalars['String']>;
+  isParent?: Maybe<Scalars['Boolean']>;
+  _locale: Maybe<Scalars['String']>;
+};
+
 export type TrackingEvent = {
    __typename?: 'TrackingEvent';
   id: Maybe<Scalars['Long']>;
@@ -2056,6 +2251,12 @@ export type VariationOptionInput = {
   name: Maybe<Scalars['String']>;
   values: Maybe<Array<Maybe<Scalars['String']>>>;
 };
+
+export enum VariationType {
+  Simple = 'SIMPLE',
+  Child = 'CHILD',
+  Parent = 'PARENT'
+}
 
 export type AddDiscountMutationVariables = {
   id: Maybe<Scalars['ID']>;
@@ -2547,7 +2748,7 @@ export type TransactionsQuery = (
     & Pick<PaymentResponse, 'total' | 'hasMore'>
     & { items: Array<(
       { __typename?: 'Payment' }
-      & Pick<Payment, 'id' | 'paymentMethod' | 'orderId' | 'amount' | 'authCode' | 'transactionId' | 'cardNumber' | 'createdDate' | 'orderReference' | 'account' | 'bankAccountNumber' | 'bankName' | 'bankOwnerName' | 'settlementDate' | 'processedDate' | 'customer' | 'cartId'>
+      & Pick<Payment, 'id' | 'paymentMethod' | 'orderId' | 'amount' | 'authCode' | 'transactionId' | 'cardNumber' | 'createdDate' | 'orderReference' | 'account' | 'bankAccountNumber' | 'bankName' | 'bankOwnerName' | 'settlementDate' | 'processedDate' | 'customer' | 'cartId' | 'invoiceNum'>
     )> }
   )> }
 );
@@ -4402,6 +4603,7 @@ export const TransactionsDocument = gql`
       processedDate
       customer
       cartId
+      invoiceNum
     }
   }
 }
