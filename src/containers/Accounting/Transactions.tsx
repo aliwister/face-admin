@@ -405,9 +405,10 @@ export default function Transactions() {
                       {row.id}
                     </TableCell>
                     <TableCell align="left">
-                      {row.orderReference ?
-                        <Link to={`order-details/${row.orderReference}`} target={"_blank"}>{row.orderReference}</Link> :
-                        <>{row.invoiceNum}</>
+                      {row.invoiceNum  ?
+                        <>{row.invoiceNum}</>:
+                        <Link to={`order-details/${row.orderReference}`} target={"_blank"}>{row.orderReference}</Link>
+
                       }
                       </TableCell>
 

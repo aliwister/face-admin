@@ -13,11 +13,21 @@ export const SendToDetrackDialog = ({open, onClose, onSubmit}) => {
   return (
   <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title" style={{minHeight:"250px"}}>
     <form onSubmit={handleSubmit(onSubmit)}>
-      <DialogTitle id="form-dialog-title">Accept Shipment</DialogTitle>
-      <DialogContent>
+      <DialogTitle id="form-dialog-title">Deliver</DialogTitle>
+      <DialogContent style={{height: "250px", width: "250px"}}>
         <DialogContentText>
           Send To Detrack
         </DialogContentText>
+        <div>
+          <Controller
+            as={<Select options={DRIVERS}/>}
+            rules={{ required: false }}
+            name="assignTo"
+            register={register}
+            control={control}
+            defaultValue=""
+          />
+        </div>
         <div>
           <Controller
             as={<Select options={DRIVERS}/>}
