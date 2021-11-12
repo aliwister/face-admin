@@ -150,18 +150,6 @@ export type AddressResponse = {
   code: Maybe<Scalars['String']>;
 };
 
-/**
- * enum Currency {
- *     OMR
- *     AED
- *     SAR
- *     KWD
- *     BHD
- *     QAR
- *     USD
- *     EUR
- * }
- */
 export type Attribute = {
    __typename?: 'Attribute';
   name: Maybe<Scalars['String']>;
@@ -335,6 +323,8 @@ export type Customer = {
   totalPoints: Maybe<Scalars['Long']>;
   spentPoints: Maybe<Scalars['Long']>;
   addresses: Maybe<Array<Maybe<Address>>>;
+  allowPickup: Maybe<Scalars['Boolean']>;
+  plusDiscount: Maybe<Scalars['Int']>;
 };
 
 
@@ -342,7 +332,9 @@ export type FieldDescription = {
    __typename?: 'FieldDescription';
   field: Maybe<AddressField>;
   label: Maybe<Scalars['String']>;
-  isRequired: Maybe<Scalars['Boolean']>;
+  required: Maybe<Scalars['Boolean']>;
+  minLength: Maybe<Scalars['Int']>;
+  maxLength: Maybe<Scalars['Int']>;
   regex: Maybe<Scalars['String']>;
   fieldType: Maybe<FieldType>;
   options: Maybe<Array<Maybe<Option>>>;
@@ -448,7 +440,7 @@ export type LineItem = {
   sku: Maybe<Scalars['String']>;
   image: Maybe<Scalars['String']>;
   name: Maybe<Scalars['String']>;
-  quantity: Maybe<Scalars['Float']>;
+  quantity: Maybe<Scalars['Int']>;
   price: Maybe<Scalars['Float']>;
   cost: Maybe<Scalars['Float']>;
   subTotal: Maybe<Scalars['Float']>;
@@ -571,6 +563,7 @@ export type Mutation = {
   completePricingRequest: Maybe<Message>;
   completePricingRequestAndEmail: Maybe<Message>;
   contact: Maybe<Message>;
+  /** For app */
   createCart: Maybe<CheckoutCart>;
   createCheckout: Maybe<CheckoutSessionResponse>;
   createCheckoutSession: Maybe<CheckoutSession>;
@@ -578,6 +571,7 @@ export type Mutation = {
   createMerchantProduct: Maybe<Message>;
   createOrder: Maybe<Order>;
   createOverride: Maybe<Product>;
+  createPlusCart: Maybe<CheckoutCart>;
   createProduct: Maybe<MerchantProduct>;
   createPurchase: Maybe<Purchase>;
   /**
@@ -630,6 +624,7 @@ export type Mutation = {
   updateCart: Maybe<CartResponse>;
   updateFromDetrack: Maybe<Message>;
   updatePurchase: Maybe<Purchase>;
+  updateTenantCart: Maybe<CartResponse>;
   voidPayment: Maybe<Message>;
 };
 
@@ -786,6 +781,12 @@ export type MutationCreateOverrideArgs = {
   merchantId: Maybe<Scalars['Int']>;
   submitOnly: Maybe<Scalars['Int']>;
   dial: Maybe<Scalars['String']>;
+};
+
+
+export type MutationCreatePlusCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<LineItemInput>>>;
 };
 
 
@@ -1064,6 +1065,14 @@ export type MutationUpdatePurchaseArgs = {
 };
 
 
+export type MutationUpdateTenantCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
+  items: Maybe<Array<Maybe<CartItemInput>>>;
+  isMerge: Maybe<Scalars['Boolean']>;
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
 export type MutationVoidPaymentArgs = {
   id: Maybe<Scalars['ID']>;
 };
@@ -1282,6 +1291,13 @@ export type PartnerProductInput = {
   children: Maybe<Array<Maybe<ChildProductInput>>>;
 };
 
+export type PartnerProductResponse = {
+   __typename?: 'PartnerProductResponse';
+  items: Maybe<Array<Maybe<PartnerProduct>>>;
+  total: Scalars['Int'];
+  hasMore: Scalars['Boolean'];
+};
+
 export type Payment = {
    __typename?: 'Payment';
   id: Maybe<Scalars['ID']>;
@@ -1450,7 +1466,7 @@ export enum ProductGroup {
 
 export type ProductI18n = {
    __typename?: 'ProductI18n';
-  title: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
   description: Maybe<Scalars['String']>;
   model: Maybe<Scalars['String']>;
   features: Maybe<Array<Maybe<Scalars['String']>>>;
@@ -1459,7 +1475,7 @@ export type ProductI18n = {
 };
 
 export type ProductI18nInput = {
-  title: Maybe<Scalars['String']>;
+  name: Maybe<Scalars['String']>;
   description: Maybe<Scalars['String']>;
   model: Maybe<Scalars['String']>;
   features: Maybe<Array<Maybe<Scalars['String']>>>;
@@ -1634,6 +1650,7 @@ export type Query = {
   inventory: Maybe<Array<Maybe<Inventory>>>;
   /** getAddress(addressId: Int): Address */
   me: Maybe<Customer>;
+  mePlus: Maybe<Customer>;
   meTest: Maybe<Customer>;
   merchantProducts: Maybe<MerchantProductResponse>;
   merchants: Maybe<Array<Maybe<Merchant>>>;
@@ -1646,9 +1663,10 @@ export type Query = {
   outstandingQueue: Maybe<Array<Maybe<OutstandingQueue>>>;
   parentOf: Maybe<Scalars['String']>;
   partnerProduct: Maybe<PartnerProduct>;
-  partnerProducts: Maybe<MerchantProductResponse>;
+  partnerProducts: Maybe<PartnerProductResponse>;
   payments: Maybe<Array<Maybe<Payment>>>;
   pkgItemDetails: Maybe<Array<Maybe<ShipmentItemDetails>>>;
+  plusCart: Maybe<CheckoutCart>;
   prepQueue: Maybe<Array<Maybe<PrepQueue>>>;
   pricingRequests: Maybe<Array<Maybe<PricingRequest>>>;
   product: Product;
@@ -1672,6 +1690,10 @@ export type Query = {
   shipments: Maybe<Array<Maybe<Shipment>>>;
   shipmentsByRef: Maybe<Array<Maybe<Shipment>>>;
   sortQueue: Maybe<Array<Maybe<SortQueue>>>;
+  tenantByName: Maybe<Tenant>;
+  tenantProduct: Maybe<Product>;
+  tenantTagProducts: Maybe<ProductResponse>;
+  tenantTags: Maybe<Array<Maybe<TenantTag>>>;
   track: Maybe<Array<Maybe<ShipmentTrackingMap>>>;
   trackingEvents: Maybe<Array<Maybe<TrackingEvent>>>;
   transaction: Maybe<Payment>;
@@ -1702,9 +1724,14 @@ export type QueryAuditActivityArgs = {
 };
 
 
+export type QueryBrandsArgs = {
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryCartArgs = {
   secureKey: Maybe<Scalars['String']>;
-  items: Maybe<Array<Maybe<CartItemInput>>>;
+  _locale?: Maybe<Scalars['String']>;
 };
 
 
@@ -1715,6 +1742,16 @@ export type QueryCategoriesArgs = {
 
 export type QueryCategoryArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryCollectionsArgs = {
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryCurrenciesArgs = {
+  _locale?: Maybe<Scalars['String']>;
 };
 
 
@@ -1751,11 +1788,13 @@ export type QueryGetProductBySkuArgs = {
 
 
 export type QueryHashtagProductsArgs = {
+  tenant: Maybe<Scalars['String']>;
   hashtag: Maybe<Scalars['String']>;
 };
 
 
 export type QueryHashtagsArgs = {
+  tenant: Maybe<Scalars['String']>;
   offset?: Maybe<Scalars['Int']>;
   limit?: Maybe<Scalars['Int']>;
 };
@@ -1824,6 +1863,7 @@ export type QueryParentOfArgs = {
 
 export type QueryPartnerProductArgs = {
   id: Maybe<Scalars['ID']>;
+  _locale?: Maybe<Scalars['String']>;
 };
 
 
@@ -1832,6 +1872,7 @@ export type QueryPartnerProductsArgs = {
   limit: Maybe<Scalars['Int']>;
   offset: Maybe<Scalars['Int']>;
   active: Maybe<Scalars['Boolean']>;
+  _locale?: Maybe<Scalars['String']>;
 };
 
 
@@ -1842,6 +1883,11 @@ export type QueryPaymentsArgs = {
 
 export type QueryPkgItemDetailsArgs = {
   id: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryPlusCartArgs = {
+  secureKey: Maybe<Scalars['String']>;
 };
 
 
@@ -1956,6 +2002,31 @@ export type QuerySortQueueArgs = {
 };
 
 
+export type QueryTenantByNameArgs = {
+  name: Maybe<Scalars['String']>;
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTenantProductArgs = {
+  slug: Maybe<Scalars['String']>;
+  _locale: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTenantTagProductsArgs = {
+  hashtag: Maybe<Scalars['String']>;
+  tenantId: Maybe<Scalars['Long']>;
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryTenantTagsArgs = {
+  tenantId: Maybe<Scalars['Long']>;
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
 export type QueryTrackArgs = {
   ref: Maybe<Scalars['String']>;
 };
@@ -1981,6 +2052,12 @@ export type QueryTransactionsArgs = {
 
 export type QueryVariationOptionsArgs = {
   name: Maybe<Scalars['String']>;
+  _locale?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryVariationsArgs = {
+  _locale?: Maybe<Scalars['String']>;
 };
 
 export type Reward = {
@@ -2108,6 +2185,7 @@ export type ShipmentList = {
   arrivedPkgs: Maybe<Scalars['Int']>;
   status: Maybe<Scalars['String']>;
   sender: Maybe<Scalars['String']>;
+  receiver: Maybe<Scalars['String']>;
 };
 
 export enum ShipmentListView {
@@ -2202,6 +2280,26 @@ export type SubscriptionGetProductBySkuArgs = {
   sku: Maybe<Scalars['String']>;
   isParent?: Maybe<Scalars['Boolean']>;
   _locale: Maybe<Scalars['String']>;
+};
+
+export type Tenant = {
+   __typename?: 'Tenant';
+  id: Maybe<Scalars['Long']>;
+  name: Maybe<Scalars['String']>;
+  maxProducts: Maybe<Scalars['Int']>;
+  planName: Maybe<Scalars['String']>;
+  discountRate: Maybe<Scalars['Int']>;
+  active: Maybe<Scalars['Boolean']>;
+  monthlyFee: Maybe<Scalars['BigDecimal']>;
+  skuPrefix: Maybe<Scalars['String']>;
+  contractStartDate: Maybe<Scalars['LocalDate']>;
+};
+
+export type TenantTag = {
+   __typename?: 'TenantTag';
+  langs: Maybe<Array<Maybe<I18String>>>;
+  icon: Maybe<Scalars['String']>;
+  position: Maybe<Scalars['Int']>;
 };
 
 export type TrackingEvent = {

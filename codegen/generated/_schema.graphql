@@ -121,18 +121,6 @@ type AddressResponse {
   code: String
 }
 
-"""
-enum Currency {
-    OMR
-    AED
-    SAR
-    KWD
-    BHD
-    QAR
-    USD
-    EUR
-}
-"""
 type Attribute {
   name: String
   value: String
@@ -312,6 +300,8 @@ type Customer {
   totalPoints: Long
   spentPoints: Long
   addresses: [Address]
+  allowPickup: Boolean
+  plusDiscount: Int
 }
 
 scalar Date
@@ -319,7 +309,9 @@ scalar Date
 type FieldDescription {
   field: AddressField
   label: String
-  isRequired: Boolean
+  required: Boolean
+  minLength: Int
+  maxLength: Int
   regex: String
   fieldType: FieldType
   options: [Option]
@@ -416,7 +408,7 @@ type LineItem {
   sku: String
   image: String
   name: String
-  quantity: Float
+  quantity: Int
   price: Float
   cost: Float
   subTotal: Float
@@ -536,6 +528,8 @@ type Mutation {
   completePricingRequest(id: Long): Message
   completePricingRequestAndEmail(id: Long): Message
   contact(id: Int): Message
+
+  """For app"""
   createCart(cart: CheckoutCartInput): CheckoutCart
   createCheckout(secureKey: String): CheckoutSessionResponse
   createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
@@ -543,6 +537,7 @@ type Mutation {
   createMerchantProduct(product: AddProductInput): Message
   createOrder(id: Int): Order
   createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
+  createPlusCart(secureKey: String, items: [LineItemInput]): CheckoutCart
   createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
   createPurchase(dto: PurchaseInput): Purchase
 
@@ -596,6 +591,7 @@ type Mutation {
   updateCart(secureKey: String, items: [CartItemInput]): CartResponse
   updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+  updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, _locale: String = "en-OM"): CartResponse
   voidPayment(id: ID): Message
 }
 
@@ -830,6 +826,12 @@ input PartnerProductInput {
   children: [ChildProductInput]
 }
 
+type PartnerProductResponse {
+  items: [PartnerProduct]
+  total: Int!
+  hasMore: Boolean!
+}
+
 type Payment {
   id: ID
   paymentMethod: String
@@ -989,7 +991,7 @@ enum ProductGroup {
 }
 
 type ProductI18n {
-  title: String
+  name: String
   description: String
   model: String
   features: [String]
@@ -998,7 +1000,7 @@ type ProductI18n {
 }
 
 input ProductI18nInput {
-  title: String
+  name: String
   description: String
   model: String
   features: [String]
@@ -1144,12 +1146,12 @@ type Query {
   addresses: AddressList
   advancedTracking(ref: String, showAll: Boolean = false, queueName: String): [ItemTracking]
   auditActivity(id: ID, type: String): [Action]
-  brands: [I18String]
-  cart(secureKey: String, items: [CartItemInput]): Cart
+  brands(_locale: String = "en-OM"): [I18String]
+  cart(secureKey: String, _locale: String = "en-OM"): Cart
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
-  collections: [I18String]
-  currencies: [Currency]
+  collections(_locale: String = "en-OM"): [I18String]
+  currencies(_locale: String = "en-OM"): [Currency]
 
   """getAddresses(customerId: Int): [Address]"""
   customer(mobile: String): Customer
@@ -1165,13 +1167,14 @@ type Query {
   getProductByDial(dial: String): Product
   getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Product
   hashtagList: [Hashtag]
-  hashtagProducts(hashtag: String): ProductResponse
-  hashtags(offset: Int = 0, limit: Int = 10): HashtagResponse
+  hashtagProducts(tenant: String, hashtag: String): ProductResponse
+  hashtags(tenant: String, offset: Int = 0, limit: Int = 10): HashtagResponse
   hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
   inventory: [Inventory]
 
   """getAddress(addressId: Int): Address"""
   me: Customer
+  mePlus: Customer
   meTest(id: Long): Customer
   merchantProducts(text: String = "", type: String = "", offset: Int = 0, limit: Int = 10, lang: Int = 1, imported: Boolean = true): MerchantProductResponse
   merchants: [Merchant]
@@ -1184,10 +1187,11 @@ type Query {
   ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
   outstandingQueue(keyword: String): [OutstandingQueue]
   parentOf(sku: String): String
-  partnerProduct(id: ID): PartnerProduct
-  partnerProducts(search: String, limit: Int, offset: Int, active: Boolean): MerchantProductResponse
+  partnerProduct(id: ID, _locale: String = "en-OM"): PartnerProduct
+  partnerProducts(search: String, limit: Int, offset: Int, active: Boolean, _locale: String = "en-OM"): PartnerProductResponse
   payments(orderId: ID): [Payment]
   pkgItemDetails(id: ID): [ShipmentItemDetails]
+  plusCart(secureKey: String): CheckoutCart
   prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
   pricingRequests: [PricingRequest]
   product(slug: String!, cookie: String = "", _locale: String): Product!
@@ -1211,14 +1215,18 @@ type Query {
   shipments(status: [ShipmentStatus], type: ShipmentType): [Shipment]
   shipmentsByRef(ref: String): [Shipment]
   sortQueue(keyword: String): [SortQueue]
+  tenantByName(name: String, _locale: String = "en-OM"): Tenant
+  tenantProduct(slug: String, _locale: String): Product
+  tenantTagProducts(hashtag: String, tenantId: Long, _locale: String = "en-OM"): ProductResponse
+  tenantTags(tenantId: Long, _locale: String = "en-OM"): [TenantTag]
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
   transaction(id: ID): Payment
   transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String, unsettledOnly: Boolean): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
   unshippedQueue: [UnshippedQueue]
-  variationOptions(name: String): VariationOption
-  variations: [VariationOption]
+  variationOptions(name: String, _locale: String = "en-OM"): VariationOption
+  variations(_locale: String = "en-OM"): [VariationOption]
 }
 
 type Reward {
@@ -1339,6 +1347,7 @@ type ShipmentList {
   arrivedPkgs: Int
   status: String
   sender: String
+  receiver: String
 }
 
 enum ShipmentListView {
@@ -1421,6 +1430,24 @@ type SortQueue {
 
 type Subscription {
   getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Attribute!
+}
+
+type Tenant {
+  id: Long
+  name: String
+  maxProducts: Int
+  planName: String
+  discountRate: Int
+  active: Boolean
+  monthlyFee: BigDecimal
+  skuPrefix: String
+  contractStartDate: LocalDate
+}
+
+type TenantTag {
+  langs: [I18String]
+  icon: String
+  position: Int
 }
 
 type TrackingEvent {

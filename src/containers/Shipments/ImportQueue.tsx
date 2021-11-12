@@ -170,7 +170,7 @@ export default function ImportQueue() {
     let dto = {
        shipment: {
          reference: formData.reference,
-         trackingNum: formData.trackingNum,
+         trackingNum: formData.trackingNum.trim(),
          shipmentStatus: 'PROCESSING',
          merchantId: formData.merchantId,
          partyId: formData.partyId,

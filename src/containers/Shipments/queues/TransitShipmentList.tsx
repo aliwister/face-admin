@@ -39,7 +39,7 @@ export function TransitShipmentList({data, refetch}) {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Customer Shipments',
+        Header: 'Transit Shipments',
         columns: [
           {
             Header: 'ID',
@@ -58,6 +58,12 @@ export function TransitShipmentList({data, refetch}) {
             accessor: 'shipmentMethod',
           },
           {
+            Header: 'Sender',
+            accessor: 'sender',
+          },          {
+            Header: 'Receiver',
+            accessor: 'receiver',
+          },          {
             Header: 'Carrier',
             accessor: 'carrier',
           },

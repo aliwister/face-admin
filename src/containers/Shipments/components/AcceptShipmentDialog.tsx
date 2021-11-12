@@ -50,7 +50,7 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
       data: { acceptShipment },
     }: any = await acceptShipmentMutation({
       variables: {
-        trackingNum: formData.trackingNum,
+        trackingNum: formData.trackingNum.trim(),
         payment: {
           price: {
             amount: formData.amount,

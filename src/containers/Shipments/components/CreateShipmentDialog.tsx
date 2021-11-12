@@ -68,7 +68,9 @@ export const CreateShipmentDialog = ({onSubmit = null, show = false, onClose = n
     const dto = {
       shipment: {
         ...data,
+        trackingNum: data.trackingNum.trim(),
         shipmentStatus: 'PROCESSING',
+
         //merchantId: merchant.value,
         //partyId: to.value,
         shipmentType: data.shipmentType.value,
