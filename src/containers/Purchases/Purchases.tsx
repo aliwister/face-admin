@@ -55,11 +55,7 @@ const GET_ORDERS = gql`
           id
           name
         }
-        purchaseItems {
-          description
-          price
-          quantity
-        }
+        length
       }
     }
   }
@@ -361,7 +357,7 @@ export default function Purchases() {
                             <TableCell align="left">{row.merchantObj.name}</TableCell>
                             <TableCell align="left">{row.ref}</TableCell>
                             <TableCell align="center">{row.currency} {row.total}</TableCell>
-                            <TableCell align="center">{row.purchaseItems.length}</TableCell>
+                            <TableCell align="center">{row.length}</TableCell>
 
                             <TableCell align="right"><Moment format='Do MMM YYYY'>{row.createdDate}</Moment></TableCell>
                           </TableRow>
