@@ -66,7 +66,9 @@ export default function ShipmentDetails(props) {
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small"/>} aria-label="breadcrumb" className={classes.bread}>
           <Link color="inherit" to="/">Home</Link>
           <Link color="inherit" to="/shipments">Shipments</Link>
-          <Typography color="textPrimary">Shipment {dp.shipment.id} - {dp.shipment.shipmentStatus}</Typography>
+          <Typography color="textPrimary">Shipment {dp.shipment.id} - {dp.shipment.shipmentStatus}
+            {(dp.shipment.shipmentStatus == "ACCEPTED") && <Link to="/EDIT"/>}
+          </Typography>
         </Breadcrumbs>
       </Grid>
       <Grid item xs={6}>
