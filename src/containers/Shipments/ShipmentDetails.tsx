@@ -67,7 +67,7 @@ export default function ShipmentDetails(props) {
           <Link color="inherit" to="/">Home</Link>
           <Link color="inherit" to="/shipments">Shipments</Link>
           <Typography color="textPrimary">Shipment {dp.shipment.id} - {dp.shipment.shipmentStatus}
-            {(dp.shipment.shipmentStatus === "ACCEPTED") && <Link to="/EDIT"><EditIcon/></Link>}
+            {(dp.shipment.shipmentStatus === "ACCEPTED") && <Link to="EDIT"> <EditIcon/></Link>}
           </Typography>
         </Breadcrumbs>
       </Grid>
