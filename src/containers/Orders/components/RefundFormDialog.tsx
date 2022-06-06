@@ -64,6 +64,7 @@ export const RefundFormDialog = ({open, onSubmit, onClose, payment, order}) =>{
             <option value="checkoutcom">Checkout.com (Credit Card)</option>
             <option value="BMB">Bank Transfer</option>
             <option value="CASH">CASH</option>
+            <option value="OD">OD</option>
           </Select>
         </FormControl>
         <br/>

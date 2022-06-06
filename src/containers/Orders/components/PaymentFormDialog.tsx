@@ -37,6 +37,7 @@ export const PaymentFormDialog = ({open, onSubmit, onClose}) =>{
           <option value="POS">POS</option>
           <option value="checkoutcom">CHECKOUTCOM</option>
           <option value="CASH">CASH</option>
+          <option value="OD">OD</option>
         </Select>
       </FormControl>
       </DialogContent>
