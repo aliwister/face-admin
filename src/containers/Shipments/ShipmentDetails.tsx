@@ -19,7 +19,7 @@ import {
   Typography,
   TableBody } from '@material-ui/core';
 import Image from "../../components/Image/Image";
-import SaveIcon from '@material-ui/icons/Save';
+import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {Link, useParams} from "react-router-dom";
 import EditShipment from "./EditShipment";
@@ -66,7 +66,9 @@ export default function ShipmentDetails(props) {
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small"/>} aria-label="breadcrumb" className={classes.bread}>
           <Link color="inherit" to="/">Home</Link>
           <Link color="inherit" to="/shipments">Shipments</Link>
-          <Typography color="textPrimary">Shipment {dp.shipment.id} - {dp.shipment.shipmentStatus}</Typography>
+          <Typography color="textPrimary">Shipment {dp.shipment.id} - {dp.shipment.shipmentStatus}
+            {(dp.shipment.shipmentStatus === "ACCEPTED") && <Link to="EDIT"> <EditIcon/></Link>}
+          </Typography>
         </Breadcrumbs>
       </Grid>
       <Grid item xs={6}>
