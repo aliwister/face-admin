@@ -3744,7 +3744,7 @@ export const OrderADocument = gql`
       city
       mobile
     }
-    orderItems {
+    items {
       id
       sequence
       productId
