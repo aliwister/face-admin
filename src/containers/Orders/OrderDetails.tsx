@@ -389,7 +389,7 @@ export default function OrderDetails(props) {
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${orderData.orderA.customer.firstname} ${orderData.orderA.customer.lastname} / ${orderData.orderA.customer.id}`}
+                  primary={`${orderData.orderA.customer?.firstname} ${orderData.orderA.customer?.lastname} / ${orderData.orderA.customer?.id}`}
                   secondary= 'Customer'
                 />
               </ListItem>
@@ -401,7 +401,7 @@ export default function OrderDetails(props) {
               </ListItem>
               <ListItem>
                 <ListItemText
-                  primary={`${orderData.orderA.customer.email}`}
+                  primary={`${orderData.orderA.customer?.email}`}
                   secondary= 'Email'
                   />
               </ListItem>
