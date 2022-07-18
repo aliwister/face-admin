@@ -24,7 +24,6 @@ import {OPTIONS, TYPE_OPTIONS} from "../Products/components/Constants";
 import green from "@material-ui/core/colors/green";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {CircularProgress} from "@material-ui/core";
-import {MerchantProductsDocument} from "../../codegen/generated/_graphql";
 import {MerchantLookup} from "../../components/Merchant/MerchantsLookup";
 import {watch} from "fs";
 import MenuItem from "@material-ui/core/MenuItem";

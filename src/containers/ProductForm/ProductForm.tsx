@@ -25,7 +25,6 @@ import {OPTIONS, TYPE_OPTIONS} from "../Products/components/Constants";
 import green from "@material-ui/core/colors/green";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {CircularProgress} from "@material-ui/core";
-import {MerchantProductsDocument} from "../../codegen/generated/_graphql";
 
 
 const GET_IMAGE_UPLOAD_URL = gql`
@@ -117,23 +116,6 @@ const AddProduct: React.FC<Props> = props => {
 
   const [createMerchantProduct] = useMutation(CREATE_PRODUCT, {
     context: { clientName: "shopLink" },
-    update(cache, { data: { createMerchantProduct } }) {
-      const { products } = cache.readQuery({
-        query: MerchantProductsDocument,
-      });
-
-      cache.writeQuery({
-        query: MerchantProductsDocument,
-        data: {
-          products: {
-            __typename: products.__typename,
-            items: [createMerchantProduct, ...products.items],
-            hasMore: true,
-            totalCount: products.items.length + 1,
-          },
-        },
-      });
-    },
   });
   const handleMultiChange = ({ value }) => {
     //console.log(value);
