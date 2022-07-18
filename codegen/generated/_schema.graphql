@@ -57,27 +57,6 @@ type Address {
   state: String
 }
 
-enum AddressField {
-  firstName
-  lastName
-  line1
-  line2
-  postalCode
-  state
-  city
-  mobile
-  alias
-  country
-  save
-}
-
-type AddressFormat {
-  inputFormat: String
-  displayFormat: String
-  descriptions: [FieldDescription]
-  gmap: OptionType
-}
-
 input AddressInput {
   id: ID
   line1: String
@@ -121,9 +100,39 @@ type AddressResponse {
   code: String
 }
 
+enum AssetType {
+  LOGO
+  PRODUCT
+  SLIDER
+  HASHTAG
+  BRAND
+}
+
+"""
+enum Currency {
+    OMR
+    AED
+    SAR
+    KWD
+    BHD
+    QAR
+    USD
+    EUR
+}
+"""
 type Attribute {
   name: String
   value: String
+}
+
+type AttributeI18n {
+  attributeList: [Attribute]
+  lang: String
+}
+
+input AttributeI18nInput {
+  attributeList: [AttributeInput]
+  lang: String
 }
 
 input AttributeInput {
@@ -142,6 +151,7 @@ type Cart {
 
   """customer: Customer,"""
   cartItems: [CartItem]
+  currency: String
 }
 
 type CartItem {
@@ -153,7 +163,11 @@ type CartItem {
   title: String
   price: String
   salePrice: String
+  listPrice: String
+  currency: String
   slug: String
+  api: String
+  sku: String
   unit: String
 }
 
@@ -178,7 +192,7 @@ type Category {
   slug: String!
 }
 
-type CheckoutCart {
+type Checkout {
   id: ID!
   ref: String
   name: String
@@ -188,9 +202,10 @@ type CheckoutCart {
   carrier: String
   currency: String
   items: [LineItem]
+  orderAdjustments: [OrderAdjustment]
 }
 
-input CheckoutCartInput {
+input CheckoutInput {
   id: ID
   ref: String
   name: String
@@ -202,17 +217,12 @@ input CheckoutCartInput {
   currency: String
   items: [LineItemInput]
   allowPickup: Boolean
+  orderAdjustments: [OrderAdjustmentInput]
 }
 
 type CheckoutSession {
   redirectUrl: String
   secureKey: String
-}
-
-type CheckoutSessionResponse {
-  secureKey: String
-  success: Boolean
-  message: String
 }
 
 type ChildProduct {
@@ -228,13 +238,13 @@ type ChildProduct {
   isDirty: Boolean
 
   """Always false on the type"""
-  priceObj: Price
+  listPrice: PriceList
 
   """null For Parent"""
-  costObj: Price
+  price: PriceList
 
   """null For Parent"""
-  salePriceObj: Price
+  cost: Price
 
   """null For Parent"""
   weight: BigDecimal
@@ -242,11 +252,11 @@ type ChildProduct {
 
   """In hours"""
   quantity: BigDecimal
-  discountInPercent: Int
   gallery: [String]
 
   """Ordered"""
   variationAttributes: [Attribute]
+  attributes: [AttributeI18n]
   active: Boolean
 }
 
@@ -258,14 +268,14 @@ input ChildProductInput {
   image: String
 
   """Main image"""
-  sku: String
+  sku: String!
   upc: String
   isDirty: Boolean
 
   """For new product doesn't matter"""
-  priceObj: PriceInput
-  costObj: PriceInput
-  salePriceObj: PriceInput
+  price: PriceListInput
+  listPrice: PriceListInput
+  cost: PriceInput
   weight: BigDecimal
   availability: Int
 
@@ -276,6 +286,7 @@ input ChildProductInput {
 
   """Ordered"""
   variationAttributes: [AttributeInput]
+  attributes: [AttributeI18nInput]
   active: Boolean
 }
 
@@ -302,30 +313,10 @@ type Customer {
   addresses: [Address]
   allowPickup: Boolean
   plusDiscount: Int
+  shipperMarkup: Int
 }
 
 scalar Date
-
-type FieldDescription {
-  field: AddressField
-  label: String
-  required: Boolean
-  minLength: Int
-  maxLength: Int
-  regex: String
-  fieldType: FieldType
-  options: [Option]
-}
-
-enum FieldType {
-  TEXT
-  REMOTE_SELECT
-  REMOTE_AUTOCOMPLETE
-  SELECT
-  CHECKBOX
-  AUTOCOMPLETE
-  MOBILE
-}
 
 type Gallery {
   url: String!
@@ -355,6 +346,11 @@ type HashtagResponse {
 }
 
 type I18String {
+  lang: String
+  value: String
+}
+
+input I18StringInput {
   lang: String
   value: String
 }
@@ -404,15 +400,16 @@ type ItemTracking {
 }
 
 type LineItem {
-  productId: Int
+  productId: Long
   sku: String
   image: String
   name: String
-  quantity: Int
+  quantity: Float
   price: Float
   cost: Float
   subTotal: Float
   url: String
+  ref: String
 }
 
 input LineItemInput {
@@ -426,15 +423,12 @@ input LineItemInput {
   subTotal: Float
   url: String
   ref: String
+  weight: Float
 }
 
 scalar LocalDate
 
 scalar LocalDateTime
-
-interface LocalizedObject {
-  _locale: String
-}
 
 """Long type"""
 scalar Long
@@ -475,21 +469,6 @@ type MerchantProduct {
   active: Boolean
 }
 
-type MerchantProductResponse {
-  items: [MerchantProduct]
-  total: Int!
-  hasMore: Boolean!
-}
-
-type MerchantStock {
-  quantity: BigDecimal
-  availability: Int
-  allow_backorder: Boolean
-  link: String
-  location: String
-  price: BigDecimal
-}
-
 type Message {
   value: String
 }
@@ -516,28 +495,25 @@ type Mutation {
   acceptShipment(trackingNum: String, payment: PaymentInput, invoiceLink: String): Shipment
   addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
   addItem(shipmentId: Long, productId: Long, purchaseItemId: Long, description: String, quantity: BigDecimal): Message
-  addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+  addPayment(id: ID, amount: BigDecimal, method: String, authCode: String, currency: String): Payment
   addShipmentDoc(id: Long, filename: String): Message
   addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
   addToPricingQ(sku: String): Message
   addTrackingEvent(trackingNums: [String], shipmentStatus: ShipmentStatus, trackingEvent: Int, eventDate: LocalDateTime, details: String): Message
+  assignRole(email: String, tenantId: String, role: String): Message
   cancelOrder(id: ID, reason: String): Order
   cancelPurchase(id: ID, reason: String): Purchase
   closeOrder(id: ID, reason: String): Order
   closePurchase(id: ID, reason: String): Purchase
   completePricingRequest(id: Long): Message
   completePricingRequestAndEmail(id: Long): Message
-  contact(id: Int): Message
-
-  """For app"""
-  createCart(cart: CheckoutCartInput): CheckoutCart
-  createCheckout(secureKey: String): CheckoutSessionResponse
-  createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+  completeUpload(fileHandle: Long): Message
   createHashtag(hashtag: HashtagInput): Message
   createMerchantProduct(product: AddProductInput): Message
   createOrder(id: Int): Order
   createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
-  createPlusCart(secureKey: String, items: [LineItemInput]): CheckoutCart
+  createPlusCart(secureKey: String, items: [LineItemInput]): Checkout
+  createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
   createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
   createPurchase(dto: PurchaseInput): Purchase
 
@@ -552,58 +528,54 @@ type Mutation {
   createShipment(shipment: ShipmentInput, shipmentItems: [ShipmentItemInput], trackingNums: [String] = []): Shipment
   createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long): MerchantProduct
   createStubFromSearch(dto: ProductInput): Product
+  createTenant(tenantId: String): Message
+  createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
   deleteAddress(id: ID): AddressResponse
   deleteProduct(id: Long): Message
+  deleteTenantTag(id: Long): Message
   discountOrder(id: ID): Order
   editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
   getAdminFile(filename: String, contentType: String): PresignedUrl
   getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
   getImageUploadUrl(filename: String, contentType: String): PresignedUrl
-  getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
+  getPartnerImageUploadUrl(filename: String, contentType: String, assetType: AssetType): PresignedUrl
   getUploadUrl(filename: String, contentType: String): PresignedUrl
+
+  """getUploadUrl(filename: String, contentType: String): PresignedUrl"""
   importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
   issueItem(orderItemId: Long, productId: Long, description: String, quantity: BigDecimal): ItemIssuance
   pasLookup(sku: String): Product
   prepItem(dto: PackagingContentInput): Message
   processCheckoutRefund(token: String, amount: String, ref: String, description: String): Message
   publishProduct(id: Long): Message
-  refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
+  refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String, currency: String): Payment
   removeItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   resetPassword(email: String): String
   saveAddress(address: AddressInput): AddressResponse
   savePartnerProduct(product: PartnerProductInput): ProductEnvelope
   saveShipment(shipment: ShipmentInput): Shipment
+  saveTenantTag(hashtag: TenantTagInput): TenantTag
   sendOrderLevelEmail(id: ID, template: String): Message
   sendPaymentSms(id: ID, mobile: String): Message
   sendProductLevelEmail(orderId: ID, orderItems: [Long], template: String): Message
   sendToDetrack(shipmentId: Long, orderId: Long, name: String, instructions: String, date: String, time: String, assignTo: String): Message
   setAccountingCode(paymentIds: [Long], code: String): Message
-  setDial(dial: String, ref: Long): Message
   setEstimatedShipDate(id: Long, date: Date): Message
   setHashtags(hashtags: [String], ref: Long): Message
-  setOrderState(value: OrderState): Message
+  setOrderState(id: ID, state: OrderState): Order
   setProcessedDate(paymentIds: [Long], date: Date): Message
   setPurchaseState(id: ID, state: OrderState): Purchase
   setSettlementDate(paymentIds: [Long], date: Date): Message
   setShipmentStatus(id: Long, status: ShipmentStatus): Message
+  setSliderList(locale: String, images: [String]): Message
+  setSocialProfile(locale: String, profiles: [AttributeInput]): Message
   unpackItem(shipmentId: ID, shipmentItemId: Long, description: String, quantity: BigDecimal): Message
   unpublishProduct(id: Long): Message
-  updateCart(secureKey: String, items: [CartItemInput]): CartResponse
   updateFromDetrack(id: String): Message
   updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
-  updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, _locale: String = "en-OM"): CartResponse
+  updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean): CartResponse
+  voidOrder(id: Long): Message
   voidPayment(id: ID): Message
-}
-
-type Option {
-  label: String
-  value: String
-}
-
-enum OptionType {
-  REQUIRED
-  OPTIONAL
-  NONE
 }
 
 type Order {
@@ -612,12 +584,12 @@ type Order {
   orderState: OrderState
   invoiceDate: LocalDate
   deliveryDate: LocalDate
-  customer: Customer!
+  customer: Customer
   cartId: Long
   currency: String
-  deliveryAddress: Address!
-  invoiceAddress: Address!
-  orderItems: [OrderItem]
+  deliveryAddress: Address
+  invoiceAddress: Address
+  items: [OrderItem]
   total: BigDecimal
   deliveryTotal: BigDecimal
   discountsTotal: BigDecimal
@@ -629,6 +601,37 @@ type Order {
   payments: [Payment]
   balance: BigDecimal
   cartSecureKey: String
+  channel: OrderChannel
+  email: String
+  orderAdjustments: [OrderAdjustment]
+}
+
+type OrderAdjustment {
+  description: String
+  value: String
+  type: OrderAdjustmentType
+  quantity: Int
+}
+
+input OrderAdjustmentInput {
+  description: String
+  value: String
+  type: OrderAdjustmentType
+  quantity: Int
+}
+
+enum OrderAdjustmentType {
+  DISCOUNT
+  FEE
+  SHIPPING
+  HANDLING
+  COMMISSION
+}
+
+enum OrderChannel {
+  POS
+  WEB
+  FACEBOOK
 }
 
 type OrderItem {
@@ -679,6 +682,12 @@ enum OrderState {
   CLOSED
 }
 
+type OrderSummary {
+  period: String
+  count: Int
+  total: BigDecimal
+}
+
 type OutstandingQueue {
   id: ID
   description: String
@@ -727,6 +736,25 @@ input PackagingContentInput {
   quantity: BigDecimal
 }
 
+type Partner {
+  id: Long
+  logo: String
+  mobileLogo: String
+  name: String
+  maxProducts: Int
+  planName: String
+  discountRate: Int
+  active: Boolean
+  monthlyFee: BigDecimal
+  skuPrefix: String
+  contractStartDate: LocalDate
+  publicPaymentProfile: [PaymentDef]
+  tenantId: String
+  subdomain: String
+  description: String
+  customDomain: String
+}
+
 type PartnerProduct {
   id: ID
 
@@ -747,15 +775,19 @@ type PartnerProduct {
   brand: String
 
   """The English value"""
-  name: String
+  title: String
 
   """The English value"""
   image: String
 
   """Main image"""
-  priceObj: Price
-  costObj: Price
-  salePriceObj: Price
+  listPrice: PriceList
+
+  """null For Parent"""
+  price: PriceList
+
+  """null For Parent"""
+  cost: Price
   weight: BigDecimal
   variationType: String
   unit: String
@@ -763,26 +795,24 @@ type PartnerProduct {
 
   """In hours"""
   quantity: BigDecimal
-  discountInPercent: Int
   options: [VariationOption]
   langs: [ProductI18n]
   gallery: [String]
 
   """Ordered"""
   children: [ChildProduct]
+  attributes: [AttributeI18n]
+  deliveryProfiles: [Attribute]
 }
 
 input PartnerProductInput {
   id: ID
 
   """Auto generated"""
-  sku: String
+  sku: String!
   upc: String
   model: String
   hashtags: [String]
-
-  """Hashtags"""
-  ref: String
 
   """SIMPLE, CHILD, PARENT"""
   slug: String
@@ -791,25 +821,21 @@ input PartnerProductInput {
   brand: String
 
   """The English value"""
-  name: String
+  title: String
 
   """The English value"""
   image: String
 
   """Main image"""
-  priceObj: PriceInput
-
-  """null For Parent"""
-  costObj: PriceInput
-
-  """null For Parent"""
-  salePriceObj: PriceInput
+  price: PriceListInput
+  listPrice: PriceListInput
+  cost: PriceInput
 
   """null For Parent"""
   weight: BigDecimal
 
   """KG"""
-  variationType: String
+  variationType: String!
 
   """readonly"""
   unit: String
@@ -817,19 +843,16 @@ input PartnerProductInput {
 
   """In hours"""
   quantity: BigDecimal
-  discountInPercent: Int
+
+  """discountInPercent: Int"""
   options: [VariationOptionInput]
   langs: [ProductI18nInput]
   gallery: [String]
 
   """Ordered"""
   children: [ChildProductInput]
-}
-
-type PartnerProductResponse {
-  items: [PartnerProduct]
-  total: Int!
-  hasMore: Boolean!
+  attributes: [AttributeI18nInput]
+  deliveryProfiles: [AttributeInput]
 }
 
 type Payment {
@@ -852,6 +875,13 @@ type Payment {
   cartId: String
   voided: Boolean
   invoiceNum: String
+}
+
+type PaymentDef {
+  name: String
+  pk: String
+  code: String
+  html: String
 }
 
 input PaymentInput {
@@ -893,6 +923,7 @@ type PresignedUrl {
   imageUrl: String
   saveUrl: String
   status: String
+  fileHandle: Long
 }
 
 type Price {
@@ -903,6 +934,16 @@ type Price {
 input PriceInput {
   amount: BigDecimal
   currency: String
+}
+
+type PriceList {
+  priceList: [Price]
+  baseCurrency: String
+}
+
+input PriceListInput {
+  priceList: [PriceInput]
+  baseCurrency: String
 }
 
 type PricingRequest {
@@ -916,7 +957,7 @@ type PricingRequest {
   createdDate: String
 }
 
-type Product implements LocalizedObject {
+type Product {
   id: ID!
   ref: Long
   parent: Int
@@ -943,7 +984,10 @@ type Product implements LocalizedObject {
   variationAttributes: [Attribute]
   variations: [Variation]
   price: String
-  salePrice: String
+
+  """salePrice: String"""
+  listPrice: String
+  currency: String
   discountInPercent: Float
   slug: String
   categories: [Category]
@@ -952,7 +996,7 @@ type Product implements LocalizedObject {
   unit: String
   description: String
   meta: Meta
-  merchantStock: [MerchantStock]
+  merchantStock: [Stock]
   hours: Int
   availability: String
   features: [String]
@@ -963,6 +1007,8 @@ type Product implements LocalizedObject {
   rating: String
   _locale: String
   stub: Boolean
+  stock: String
+  api: String
 }
 
 type ProductEnvelope {
@@ -991,16 +1037,19 @@ enum ProductGroup {
 }
 
 type ProductI18n {
-  name: String
+  title: String
   description: String
   model: String
   features: [String]
   brand: String
   lang: String
+
+  """ar #en"""
+  attributes: [Attribute]
 }
 
 input ProductI18nInput {
-  name: String
+  title: String
   description: String
   model: String
   features: [String]
@@ -1011,11 +1060,13 @@ input ProductI18nInput {
 input ProductInput {
   sku: String
   upc: String
-  price: BigDecimal
-  salePrice: BigDecimal
+  price: String
 
-  """currency: String,"""
+  """salePrice: String"""
+  listPrice: String
+  currency: String
   image: String
+  inStock: Boolean
 
   """
   images: [String],
@@ -1044,12 +1095,16 @@ input ProductInput {
   quantity: Int
   isPrime: Boolean
   rating: String
+  api: String
+  pricingApi: String
+  variationType: VariationType
 }
 
 type ProductResponse {
   items: [Product!]!
-  total: Int!
-  hasMore: Boolean!
+  total: Int
+  hasMore: Boolean
+  timestamp: LocalDateTime
 }
 
 type Purchase {
@@ -1068,6 +1123,7 @@ type Purchase {
   createdDate: String
   lastModifiedBy: String
   lastModifiedDate: String
+  length: Int
 }
 
 input PurchaseInput {
@@ -1142,56 +1198,48 @@ input PurchaseShipmentInput {
 }
 
 type Query {
-  addressDescription(isoCode: String, lang: String): AddressFormat
   addresses: AddressList
+  adminSearchTenantProducts(upc: String, title: String): ProductResponse
   advancedTracking(ref: String, showAll: Boolean = false, queueName: String): [ItemTracking]
+  aggOrderReport: [OrderSummary]
   auditActivity(id: ID, type: String): [Action]
-  brands(_locale: String = "en-OM"): [I18String]
-  cart(secureKey: String, _locale: String = "en-OM"): Cart
+  brands: [I18String]
+  cart(secureKey: String): Cart
   categories(type: String!): [Category!]!
   category(id: Int!): Category!
-  collections(_locale: String = "en-OM"): [I18String]
-  currencies(_locale: String = "en-OM"): [Currency]
+  collections: [I18String]
+  currencies: [Currency]
+  currentPartner(locale: String): Partner
+  currentTenant: Tenant
 
   """getAddresses(customerId: Int): [Address]"""
   customer(mobile: String): Customer
   customers: [Customer]
-
-  """
-  pas(sku: String):Product
-  pasUk(sku: String):Product
-  """
-  ebay(id: String): Product
-  findByKeyword(keyword: String): ProductResponse
-  findByKeywordIndex(keyword: String): ProductResponse
-  getProductByDial(dial: String): Product
+  deliveryProfiles: [Attribute]
   getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Product
-  hashtagList: [Hashtag]
   hashtagProducts(tenant: String, hashtag: String): ProductResponse
   hashtags(tenant: String, offset: Int = 0, limit: Int = 10): HashtagResponse
   hashtagsWithProducts(offset: Int = 0, limit: Int = 10): HashtagResponse
   inventory: [Inventory]
-
-  """getAddress(addressId: Int): Address"""
   me: Customer
   mePlus: Customer
-  meTest(id: Long): Customer
-  merchantProducts(text: String = "", type: String = "", offset: Int = 0, limit: Int = 10, lang: Int = 1, imported: Boolean = true): MerchantProductResponse
-  merchants: [Merchant]
-  mws(sku: String): Product
-  orderA(id: ID): Order
 
-  """getOrders(): [Orders]"""
-  orderConfirmation(ref: String, key: String): Order
-  orders(limit: Int = 10): [Order]
+  """getAddress(addressId: Int): Address"""
+  meTest(id: Long): Customer
+  merchants: [Merchant]
+  orderA(id: ID): Order
+  orderSummary(ref: String, confirmationKey: String): Order
   ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
   outstandingQueue(keyword: String): [OutstandingQueue]
   parentOf(sku: String): String
-  partnerProduct(id: ID, _locale: String = "en-OM"): PartnerProduct
-  partnerProducts(search: String, limit: Int, offset: Int, active: Boolean, _locale: String = "en-OM"): PartnerProductResponse
+  partnerOrder(id: ID): Order
+  partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
+  partnerProduct(id: ID): PartnerProduct
+  partnerProducts(search: String, limit: Int, offset: Int, active: Boolean): ProductResponse
+  partnerTenantTags: [TenantTag]
   payments(orderId: ID): [Payment]
   pkgItemDetails(id: ID): [ShipmentItemDetails]
-  plusCart(secureKey: String): CheckoutCart
+  plusCart(secureKey: String): Checkout
   prepQueue(shipmentId: Long, keyword: String = ""): [PrepQueue]
   pricingRequests: [PricingRequest]
   product(slug: String!, cookie: String = "", _locale: String): Product!
@@ -1202,8 +1250,9 @@ type Query {
   purchaseQueue: [PurchaseQueue]
   purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
   relatedProducts(type: String, slug: String!): [Product!]!
+
+  """getProductByDial(dial: String):Product"""
   relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
-  rewards: [Reward]
   shipQueue: [ShipQueue]
   shipQueueByCustomerId(customerId: Long): [ShipQueue]
   shipment(id: ID): Shipment
@@ -1214,29 +1263,25 @@ type Query {
   shipmentList(viewName: ShipmentListView): [ShipmentList]
   shipments(status: [ShipmentStatus], type: ShipmentType): [Shipment]
   shipmentsByRef(ref: String): [Shipment]
+  sliders(locale: String): [Attribute]
+  social(locale: String): [Attribute]
+  socialProfiles: [Attribute]
   sortQueue(keyword: String): [SortQueue]
-  tenantByName(name: String, _locale: String = "en-OM"): Tenant
-  tenantProduct(slug: String, _locale: String): Product
-  tenantTagProducts(hashtag: String, tenantId: Long, _locale: String = "en-OM"): ProductResponse
-  tenantTags(tenantId: Long, _locale: String = "en-OM"): [TenantTag]
+  tenantInfo: Tenant
+  tenantOrder(ref: String): Order
+  tenantOrders(state: [OrderState], limit: Int = 10, offset: Int = 0): OrderResponse
+  tenantProduct(slug: String): Product
+  tenantSliders: [Attribute]
+  tenantTagProducts(hashtag: String): ProductResponse
+  tenantTags: [TenantTag]
   track(ref: String): [ShipmentTrackingMap]
   trackingEvents: [TrackingEvent]
   transaction(id: ID): Payment
   transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String, unsettledOnly: Boolean): PaymentResponse
   unshippedPurchases: [PurchaseQueue]
   unshippedQueue: [UnshippedQueue]
-  variationOptions(name: String, _locale: String = "en-OM"): VariationOption
-  variations(_locale: String = "en-OM"): [VariationOption]
-}
-
-type Reward {
-  id: ID
-  name: String
-  description: String
-  minimumCartAmount: Long
-  discountValue: Long
-  discountValidDays: Long
-  points: Long
+  variationOptions(name: String): VariationOption
+  variations: [VariationOption]
 }
 
 type Shipment {
@@ -1428,26 +1473,50 @@ type SortQueue {
   productId: Long
 }
 
+type Stock {
+  quantity: BigDecimal
+  availability: Int
+  allow_backorder: Boolean
+  link: String
+  location: String
+  price: BigDecimal
+}
+
 type Subscription {
   getProductBySku(sku: String, isParent: Boolean = false, _locale: String): Attribute!
 }
 
 type Tenant {
   id: Long
+  logo: String
+  mobileLogo: String
   name: String
   maxProducts: Int
-  planName: String
   discountRate: Int
   active: Boolean
-  monthlyFee: BigDecimal
   skuPrefix: String
-  contractStartDate: LocalDate
+  publicPaymentProfile: [PaymentDef]
+  tenantId: String
+  socialList: [Attribute]
+  subdomain: String
+  description: String
+  customDomain: String
 }
 
 type TenantTag {
+  id: Long
   langs: [I18String]
   icon: String
   position: Int
+  name: String
+}
+
+input TenantTagInput {
+  id: Long
+  langs: [I18StringInput]
+  icon: String
+  position: Int
+  name: String
 }
 
 type TrackingEvent {

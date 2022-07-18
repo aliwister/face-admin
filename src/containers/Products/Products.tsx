@@ -67,7 +67,7 @@ const priceSelectOptions = [
 ];
 
 export default function Products() {
-  const { data, error, refetch, fetchMore } = useMerchantProductsQuery({ context: { clientName: "shopLink" }});
+  /*const { data, error, refetch, fetchMore } = useMerchantProductsQuery({ context: { clientName: "shopLink" }});
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {}
   });
@@ -101,7 +101,7 @@ export default function Products() {
       },
     });
   }
-/*
+/!*
   function handlePriceSort({ value }) {
     setPriceOrder(value);
     if (value.length) {
@@ -114,7 +114,7 @@ export default function Products() {
       });
     }
   }
-*/
+*!/
 
 
   function handleSearch(data) {
@@ -264,7 +264,9 @@ export default function Products() {
       {data && data.merchantProducts && data.merchantProducts.hasMore && (
             <Button onClick={loadMore}>Load More</Button>
       )}
-
-    </Grid>
+      </Grid>
+*/
+  return(
+    <></>
   );
 }

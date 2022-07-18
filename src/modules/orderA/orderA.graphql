@@ -30,7 +30,7 @@
           city
           mobile
       }
-      orderItems {
+      items {
         id
         sequence
         productId

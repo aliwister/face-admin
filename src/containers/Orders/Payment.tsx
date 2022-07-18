@@ -37,9 +37,11 @@ export default function Payment({order, refetch}) {
   const onSubmit = async formData => {
     setB1(false);
     const {
-      data: { addPayment },
+      data: {
+        addPayment,
+      },
     }: any = await addPaymentMutation({
-      variables: {id: order.id, ...formData}
+      variables: {id: order.id, ...formData, currency: 'OMR'}
     });
     if(addPayment)  {
       handleClose();
@@ -53,7 +55,7 @@ export default function Payment({order, refetch}) {
     const {
       data: { refundPayment },
     }: any = await addRefundMutation({
-      variables: {id: order.id, ...formData}
+      variables: {id: order.id, ...formData, currency: 'OMR'}
     });
     if(refundPayment)  {
       handleClose();
