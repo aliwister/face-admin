@@ -307,7 +307,7 @@ export default function OrderDetails(props) {
     if(sendProductLevelEmail)  {
       alert.success(sendProductLevelEmail.value);
 
-      orderData.orderA.orderItems.filter(function(el) { return checkedId.includes(el.id) }).forEach(function(a,b) {
+      orderData.orderA.items.filter(function(el) { return checkedId.includes(el.id) }).forEach(function(a,b) {
         let externalId = `${slug}-${a.sequence}-APP`;
         let testData = {
           "type": "approvalWorkflow",
@@ -371,8 +371,8 @@ export default function OrderDetails(props) {
 
   return (
     <Grid fluid={true}>
-      <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.orderItems} />
-      <ReturnDialog onSubmit={onReturnRequest} onClose={onCancelEdit} open={returndialog} orderItems={orderData.orderA.orderItems} />
+      <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.items} />
+      <ReturnDialog onSubmit={onReturnRequest} onClose={onCancelEdit} open={returndialog} orderItems={orderData.orderA.items} />
       <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
       <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
       <DiscountDialog onSubmit={onAddDiscount} onClose={onCancelEdit} open={discount} title={"Discount Order"} />
@@ -518,9 +518,9 @@ export default function OrderDetails(props) {
                   <TableCell align="center">PO</TableCell>
                 </TableRow>
               </TableHead>
-              {orderData && orderData.orderA.orderItems && (
+              {orderData && orderData.orderA.items && (
                 <TableBody>
-                  {orderData.orderA.orderItems.map(row => (
+                  {orderData.orderA.items.map(row => (
                     <TableRow key={row.sequence}>
                       <TableCell align="left">
                         <Checkbox
