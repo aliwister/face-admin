@@ -54,7 +54,7 @@ const GET_ORDERS = gql`
           line1
           city
       }
-      orderItems {
+      items {
         productName
         price
         quantity

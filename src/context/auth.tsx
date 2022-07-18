@@ -77,7 +77,7 @@ const AuthProvider = (props: any) => {
   const [username, setUsername] = React.useState(getUsername());
 
   async function authenticate({username, password}, cb) {
-      return badalsAPI.post(`/authenticate`, {"username": username, "password": password, "rememberMe": true})
+      return badalsAPI.post(`/authenticate`, {"username": username, "password": password, "rememberMe": true}, { headers: {'X-TenantId': 'badals'}})
           .then(res => {
               // @ts-ignore
 /*              console.log(res);
