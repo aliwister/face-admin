@@ -2625,6 +2625,7 @@ export type AddPaymentMutationVariables = {
   amount: Maybe<Scalars['BigDecimal']>;
   method: Maybe<Scalars['String']>;
   authCode: Maybe<Scalars['String']>;
+  currency: Maybe<Scalars['String']>;
 };
 
 
@@ -2645,6 +2646,7 @@ export type RefundPaymentMutationVariables = {
   bankOwnerName: Maybe<Scalars['String']>;
   ref: Maybe<Scalars['Long']>;
   paymentMethod: Maybe<Scalars['String']>;
+  currency: Maybe<Scalars['String']>;
 };
 
 
@@ -3689,8 +3691,8 @@ export type OrderAQueryHookResult = ReturnType<typeof useOrderAQuery>;
 export type OrderALazyQueryHookResult = ReturnType<typeof useOrderALazyQuery>;
 export type OrderAQueryResult = ApolloReactCommon.QueryResult<OrderAQuery, OrderAQueryVariables>;
 export const AddPaymentDocument = gql`
-    mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
-  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
+    mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String, $currency: String) {
+  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode, currency: $currency) {
     paymentMethod
     amount
   }
@@ -3734,6 +3736,7 @@ export function withAddPayment<TProps, TChildProps = {}, TDataName extends strin
  *      amount: // value for 'amount'
  *      method: // value for 'method'
  *      authCode: // value for 'authCode'
+ *      currency: // value for 'currency'
  *   },
  * });
  */
@@ -3744,8 +3747,8 @@ export type AddPaymentMutationHookResult = ReturnType<typeof useAddPaymentMutati
 export type AddPaymentMutationResult = ApolloReactCommon.MutationResult<AddPaymentMutation>;
 export type AddPaymentMutationOptions = ApolloReactCommon.BaseMutationOptions<AddPaymentMutation, AddPaymentMutationVariables>;
 export const RefundPaymentDocument = gql`
-    mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankName: String, $bankAccountNumber: String, $bankOwnerName: String, $ref: Long, $paymentMethod: String) {
-  refundPayment(id: $id, amount: $amount, ref: $ref, authCode: $authCode, bankName: $bankName, bankAccountNumber: $bankAccountNumber, bankOwnerName: $bankOwnerName, paymentMethod: $paymentMethod) {
+    mutation refundPayment($id: ID, $amount: BigDecimal, $authCode: String, $bankName: String, $bankAccountNumber: String, $bankOwnerName: String, $ref: Long, $paymentMethod: String, $currency: String) {
+  refundPayment(id: $id, amount: $amount, ref: $ref, authCode: $authCode, bankName: $bankName, bankAccountNumber: $bankAccountNumber, bankOwnerName: $bankOwnerName, paymentMethod: $paymentMethod, currency: $currency) {
     paymentMethod
     amount
   }
@@ -3793,6 +3796,7 @@ export function withRefundPayment<TProps, TChildProps = {}, TDataName extends st
  *      bankOwnerName: // value for 'bankOwnerName'
  *      ref: // value for 'ref'
  *      paymentMethod: // value for 'paymentMethod'
+ *      currency: // value for 'currency'
  *   },
  * });
  */

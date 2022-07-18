@@ -1,5 +1,5 @@
-mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String) {
-  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode) {
+mutation addPayment($id: ID, $amount: BigDecimal, $method: String, $authCode: String, $currency: String) {
+  addPayment(id: $id, amount: $amount, method: $method, authCode: $authCode, currency: $currency) {
     paymentMethod
     amount
   }
