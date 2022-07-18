@@ -1,27 +1,6 @@
 import React, { useState } from 'react';
 import { styled } from 'baseui';
-import { useAlert } from "react-alert";
 
-import gql from 'graphql-tag';
-import {useMutation, useQuery} from '@apollo/react-hooks';
-import { Header, Heading } from '../../components/WrapperStyle';
-import Fade from 'react-reveal/Fade';
-import ProductCard from '../../components/ProductCard/ProductCard';
-import NoResult from '../../components/NoResult/NoResult';
-import { CURRENCY } from '../../settings/constants';
-import Placeholder from '../../components/Placeholder/Placeholder';
-import {Tab, TextField} from '@material-ui/core';
-import Tabs from '@material-ui/core/Tabs';
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import {Col, IMPORT_ALL} from "./ImportProducts";
-import {useForm} from "react-hook-form";
-import Checkbox from "@material-ui/core/Checkbox";
-import {ImportAllDialog} from "./components/ImportAllDialog";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import {useMerchantProductsQuery} from "../../codegen/generated/_graphql";
-import {Link} from "react-router-dom";
 
 export const ProductsRow = styled('div', ({ $theme }) => ({
   display: 'flex',
