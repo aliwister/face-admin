@@ -1,10 +1,8 @@
 import React, {useEffect, useReducer, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Moment from 'react-moment';
 import Button from '@material-ui/core/Button';
 
 import gql from 'graphql-tag';
-import {useMutation, useQuery} from '@apollo/react-hooks';
 
 import { useAlert } from "react-alert";
 import {
@@ -19,12 +17,11 @@ import {
   TableBody } from '@material-ui/core';
 import Image from "../../../components/Image/Image";
 import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import _ from 'lodash';
-import TextField from "@material-ui/core/TextField";
+
 import {Link} from "react-router-dom";
 import {usePurchaseQueueQuery} from "../../../codegen/generated/_graphql";
 import {MerchantURL} from "../../../components/MerchantURL/MerchantURL";
+import {BadalsURL} from "../../../components/BadalsURL/BadalsURL";
 
 
 const UPDATE_PURCHASE = gql`
@@ -95,6 +92,7 @@ export default function PurchaseQueue({handleAdd}) {
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
                     <TableCell component="th" scope="row">
                       <MerchantURL merchantId={q.merchantId} sku={q.sku} url={q.url} name={q.productName}/>
+                      [<BadalsURL merchantId={q.merchantId} sku={q.sku}>View on Badal.com</BadalsURL>]
                     </TableCell>
                     <TableCell align="right">{q.quantity}</TableCell>
                     <TableCell align="right">{q.price} / {Math.round(q.price * 260)/100}</TableCell>
