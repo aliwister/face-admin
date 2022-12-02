@@ -1,6 +1,6 @@
 import React from "react";
 
-export const BadalsURL = ({merchantId, sku, url, children}) => {
+export const BadalsURL = ({merchantId, sku, children}) => {
 
   const buildUrl = () => {
     if (merchantId == 1)
@@ -13,13 +13,8 @@ export const BadalsURL = ({merchantId, sku, url, children}) => {
 
   return (
     <>
-      {url ?
-        <a href={`${url}`} target="_blank">
-          {children}
-        </a>
-        :
+
         <span>{buildUrl()?<a href={buildUrl()} target="_blank">{children}</a>:<span>{children}</span>}</span>
-      }
     </>
   )
 
