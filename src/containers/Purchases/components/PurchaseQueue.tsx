@@ -92,7 +92,7 @@ export default function PurchaseQueue({handleAdd}) {
                     <TableCell align="right"><Image url={q.image} className="product-image" style={{maxWidth: '70px'}} /></TableCell>
                     <TableCell component="th" scope="row">
                       <MerchantURL merchantId={q.merchantId} sku={q.sku} url={q.url} name={q.productName}/>
-                      [<BadalsURL merchantId={q.merchantId} sku={q.sku}>View on Badal.com</BadalsURL>]
+                      <span> [<BadalsURL merchantId={q.merchantId} sku={q.sku}>View on Badal.com</BadalsURL>] </span>
                     </TableCell>
                     <TableCell align="right">{q.quantity}</TableCell>
                     <TableCell align="right">{q.price} / {Math.round(q.price * 260)/100}</TableCell>

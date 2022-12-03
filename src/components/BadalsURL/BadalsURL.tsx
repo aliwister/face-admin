@@ -14,7 +14,7 @@ export const BadalsURL = ({merchantId, sku, children}) => {
   return (
     <>
 
-        <span>{buildUrl()?<a href={buildUrl()} target="_blank">{children}</a>:<span>{children}</span>}</span>
+        <span>{buildUrl()?<a href={buildUrl()} target="_blank"  style={{color:'red', textDecoration:'none', fontWeight: 'bold'}}>{children}</a>:<span> {children} </span>}</span>
     </>
   )
 
