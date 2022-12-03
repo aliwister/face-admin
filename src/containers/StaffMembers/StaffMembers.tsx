@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import Moment from 'react-moment';
 import { withStyle } from 'baseui';
 import {
@@ -6,7 +6,6 @@ import {
   Row as Rows,
   Col as Column,
 } from '../../components/FlexBox/FlexBox';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
@@ -25,6 +24,7 @@ import {
   StyledBodyCell,
 } from './StaffMembers.style';
 import NoResult from '../../components/NoResult/NoResult';
+import {DrawerContext} from "../../context/DrawerContext";
 
 const GET_STUFFS = gql`
   query getStuffs($role: String, $searchBy: String) {
@@ -63,7 +63,7 @@ const roleSelectOptions = [
 ];
 
 export default function StuffMembers() {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
 
   const openDrawer = useCallback(
     () =>

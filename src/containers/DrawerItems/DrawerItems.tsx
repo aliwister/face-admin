@@ -1,8 +1,7 @@
-import React, { useCallback } from 'react';
+import React, {useCallback, useContext} from 'react';
 import { styled } from 'baseui';
 import Drawer from '../../components/Drawer/Drawer';
 import { CloseIcon } from '../../components/AllSvgIcon';
-import { useDrawerState, useDrawerDispatch } from '../../context/DrawerContext';
 
 /** Drawer Components */
 import StubProductForm from '../ProductForm/StubProductForm';
@@ -12,6 +11,7 @@ import CampaingForm from '../CampaingForm/CampaingForm';
 import CategoryForm from '../CategoryForm/CategoryForm';
 import StaffMemberForm from '../StaffMemberForm/StaffMemberForm';
 import Sidebar from '../Layout/Sidebar/Sidebar';
+import {DrawerContext} from "../../context/DrawerContext";
 
 /** Components Name Constants */
 const DRAWER_COMPONENTS = {
@@ -52,10 +52,12 @@ const CloseButton = styled('button', ({ $theme }) => ({
 }));
 
 export default function DrawerItems() {
-  const isOpen = useDrawerState('isOpen');
-  const drawerComponent = useDrawerState('drawerComponent');
-  const data = useDrawerState('data');
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
+  const {drawerState} = useContext(DrawerContext);
+
+  const isOpen = drawerState['isOpen'];
+  const drawerComponent = drawerState['drawerComponent'];
+  const data = drawerState['data'];
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);

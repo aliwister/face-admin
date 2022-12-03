@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import Moment from 'react-moment';
 import { withStyle, createThemedUseStyletron } from 'baseui';
 import {
@@ -6,7 +6,6 @@ import {
   Row as Rows,
   Col as Column,
 } from '../../components/FlexBox/FlexBox';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import ProgressBar from '../../components/ProgressBar/ProgressBar';
 
 import Select from '../../components/Select/Select';
@@ -29,6 +28,7 @@ import {
   Status,
 } from './Coupon.style';
 import NoResult from '../../components/NoResult/NoResult';
+import {DrawerContext} from "../../context/DrawerContext";
 
 const GET_COUPONS = gql`
   query getCoupons($status: String, $searchBy: String) {
@@ -70,7 +70,7 @@ const statusSelectOptions = [
 ];
 
 export default function Coupons() {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
 

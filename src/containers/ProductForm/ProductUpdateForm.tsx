@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback, useContext} from 'react';
 import { useForm } from 'react-hook-form';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { useDrawerDispatch, useDrawerState } from '../../context/DrawerContext';
 import Uploader from '../../components/Uploader/Uploader';
 import Button, { KIND } from '../../components/Button/Button';
 import DrawerBox from '../../components/DrawerBox/DrawerBox';
@@ -18,6 +17,7 @@ import {
   FieldDetails,
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
+import {DrawerContext} from "../../context/DrawerContext";
 
 
 const options = [
@@ -43,8 +43,8 @@ const typeOptions = [
 type Props = any;
 
 const AddProduct: React.FC<Props> = () => {
-  const dispatch = useDrawerDispatch();
-  const data = useDrawerState('data');
+  const {drawerDispatch: dispatch, drawerState} = useContext(DrawerContext);
+  const data = drawerState['data'];
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);

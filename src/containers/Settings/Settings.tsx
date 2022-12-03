@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react';
+import React, {useCallback, useContext} from 'react';
 import SettingsCard from '../../components/SettingsCard/SettingsCard';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import { STUFF_MEMBERS, SITE_SETTINGS } from '../../settings/constants';
 import { styled } from 'baseui';
 import {
@@ -13,6 +12,7 @@ import {
 } from '../../components/AllSvgIcon';
 import { Grid, Row, Col as Column } from '../../components/FlexBox/FlexBox';
 import { useHistory } from 'react-router-dom';
+import {DrawerContext} from "../../context/DrawerContext";
 
 const Col = styled(Column, () => ({
   '@media only screen and (max-width: 767px)': {
@@ -27,7 +27,7 @@ const Col = styled(Column, () => ({
 export default function Settings() {
   let history = useHistory();
 
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
 
   const openStaffForm = useCallback(
     () =>

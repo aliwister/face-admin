@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {
   ProductCardWrapper,
   ProductImageWrapper,
@@ -14,7 +14,7 @@ import {
   ProductPrice,
   DiscountedPrice,
 } from './ProductCard.style';
-import { useDrawerDispatch } from '../../context/DrawerContext';
+import {DrawerContext} from "../../context/DrawerContext";
 
 type ProductCardProps = {
   title: string;
@@ -41,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   orderId,
   ...props
 }) => {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
 
   const openDrawer = React.useCallback(
     () =>

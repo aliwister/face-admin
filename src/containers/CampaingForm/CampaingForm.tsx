@@ -1,9 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback, useContext} from 'react';
 import { useForm } from 'react-hook-form';
 import uuidv4 from 'uuid/v4';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import { Scrollbars } from 'react-custom-scrollbars';
 import Input from '../../components/Input/Input';
 import Select from '../../components/Select/Select';
@@ -18,6 +17,7 @@ import {
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
 import { FormFields, FormLabel } from '../../components/FormFields/FormFields';
+import {DrawerContext} from "../../context/DrawerContext";
 
 const GET_COUPONS = gql`
   query getCoupons($status: String, $searchBy: String) {
@@ -57,7 +57,7 @@ const options = [
 type Props = any;
 
 const AddCampaing: React.FC<Props> = props => {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);

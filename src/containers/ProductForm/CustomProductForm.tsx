@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback, useContext} from 'react';
 import { useForm } from 'react-hook-form';
 
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
 import { Scrollbars } from 'react-custom-scrollbars';
-import {useDrawerDispatch, useDrawerState} from '../../context/DrawerContext';
+import {DrawerContext} from '../../context/DrawerContext';
 import Uploader from '../../components/Uploader/Uploader';
 import Button, { KIND } from '../../components/Button/Button';
 import DrawerBox from '../../components/DrawerBox/DrawerBox';
@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
 type Props = any;
 
 const AddProduct: React.FC<Props> = props => {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch, drawerState} = useContext(DrawerContext);
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);
@@ -71,7 +71,7 @@ const AddProduct: React.FC<Props> = props => {
     [dispatch]
   );
 
-  const updateData = useDrawerState('data');
+  const updateData = drawerState['data'];
   //console.log(updateData);
   const { watch, register, handleSubmit, setValue } = useForm({
     defaultValues: {

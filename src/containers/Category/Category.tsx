@@ -1,11 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import { withStyle } from 'baseui';
 import {
   Grid,
   Row as Rows,
   Col as Column,
 } from '../../components/FlexBox/FlexBox';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import Select from '../../components/Select/Select';
 import Input from '../../components/Input/Input';
 import Button from '../../components/Button/Button';
@@ -55,6 +54,7 @@ import {
   WomenDress,
 } from '../../components/AllSvgIcon';
 import NoResult from '../../components/NoResult/NoResult';
+import {DrawerContext} from "../../context/DrawerContext";
 let icons = {
   Accessories: Accessories,
   BathOil: BathOil,
@@ -125,7 +125,7 @@ const categorySelectOptions = [
 export default function Category() {
   const [category, setCategory] = useState([]);
   const [search, setSearch] = useState('');
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const openDrawer = useCallback(

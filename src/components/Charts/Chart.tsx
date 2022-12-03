@@ -1,8 +1,7 @@
 import React from 'react';
-import Chart from 'react-apexcharts';
 
 const Charts = ({ ...props }) => {
-  return <Chart {...props} />;
+  return <></>;
 };
 
 export default Charts;

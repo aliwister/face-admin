@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button/Button';
 import Popover, { PLACEMENT } from '../../../components/Popover/Popover';
@@ -28,11 +28,11 @@ import {
 } from './Topbar.style';
 import Logoimage from '../../../image/logo.svg';
 import UserImage from '../../../image/avatar-sm.png';
-import { useDrawerDispatch } from '../../../context/DrawerContext';
 import { MenuIcon } from '../../../components/AllSvgIcon';
 import Drawer, { ANCHOR } from '../../../components/Drawer/Drawer';
 import Sidebar from '../Sidebar/Sidebar';
 import {LoadOrderForm} from "../../Orders/components/LoadOrderForm";
+import {DrawerContext} from "../../../context/DrawerContext";
 
 const data = [
   {
@@ -42,7 +42,7 @@ const data = [
   },
 ];
 const Topbar = ({ refs }: any) => {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
   const { signout, isMerchant, isAdmin } = React.useContext(AuthContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const openDrawer = useCallback(

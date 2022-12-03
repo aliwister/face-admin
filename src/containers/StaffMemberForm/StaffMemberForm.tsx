@@ -1,10 +1,9 @@
-import React, { useCallback } from 'react';
+import React, {useCallback, useContext} from 'react';
 import { useForm } from 'react-hook-form';
 import uuidv4 from 'uuid/v4';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { useDrawerDispatch } from '../../context/DrawerContext';
 import Input from '../../components/Input/Input';
 import Checkbox from '../../components/CheckBox/CheckBox';
 import PhoneInput from '../../components/PhoneInput/PhoneInput';
@@ -20,6 +19,7 @@ import {
   ButtonGroup,
 } from '../DrawerItems/DrawerItems.style';
 import { FormFields, FormLabel } from '../../components/FormFields/FormFields';
+import {DrawerContext} from "../../context/DrawerContext";
 
 const GET_STUFFS = gql`
   query getStuffs($role: String, $searchBy: String) {
@@ -52,7 +52,7 @@ const CREATE_STUFF = gql`
 type Props = any;
 
 const StuffMemberForm: React.FC<Props> = props => {
-  const dispatch = useDrawerDispatch();
+  const {drawerDispatch: dispatch} = useContext(DrawerContext);
   const closeDrawer = useCallback(() => dispatch({ type: 'CLOSE_DRAWER' }), [
     dispatch,
   ]);
