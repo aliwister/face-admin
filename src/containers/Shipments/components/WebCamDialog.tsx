@@ -3,6 +3,8 @@ import React, {useState} from "react";
 import {Dialog, DialogContent, DialogTitle} from "@material-ui/core";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
+import {Buffer} from 'buffer';
+
 import {handleUpload} from "../../Image/Uploader";
 import {useGetUploadUrlMutation} from "../../../codegen/generated/_graphql";
 const videoConstraints = {
