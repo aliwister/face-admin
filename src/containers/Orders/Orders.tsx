@@ -104,6 +104,12 @@ function reducer(state, action) {
         ...state,
         balance: action.payload
       }
+    case 'SET_BALANCE':
+      return {
+        ...state,
+        balance: true,
+        minBal: action.payload
+      }
     default:
       return state;
   }
@@ -124,7 +130,7 @@ export default function Orders() {
     tab: 'PROCESSING',
     search: "",
     isAsc: false,
-    minBal: 0
+    minBal: "0"
   };
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
@@ -144,14 +150,14 @@ export default function Orders() {
       searchText: "",
       balance: state.balance,
       isAsc: false,
-      minBal: 0
+      minBal: "0"
     },
     fetchPolicy: "cache-and-network",
     context: { clientName: "shopLink" }
   });
 
   async function doRefetch() {
-    //await refetch({ state: arrayToObject(state.status, 'value'), limit:10, searchText: state.search, balance: state.balance, isAsc: state.isAsc, minBal: state.minBal });
+    await refetch({ state: arrayToObject(state.status, 'value'), limit:10, searchText: state.search, balance: state.balance, isAsc: state.isAsc, minBal: state.minBal });
 
   }
 
@@ -258,7 +264,7 @@ export default function Orders() {
                 },
               },
             }}
-          >Balance Only</Checkbox>{state.balance && <TextField name="minBal" type="number" label="Min Balance" onChange={(event) => dispatch({action: 'SET_BALANCE', payload: event.target.value})}></TextField>} </span>
+          >Balance Only</Checkbox>{state.balance && <TextField name="minBal" type="number" label="Min Balance" onChange={(event) => dispatch({type: 'SET_BALANCE', payload: event.target.value})}></TextField>} </span>
 
       </Grid>
       <Grid  item  md={4} >
