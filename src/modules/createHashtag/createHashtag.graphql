@@ -1,5 +1,0 @@
-mutation createHashtag( $hashtag: HashtagInput) {
-  createHashtag(hashtag: $hashtag) {
-    value
-  }
-}

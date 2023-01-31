@@ -151,6 +151,7 @@ const Row = withStyle(Rows, () => ({
 
 
 export default function OrderDetails(props) {
+  // @ts-ignore
   let { slug } = useParams();
   console.log(slug);
   const [sendOrderLevelEmailMutation] = useMutation(SEND_ORDER_EMAIL,{context: { clientName: "shopLink" }});

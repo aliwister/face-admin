@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useReducer, useState} from 'react';
 
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
@@ -26,46 +26,10 @@ import  Select from "react-select";
 import {ORDER_STATES} from "./components/Constants";
 import {useForm} from "react-hook-form";
 import TimeAgo from 'react-timeago';
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import {useOrdersAQuery} from "../../codegen/generated/_graphql-shop";
 
-const GET_ORDERS = gql`
-  query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String, $balance: Boolean) {
-    ordersA(state: $state, offset: $offset, limit: $limit, searchText: $searchText, balance: $balance) {
-      total,
-      hasMore,
-      items {
-      id
-      reference
-      createdDate
-      invoiceDate
-      total
-      invoiceDate
-      paymentMethod
-      subtotal
-      orderState
-      deliveryTotal
-      discountsTotal
-      deliveryDate
-      cartId
-      balance
-      deliveryAddress {
-          firstName
-          lastName
-          line1
-          line1
-          city
-      }
-      items {
-        productName
-        price
-        quantity
-        image
-        lineTotal
-        po
-      }
-    }
-    }
-  }
-`;
 const useStyles = makeStyles(theme => ({
   table: {
     minWidth: 650,
@@ -75,7 +39,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 const statusSelectOptions = [
   { value: 'delivered', label: 'Delivered' },
@@ -89,15 +58,75 @@ const limitSelectOptions = [
   { value: 30, label: 'Last 30 orders' },
 ];
 
+function reducer(state, action) {
+  console.log(action, state);
+  switch (action.type) {
+    case 'PROCESSING':
+      return {
+        ...state,
+        tab: 'PROCESSING',
+        search: "",
+        isAsc: false,
+      }
+    case 'UNPAID_COMPLETE':
+      return {
+        ...state,
+        //status: [ORDER_STATES[7]],
+        status: [ORDER_STATES[4]],
+        tab: 'UNPAID_COMPLETE',
+        search: "",
+        balance: true,
+        isAsc: true,
+      }
+    case 'ALL_UNPAID':
+      return {
+        ...state,
+        status: [ORDER_STATES[4]],
+        tab: 'ALL_UNPAID',
+        search: "",
+        balance: true,
+        isAsc: false,
+      }
+    case 'SEARCH_STATUS':
+      return {
+        ...state,
+        tab: 'SEARCH',
+        status: action.payload
+      }
+    case 'SEARCH_KEYWORD':
+      return {
+        ...state,
+        tab: 'SEARCH',
+        search: action.payload
+      }
+    case 'TOGGLE_BALANCE':
+      return {
+        ...state,
+        balance: action.payload
+      }
+    default:
+      return state;
+  }
+}
+
 export default function Orders() {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [status, setStatus] = useState([ORDER_STATES[4]]);
-  const [balance, setBalance] = useState(false);
   const [limit, setLimit] = useState([]);
-  const [search, setSearch] = useState([]);
+  const [search, setSearch] = useState("");
   const alert = useAlert();
   const classes = useStyles();
+
+  const INITIAL_STATE = {
+    balance: false,
+    status: [ORDER_STATES[4]],
+    tab: 'PROCESSING',
+    search: "",
+    isAsc: false,
+    minBal: 0
+  };
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   const { register, handleSubmit, errors, control } = useForm({
     defaultValues: {}
@@ -106,48 +135,45 @@ export default function Orders() {
   const arrayToObject = (array,prop) =>
     array.map(t => t[prop]);
 
-  const { data, error, refetch, fetchMore } = useQuery(GET_ORDERS, {
+
+
+  const { data, error, refetch, fetchMore } = useOrdersAQuery({
     variables: {
       state: arrayToObject(status, 'value'),
       limit: 15,
       searchText: "",
-      balance: balance
+      balance: state.balance,
+      isAsc: false,
+      minBal: 0
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
     context: { clientName: "shopLink" }
   });
+
+  async function doRefetch() {
+    //await refetch({ state: arrayToObject(state.status, 'value'), limit:10, searchText: state.search, balance: state.balance, isAsc: state.isAsc, minBal: state.minBal });
+
+  }
+
+  useEffect(() => {
+    doRefetch()
+  }, [state]);
+
   if (error) {
     return <div>Error! {error.message}</div>;
   }
 
   function handleStatus(value) {
-    console.log(value);
-    setStatus(value);
-
     if (value && value.length) {
-      refetch({
-        state: arrayToObject(value, 'value'),
-        limit: 15, //limit.length ? limit[0].value : null,
-        searchText: "",
-        balance: balance
-      });
-    } else {
-      refetch({ state: [], limit:10, searchText:"", balance:balance });
+      dispatch({type: 'SEARCH_STATUS', payload: value})
     }
   }
   function handleSearch(data) {
     const searchText = data.search;
-    if (searchText && searchText.length) {
-      refetch({
-        state: arrayToObject(status, 'value'),
-        limit: 15, //limit.length ? limit[0].value : null,
-        searchText: searchText,
-        balance: balance,
-      });
-    } else {
-      refetch({ state: [], limit:10, searchText:searchText, balance:balance });
-    }
+    if (searchText && searchText.length)
+      dispatch({type: 'SEARCH_KEYWORD', payload: searchText})
   }
+
   function loadMore() {
     fetchMore({
       variables: {
@@ -170,22 +196,9 @@ export default function Orders() {
     });
   }
 
-/*  function handleLimit({ value }) {
-    setLimit(value);
-    if (value.length) {
-      refetch({
-        status: status.length ? [status[0].value] : [],
-        limit: value[0].value,
-        searchText: ""
-      });
-    } else {
-      refetch({ status: [], limit:10, searchText:"" });
-    }
-  }*/
-
   function onAllCheck(event) {
     if (event.target.checked) {
-      const idx = data && data.orders.map(order => order.id);
+      const idx = data && data.ordersA.items.map(order => order.id);
       setCheckedId(idx);
     } else {
       setCheckedId([]);
@@ -200,20 +213,43 @@ export default function Orders() {
       setCheckedId(prevState => prevState.filter(id => id !== name));
     }
   }
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    dispatch({type: newValue})
+
+  };
+  const handleBalanceCheckbox = (event: React.SyntheticEvent, newValue: string) => {
+    console.log("handleBalanceCheckbox", state.balance, !state.balance);
+    dispatch({type: 'TOGGLE_BALANCE', payload: !state.balance})
+  };
+
   return (
     <Grid container spacing={1}>
+      <Grid item  md={12} >
+        <Tabs value={state.tab} onChange={handleChange} aria-label="basic tabs example">
+          <Tab label="Processing" {...a11yProps(0)} value="PROCESSING" />
+          <Tab label="Unpaid Complete" {...a11yProps(1)} value="UNPAID_COMPLETE" />
+          <Tab label="All Unpaid" {...a11yProps(2)} value="ALL_UNPAID" />
+          <Tab label="Search" {...a11yProps(3)} value="SEARCH" />
+        </Tabs>
+      </Grid>
       <Grid item  md={5} >
+
         <Select
-          value={status}
+          value={state.status}
           onChange={handleStatus}
           options={ORDER_STATES}
           isMulti={true}
         />
+
         <form onSubmit={handleSubmit(handleSearch)}>
           <TextField name="search" inputRef={register({required: true, minLength: 2, maxLength: 12})} style={{width:'320px'}}></TextField>
-          <Checkbox
-            checked={balance}
-            onChange={() => setBalance(!balance)}
+          <Button size="medium" variant="contained" color="primary" type="submit" >Go</Button>
+        </form>
+          <span><Checkbox
+            checked={state.balance}
+            onChange={handleBalanceCheckbox}
+            inputProps={{ 'aria-label': 'controlled' }}
             overrides={{
               Checkmark: {
                 style: {
@@ -222,9 +258,8 @@ export default function Orders() {
                 },
               },
             }}
-          >Balance Only</Checkbox>
-          <Button size="medium" variant="contained" color="primary" type="submit" >Go</Button>
-        </form>
+          >Balance Only</Checkbox>{state.balance && <TextField name="minBal" type="number" label="Min Balance" onChange={(event) => dispatch({action: 'SET_BALANCE', payload: event.target.value})}></TextField>} </span>
+
       </Grid>
       <Grid  item  md={4} >
       </Grid>
@@ -246,11 +281,9 @@ export default function Orders() {
                 <TableCell align="center">Status</TableCell>
               </TableRow>
             </TableHead>
-            {data && data.ordersA.items.length && (
               <TableBody>
-
-                {data.ordersA.items.map(row => (
-                  <TableRow key={row.orderId}>
+                {data?.ordersA?.items?.map(row => (
+                  <TableRow key={row.id}>
                     <TableCell align="right"><Checkbox
                       name={row.id}
                       checked={checkedId.includes(row.id)}
@@ -269,7 +302,7 @@ export default function Orders() {
                     </TableCell>
                     <TableCell align="left">{row.reference}</TableCell>
 
-                    <TableCell align="left">{row.deliveryAddress.firstName} {row.deliveryAddress.lastName}</TableCell>
+                    <TableCell align="left">{row?.deliveryAddress?.firstName} {row?.deliveryAddress?.lastName}</TableCell>
                     <TableCell align="right">{row.total} <sup>OMR</sup> </TableCell>
                     <TableCell align="right">{row.balance}</TableCell>
 
@@ -281,10 +314,9 @@ export default function Orders() {
                   </TableRow>
                 ))}
               </TableBody>
-            )}
           </Table>
         </TableContainer>
-        {data && data.ordersA && data.ordersA.hasMore && (
+        {data?.ordersA?.hasMore && (
           <Button onClick={loadMore}>Load More</Button>
         )}
       </Grid>

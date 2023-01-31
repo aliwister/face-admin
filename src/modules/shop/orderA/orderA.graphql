@@ -1,3 +1,41 @@
+  query ordersA($state: [OrderState], $offset: Int = 0, $limit: Int = 25, $searchText: String, $balance: Boolean, $isAsc: Boolean, $minBal: BigDecimal) {
+    ordersA(state: $state, offset: $offset, limit: $limit, searchText: $searchText, balance: $balance, isAsc: $isAsc, minBal: $minBal) {
+      total,
+      hasMore,
+      items {
+      id
+      reference
+      createdDate
+      invoiceDate
+      total
+      invoiceDate
+      paymentMethod
+      subtotal
+      orderState
+      deliveryTotal
+      discountsTotal
+      deliveryDate
+      cartId
+      balance
+      deliveryAddress {
+          firstName
+          lastName
+          line1
+          line1
+          city
+      }
+      items {
+        productName
+        price
+        quantity
+        image
+        lineTotal
+        po
+      }
+    }
+    }
+  }
+
   query orderA($id: ID) {
     orderA(id: $id) {
       id

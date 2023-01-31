@@ -1,7 +1,0 @@
-mutation getAdminImageUploadUrl($filename: String, $merchant: String) {
-  getAdminImageUploadUrl(filename: $filename, merchant: $merchant) {
-    uploadUrl
-    imageUrl
-    status
-  }
-}

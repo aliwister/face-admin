@@ -1,5 +1,0 @@
-mutation createStub( $product: AddProductInput, $isSaveES: Boolean, $currentMerchantId: Long) {
-  createStub(product: $product, isSaveES: $isSaveES, currentMerchantId: $currentMerchantId,) {
-    ref
-  }
-}
