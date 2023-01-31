@@ -130,7 +130,7 @@ export default function Orders() {
     tab: 'PROCESSING',
     search: "",
     isAsc: false,
-    minBal: "0"
+    minBal: "0.001"
   };
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
