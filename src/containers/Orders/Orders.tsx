@@ -67,6 +67,7 @@ function reducer(state, action) {
         tab: 'PROCESSING',
         search: "",
         isAsc: false,
+        balance: false
       }
     case 'UNPAID_COMPLETE':
       return {
@@ -90,7 +91,6 @@ function reducer(state, action) {
     case 'SEARCH_STATUS':
       return {
         ...state,
-        tab: 'SEARCH',
         status: action.payload
       }
     case 'SEARCH_KEYWORD':
