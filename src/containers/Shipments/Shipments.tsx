@@ -188,11 +188,6 @@ export default function Shipments() {
           viewName: "CANCELLED_TRANSIT"
         });
       }
-      else if (newValue ==4) {
-        refetch({
-          viewName: "ALL_TRANSIT"
-        });
-      }
       else if (newValue == 5) {
         refetch({
           viewName: "CUSTOMER_SCHEDULED"

@@ -24,7 +24,7 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
 
   const { register, control, handleSubmit, watch } = useForm({
     defaultValues: {
-      items: purchase.purchaseItems.map(({id, orderItems, price, quantity, description, sequence, productId}) => ({
+      items: purchase.purchaseItems.map(({id, orderItems, price, quantity, description, sequence, productId, sku}) => ({
         id: id,
         pid: id,
         ref: (orderItems.length > 0)?orderItems[0].id:"",
@@ -33,7 +33,8 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
         quantity,
         description,
         sequence,
-        productId
+        productId,
+        sku
       })),
       deliveryTotal: purchase.deliveryTotal,
       taxesTotal: purchase.taxesTotal,
@@ -53,7 +54,7 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
     console.log("data", data);
     return savePurchase(data);
   }
-  const addToPurchase = ({id,cost,quantity, productName,productId, orderId}) => {
+  const addToPurchase = ({id,cost,quantity, productName,productId, orderId, sku}) => {
     append(
       {
         pid: "",
@@ -63,7 +64,7 @@ export default function PurchaseForm({purchase, savePurchase, setMerchant}) {
         description: productName,
         orderId: orderId,
         ref: id,
-
+        sku: sku
       });
   }
 

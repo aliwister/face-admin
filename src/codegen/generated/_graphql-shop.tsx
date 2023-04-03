@@ -414,6 +414,7 @@ export type Mutation = {
   cancelPurchase: Maybe<Purchase>;
   closePurchase: Maybe<Purchase>;
   setPurchaseState: Maybe<Purchase>;
+  sendPurchaseToAmazon: Maybe<Message>;
   createOrder: Maybe<Order>;
   sendPaymentSms: Maybe<Message>;
   discountOrder: Maybe<Order>;
@@ -614,6 +615,11 @@ export type MutationClosePurchaseArgs = {
 export type MutationSetPurchaseStateArgs = {
   id: Maybe<Scalars['ID']>;
   state: Maybe<OrderState>;
+};
+
+
+export type MutationSendPurchaseToAmazonArgs = {
+  id: Maybe<Scalars['ID']>;
 };
 
 
@@ -1036,7 +1042,7 @@ export type Product = {
   brand: Maybe<Scalars['String']>;
   group: Maybe<ProductGroup>;
   condition: Maybe<Condition>;
-  isUsed: Maybe<Scalars['Boolean']>;
+  /** isUsed: Boolean */
   availableForOrder: Maybe<Scalars['Boolean']>;
   weight: Maybe<Scalars['Float']>;
   volumeWeight: Maybe<Scalars['Float']>;
@@ -1210,6 +1216,7 @@ export type PurchaseItem = {
   description: Maybe<Scalars['String']>;
   orderItems: Maybe<Array<Maybe<OrderItem>>>;
   productId: Maybe<Scalars['Long']>;
+  sku: Maybe<Scalars['String']>;
 };
 
 export type PurchaseItemInput = {
@@ -1220,6 +1227,7 @@ export type PurchaseItemInput = {
   description: Maybe<Scalars['String']>;
   orderItems: Maybe<Array<Maybe<OrderItemInput>>>;
   productId: Maybe<Scalars['Long']>;
+  sku: Maybe<Scalars['String']>;
 };
 
 export type PurchaseQueue = {
@@ -1731,12 +1739,25 @@ export type PurchaseQuery = (
       & Pick<Merchant, 'id' | 'name'>
     )>, purchaseItems: Maybe<Array<Maybe<(
       { __typename?: 'PurchaseItem' }
-      & Pick<PurchaseItem, 'id' | 'productId' | 'sequence' | 'price' | 'quantity' | 'description'>
+      & Pick<PurchaseItem, 'id' | 'productId' | 'sequence' | 'price' | 'quantity' | 'description' | 'sku'>
       & { orderItems: Maybe<Array<Maybe<(
         { __typename?: 'OrderItem' }
         & Pick<OrderItem, 'id' | 'orderId'>
       )>>> }
     )>>> }
+  )> }
+);
+
+export type SendPurchaseToAmazonMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+};
+
+
+export type SendPurchaseToAmazonMutation = (
+  { __typename?: 'Mutation' }
+  & { sendPurchaseToAmazon: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
   )> }
 );
 
@@ -2492,6 +2513,7 @@ export const PurchaseDocument = gql`
       price
       quantity
       description
+      sku
       orderItems {
         id
         orderId
@@ -2545,6 +2567,57 @@ export function usePurchaseLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHoo
 export type PurchaseQueryHookResult = ReturnType<typeof usePurchaseQuery>;
 export type PurchaseLazyQueryHookResult = ReturnType<typeof usePurchaseLazyQuery>;
 export type PurchaseQueryResult = ApolloReactCommon.QueryResult<PurchaseQuery, PurchaseQueryVariables>;
+export const SendPurchaseToAmazonDocument = gql`
+    mutation sendPurchaseToAmazon($id: ID) {
+  sendPurchaseToAmazon(id: $id) {
+    value
+  }
+}
+    `;
+export type SendPurchaseToAmazonMutationFn = ApolloReactCommon.MutationFunction<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>;
+export type SendPurchaseToAmazonComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>, 'mutation'>;
+
+    export const SendPurchaseToAmazonComponent = (props: SendPurchaseToAmazonComponentProps) => (
+      <ApolloReactComponents.Mutation<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables> mutation={SendPurchaseToAmazonDocument} {...props} />
+    );
+    
+export type SendPurchaseToAmazonProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>
+    } & TChildProps;
+export function withSendPurchaseToAmazon<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  SendPurchaseToAmazonMutation,
+  SendPurchaseToAmazonMutationVariables,
+  SendPurchaseToAmazonProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables, SendPurchaseToAmazonProps<TChildProps, TDataName>>(SendPurchaseToAmazonDocument, {
+      alias: 'sendPurchaseToAmazon',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useSendPurchaseToAmazonMutation__
+ *
+ * To run a mutation, you first call `useSendPurchaseToAmazonMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendPurchaseToAmazonMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendPurchaseToAmazonMutation, { data, loading, error }] = useSendPurchaseToAmazonMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useSendPurchaseToAmazonMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>) {
+        return ApolloReactHooks.useMutation<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>(SendPurchaseToAmazonDocument, baseOptions);
+      }
+export type SendPurchaseToAmazonMutationHookResult = ReturnType<typeof useSendPurchaseToAmazonMutation>;
+export type SendPurchaseToAmazonMutationResult = ApolloReactCommon.MutationResult<SendPurchaseToAmazonMutation>;
+export type SendPurchaseToAmazonMutationOptions = ApolloReactCommon.BaseMutationOptions<SendPurchaseToAmazonMutation, SendPurchaseToAmazonMutationVariables>;
 export const PurchaseQueueDocument = gql`
     query purchaseQueue {
   purchaseQueue {

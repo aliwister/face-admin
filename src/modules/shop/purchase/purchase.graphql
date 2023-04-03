@@ -20,10 +20,17 @@ query purchase($id: ID) {
       price
       quantity
       description
+      sku
       orderItems {
         id
         orderId
       }
     }
+  }
+}
+
+mutation sendPurchaseToAmazon($id: ID) {
+  sendPurchaseToAmazon(id: $id)  {
+    value
   }
 }

@@ -6,7 +6,7 @@ import { useAlert } from "react-alert";
 
 import {useParams} from "react-router-dom";
 import PurchaseForm from "./components/PurchaseForm";
-import {usePurchaseQuery} from "../../codegen/generated/_graphql";
+import {usePurchaseQuery, useSendPurchaseToAmazonMutation} from "../../codegen/generated/_graphql-shop";
 import {useMutation} from "@apollo/react-hooks";
 import {gql} from "apollo-boost";
 import Button from "@material-ui/core/Button";
@@ -47,8 +47,10 @@ function reducer(state, action) {
   }
 }
 export default function PurchaseDetails(props) {
+  // @ts-ignore
   let { slug } = useParams();
   const [updatePurchaseMutation] = useMutation(UPDATE_PURCHASE,{ context: { clientName: "shopLink" }});
+  const [sendPurchaseToAmazonMutation] = useSendPurchaseToAmazonMutation({ context: { clientName: "shopLink" }});
   const [merchant, setMerchant] = useState({});
   const [create, setCreate] = useState(true);
   const [update, setUpdate] = useState(false);
@@ -75,13 +77,14 @@ export default function PurchaseDetails(props) {
       currency: form.currency.value
     }
 
-    const purchaseItems = form.items.map(({pid, productId, description, price, quantity, ref}) => ({
+    const purchaseItems = form.items.map(({pid, productId, description, price, quantity, ref, sku}) => ({
       id: pid===""?null:pid,
       orderItems: [{id: ref}],
       price,
       quantity,
       description,
-      productId
+      productId,
+      sku
     }));
     //console.log(dto);
     //console.log(purchaseItems);
@@ -100,6 +103,20 @@ export default function PurchaseDetails(props) {
     }
   }
 
+  const sendPurchaseToAmazon = async () => {
+    console.log(slug);
+
+    const {
+      data: { sendPurchaseToAmazon },
+    }: any = await sendPurchaseToAmazonMutation({
+      variables: { id: slug },
+    });
+    if(sendPurchaseToAmazon)  {
+      alert.success("sendPurchaseToAmazon.value");
+      setCreate(true);
+    }
+  }
+
 
 
   if (loading)
@@ -110,6 +127,8 @@ export default function PurchaseDetails(props) {
     <>
       <h1>Purchase <Button variant="contained" color="secondary" onClick={()=>{refetch({id: slug})}}>
         Refresh
+      </Button> <Button variant="contained" color="secondary" onClick={sendPurchaseToAmazon} disabled>
+        Send Purchase to Amazon
       </Button> </h1>
       <Heading>PO {data.purchase.id}</Heading>
       <PurchaseForm purchase={data.purchase} savePurchase={savePurchase} setMerchant={setMerchant}/>

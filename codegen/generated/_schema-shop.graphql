@@ -390,6 +390,7 @@ type Mutation {
   cancelPurchase(id: ID, reason: String): Purchase
   closePurchase(id: ID, reason: String): Purchase
   setPurchaseState(id: ID, state: OrderState): Purchase
+  sendPurchaseToAmazon(id: ID): Message
   createOrder(id: Int): Order
   sendPaymentSms(id: ID, mobile: String): Message
   discountOrder(id: ID): Order
@@ -743,7 +744,8 @@ type Product {
   brand: String
   group: ProductGroup
   condition: Condition
-  isUsed: Boolean
+
+  """isUsed: Boolean"""
   availableForOrder: Boolean
   weight: Float
   volumeWeight: Float
@@ -917,6 +919,7 @@ type PurchaseItem {
   description: String
   orderItems: [OrderItem]
   productId: Long
+  sku: String
 }
 
 input PurchaseItemInput {
@@ -927,6 +930,7 @@ input PurchaseItemInput {
   description: String
   orderItems: [OrderItemInput]
   productId: Long
+  sku: String
 }
 
 type PurchaseQueue {
