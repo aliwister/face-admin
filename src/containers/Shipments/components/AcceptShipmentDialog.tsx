@@ -96,7 +96,7 @@ export const AcceptShipmentDialog = ({show, onClose}) => {
        {/* <Uploader onChange={handleUploader} handleUpload={handleUpload } />*/}
         <div><TextField variant="outlined" fullWidth type="text" placeholder="Invoice #" name="invoiceNum"
                         inputRef={register({required: true})} /></div>
-        <div><TextField variant="outlined" fullWidth type="text" placeholder="Amount" name="amount"
+        <div><TextField variant="outlined" fullWidth type="text" placeholder="Amount Paid On Delivery" name="amount"
                         inputRef={register({required: true})} /></div>
         <div>          <Controller
           as={<Select options={USERS}/>}

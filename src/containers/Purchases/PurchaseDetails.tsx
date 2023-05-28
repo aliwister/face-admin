@@ -127,7 +127,7 @@ export default function PurchaseDetails(props) {
     <>
       <h1>Purchase <Button variant="contained" color="secondary" onClick={()=>{refetch({id: slug})}}>
         Refresh
-      </Button> <Button variant="contained" color="secondary" onClick={sendPurchaseToAmazon} disabled>
+      </Button> <Button variant="contained" color="secondary" onClick={sendPurchaseToAmazon}>
         Send Purchase to Amazon
       </Button> </h1>
       <Heading>PO {data.purchase.id}</Heading>
