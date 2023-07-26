@@ -19,7 +19,7 @@ import {
 } from './Orders.style';
 import NoResult from '../../components/NoResult/NoResult';
 import StickerCard from "../../components/Widgets/StickerCard/StickerCard";
-import {CartIconBig, CoinIcon} from "../../components/AllSvgIcon";
+import {CartIconBig, CoinIcon, PencilIcon} from "../../components/AllSvgIcon";
 import Image from '../../components/Image/Image';
 import Button from "../../components/Button/Button";
 import Payment from "./Payment";
@@ -51,6 +51,9 @@ import {MerchantURL} from "../../components/MerchantURL/MerchantURL";
 import AuditHistory from "./AuditHistory";
 import {WorkItems} from "../Dashboard/WorkItems";
 import AdvancedTracking from "./AdvancedTracking";
+import IconButton from "@material-ui/core/IconButton";
+import { UpdateCarrierDialog } from './components/UpdateCarrierDialog';
+import {useUpdateCarrierMutation} from "../../codegen/generated/_graphql-shop";
 
 
 
@@ -162,6 +165,7 @@ export default function OrderDetails(props) {
   const [closeOrderMutation] = useMutation(CLOSE_ORDER, { context: { clientName: "shopLink" }});
   const [getAdminFileMutation] = useGetAdminFileMutation({ context: { clientName: "shopLink" }});
   const [addDiscountMutation] = useAddDiscountMutation({context : {clientName: "shopLink"}});
+  const [updateCarrierMutation] = useUpdateCarrierMutation({context : {clientName: "shopLink"}});
   const { data:orderData, loading, error, refetch } = useOrderAQuery({
     variables: {
       id: slug
@@ -179,6 +183,7 @@ export default function OrderDetails(props) {
   const [checkedId, setCheckedId] = useState([]);
   const [checked, setChecked] = useState(false);
   const [editdialog, setEditdialog] = useState(false);
+  const [updatecarrier, setUpdatecarrierdialog] = useState(false);
   const [returndialog, setReturndialog] = useState(false);
   const [canceldialog, setCanceldialog] = useState(false);
   const [closedialog, setClosedialog] = useState(false);
@@ -244,6 +249,18 @@ export default function OrderDetails(props) {
     });
     if(addDiscount)  {
       alert.success(addDiscount.id);
+      await refetch();
+    }
+  }
+  const onUpdateCarrier = async formData => {
+    const {
+      data: { updateCarrier },
+    }: any = await updateCarrierMutation({
+      variables: {id: orderData.orderA.id, carrier: formData.carrier, value: formData.value}
+    });
+    if(updateCarrier)  {
+      alert.success(updateCarrier.id);
+      setUpdatecarrierdialog(false);
       await refetch();
     }
   }
@@ -364,16 +381,19 @@ export default function OrderDetails(props) {
   }
 
   const onEditStart = () => setEditdialog(true);
+  const onUpdateCarrierStart = () => setUpdatecarrierdialog(true);
+
   const onReturnStart = () => setReturndialog(true);
   const onCancelStart = () => setCanceldialog(true);
   const onAddDiscountStart = () => setDiscountdialog(true);
-  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);setDiscountdialog(false); setReturndialog(false);}
+  const onCancelEdit = () => {setEditdialog(false); setCanceldialog(false); setClosedialog(false);setDiscountdialog(false); setReturndialog(false); setUpdatecarrierdialog(false);}
   const onCloseStart = () => {setClosedialog(true);}
 
   return (
     <Grid fluid={true}>
       <EditOrderDialog onSubmit={onEditOrder} onClose={onCancelEdit} open={editdialog} orderItems={orderData.orderA.items} />
       <ReturnDialog onSubmit={onReturnRequest} onClose={onCancelEdit} open={returndialog} orderItems={orderData.orderA.items} />
+      <UpdateCarrierDialog onSubmit={onUpdateCarrier} onClose={onCancelEdit} open={updatecarrier}  title={"Update Carrier"}/>
       <ActionReasonDialog onSubmit={onCancelOrder} onClose={onCancelEdit} open={canceldialog} title={"Cancel Order"}/>
       <ActionReasonDialog onSubmit={onCloseOrder} onClose={onCancelEdit} open={closedialog} title={"Close Order"} />
       <DiscountDialog onSubmit={onAddDiscount} onClose={onCancelEdit} open={discount} title={"Discount Order"} />
@@ -457,7 +477,9 @@ export default function OrderDetails(props) {
                   <TableCell component="th" scope="row">
                   </TableCell>
                   <TableCell align="left">Delivery</TableCell>
-                  <TableCell align="left">{orderData.orderA.carrier}</TableCell>
+                  <TableCell align="left">{orderData.orderA.carrier} <IconButton color="secondary" onClick={onUpdateCarrierStart} aria-label="add an alarm">
+                    <PencilIcon />
+                  </IconButton></TableCell>
                   <TableCell align="left">OMR {orderData.orderA.deliveryTotal}</TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>

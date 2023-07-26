@@ -1,0 +1,5 @@
+mutation updateCarrier( $id: ID, $carrier: String, $value: BigDecimal) {
+  updateCarrier(id: $id, carrier: $carrier, value: $value) {
+    value
+  }
+}

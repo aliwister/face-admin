@@ -421,6 +421,7 @@ export type Mutation = {
   /** setOrderState(id: ID, state: OrderState): Order */
   cancelOrder: Maybe<Order>;
   closeOrder: Maybe<Order>;
+  updateCarrier: Maybe<Message>;
   voidPayment: Maybe<Message>;
   addPayment: Maybe<Payment>;
   sendOrderLevelEmail: Maybe<Message>;
@@ -562,6 +563,7 @@ export type MutationUpdateTenantCartArgs = {
   secureKey: Maybe<Scalars['String']>;
   items: Maybe<Array<Maybe<CartItemInput>>>;
   isMerge: Maybe<Scalars['Boolean']>;
+  coupon: Maybe<Scalars['String']>;
 };
 
 
@@ -648,6 +650,13 @@ export type MutationCancelOrderArgs = {
 export type MutationCloseOrderArgs = {
   id: Maybe<Scalars['ID']>;
   reason: Maybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateCarrierArgs = {
+  id: Maybe<Scalars['ID']>;
+  carrier: Maybe<Scalars['String']>;
+  value: Maybe<Scalars['BigDecimal']>;
 };
 
 
@@ -1839,6 +1848,21 @@ export type TransactionsQuery = (
   )> }
 );
 
+export type UpdateCarrierMutationVariables = {
+  id: Maybe<Scalars['ID']>;
+  carrier: Maybe<Scalars['String']>;
+  value: Maybe<Scalars['BigDecimal']>;
+};
+
+
+export type UpdateCarrierMutation = (
+  { __typename?: 'Mutation' }
+  & { updateCarrier: Maybe<(
+    { __typename?: 'Message' }
+    & Pick<Message, 'value'>
+  )> }
+);
+
 
 export const AddDiscountDocument = gql`
     mutation addDiscount($id: ID, $amount: BigDecimal, $couponName: String) {
@@ -2917,3 +2941,56 @@ export function useTransactionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQuer
 export type TransactionsQueryHookResult = ReturnType<typeof useTransactionsQuery>;
 export type TransactionsLazyQueryHookResult = ReturnType<typeof useTransactionsLazyQuery>;
 export type TransactionsQueryResult = ApolloReactCommon.QueryResult<TransactionsQuery, TransactionsQueryVariables>;
+export const UpdateCarrierDocument = gql`
+    mutation updateCarrier($id: ID, $carrier: String, $value: BigDecimal) {
+  updateCarrier(id: $id, carrier: $carrier, value: $value) {
+    value
+  }
+}
+    `;
+export type UpdateCarrierMutationFn = ApolloReactCommon.MutationFunction<UpdateCarrierMutation, UpdateCarrierMutationVariables>;
+export type UpdateCarrierComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateCarrierMutation, UpdateCarrierMutationVariables>, 'mutation'>;
+
+    export const UpdateCarrierComponent = (props: UpdateCarrierComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateCarrierMutation, UpdateCarrierMutationVariables> mutation={UpdateCarrierDocument} {...props} />
+    );
+    
+export type UpdateCarrierProps<TChildProps = {}, TDataName extends string = 'mutate'> = {
+      [key in TDataName]: ApolloReactCommon.MutationFunction<UpdateCarrierMutation, UpdateCarrierMutationVariables>
+    } & TChildProps;
+export function withUpdateCarrier<TProps, TChildProps = {}, TDataName extends string = 'mutate'>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateCarrierMutation,
+  UpdateCarrierMutationVariables,
+  UpdateCarrierProps<TChildProps, TDataName>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateCarrierMutation, UpdateCarrierMutationVariables, UpdateCarrierProps<TChildProps, TDataName>>(UpdateCarrierDocument, {
+      alias: 'updateCarrier',
+      ...operationOptions
+    });
+};
+
+/**
+ * __useUpdateCarrierMutation__
+ *
+ * To run a mutation, you first call `useUpdateCarrierMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCarrierMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCarrierMutation, { data, loading, error }] = useUpdateCarrierMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      carrier: // value for 'carrier'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useUpdateCarrierMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateCarrierMutation, UpdateCarrierMutationVariables>) {
+        return ApolloReactHooks.useMutation<UpdateCarrierMutation, UpdateCarrierMutationVariables>(UpdateCarrierDocument, baseOptions);
+      }
+export type UpdateCarrierMutationHookResult = ReturnType<typeof useUpdateCarrierMutation>;
+export type UpdateCarrierMutationResult = ApolloReactCommon.MutationResult<UpdateCarrierMutation>;
+export type UpdateCarrierMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateCarrierMutation, UpdateCarrierMutationVariables>;

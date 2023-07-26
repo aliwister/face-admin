@@ -380,7 +380,7 @@ type Mutation {
   deleteProduct(id: Long): Message
   voidOrder(id: Long): Message
   createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
-  updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean): CartResponse
+  updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, coupon: String): CartResponse
   createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
   createStubFromSearch(dto: ProductInput, tag: String): Product
   removeTag(ref: String, tag: String): Product
@@ -398,6 +398,7 @@ type Mutation {
   """setOrderState(id: ID, state: OrderState): Order"""
   cancelOrder(id: ID, reason: String): Order
   closeOrder(id: ID, reason: String): Order
+  updateCarrier(id: ID, carrier: String, value: BigDecimal): Message
   voidPayment(id: ID): Message
   addPayment(id: ID, amount: BigDecimal, method: String, authCode: String, currency: String): Payment
   sendOrderLevelEmail(id: ID, template: String): Message
